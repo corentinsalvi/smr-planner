@@ -862,8 +862,58 @@ button, input, select {
 
 .agenda-global-toolbar {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
+  align-items: flex-end;
+  gap: 12px 16px;
   margin-bottom: 16px;
+}
+
+.agenda-global-pro-entete {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  background: var(--fond-releve);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+}
+
+.agenda-global-pro-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.agenda-global-pro-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.agenda-global-pro-nom {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--encre);
+  letter-spacing: -0.02em;
+}
+
+.agenda-global-pro-role {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.combobox-pro-global {
+  min-width: 240px;
+  width: 240px;
 }
 
 .agenda-filtre-metier {
@@ -1864,6 +1914,7 @@ button, input, select {
   .agenda-global-toolbar { justify-content: stretch; }
   .agenda-filtre-metier { width: 100%; }
   .select-filtre-metier { flex: 1; min-width: 0; }
+  .combobox-pro-global { min-width: 0; width: 100%; }
 
   .vue-actions--patient {
     align-items: stretch;

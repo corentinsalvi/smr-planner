@@ -157,7 +157,25 @@
             <option value="">Tous les métiers</option>
           </select>
         </label>
+        <label class="agenda-filtre-metier" id="filtre-pro-global-label" for="selecteur-pro-agenda-global" hidden>
+          <span class="agenda-filtre-metier-label">Professionnel</span>
+          <div class="combobox-patient combobox-pro-global" id="combobox-pro-agenda-global">
+            <input
+              type="text"
+              id="selecteur-pro-agenda-global"
+              class="combobox-patient-input"
+              placeholder="Rechercher un professionnel…"
+              autocomplete="off"
+              role="combobox"
+              aria-expanded="false"
+              aria-controls="liste-options-pro-agenda-global"
+            >
+            <ul id="liste-options-pro-agenda-global" class="combobox-patient-liste" role="listbox" hidden></ul>
+          </div>
+        </label>
       </div>
+
+      <div id="agenda-global-pro-entete" class="agenda-global-pro-entete" hidden></div>
 
       <div class="grille-agenda grille-agenda--globale" id="grille-globale"></div>
       <div id="agenda-global-vide" class="agenda-global-vide" hidden></div>

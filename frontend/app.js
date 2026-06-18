@@ -7,7 +7,8 @@
     jours: [],
     semaineLundi: null,
     creneauSelectionne: null,
-    patientAgendaId: null
+    patientAgendaId: null,
+    agendaGlobalEmployeId: null
   };
 
   const $ = id => document.getElementById(id);
@@ -141,7 +142,7 @@
       const date = parseDateLocale(d);
       const jour = date.toLocaleDateString('fr-FR', { weekday: 'long' });
       const num = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-      if (options.modeGlobal || options.modePatient) {
+      if (options.modeGlobal || options.modePatient || options.modePro) {
         return `<th><span class="agenda-jour-nom">${jour}</span><span class="agenda-jour-date">${num}</span></th>`;
       }
       return `<th>${formatDateCourte(d)}</th>`;
@@ -162,7 +163,7 @@
           c.date === date && c.heure_debut === heure && c.statut !== 'ANNULE'
         );
         if (!creneau) {
-          return (options.modeGlobal || options.modePatient)
+          return (options.modeGlobal || options.modePatient || options.modePro)
             ? '<td class="cellule-vide"><span class="cellule-vide-point"></span></td>'
             : '<td></td>';
         }
@@ -173,6 +174,9 @@
         if (options.modePatient) {
           titre = employe ? nomComplet(employe) : labelRole(creneau.role);
           sousTitre = `${creneau.heure_debut} – ${creneau.heure_fin}`;
+        } else if (options.modePro) {
+          titre = patient ? nomComplet(patient) : '—';
+          sousTitre = `${creneau.heure_debut} – ${creneau.heure_fin}`;
         } else if (options.modeGlobal) {
           titre = patient ? nomComplet(patient) : '—';
           sousTitre = employe ? nomComplet(employe) : labelRole(creneau.role);
@@ -182,10 +186,16 @@
         }
         const couleur = couleurRole(creneau.role);
         const classeVariante = options.modeGlobal ? ' creneau-carte--global'
-          : options.modePatient ? ' creneau-carte--patient' : '';
+          : options.modePatient ? ' creneau-carte--patient'
+          : options.modePro ? ' creneau-carte--pro-global' : '';
 
         let corpsCarte;
-        if (options.modeGlobal) {
+        if (options.modePro) {
+          corpsCarte = `
+            <span class="creneau-badge-role" style="background:${couleur}18;color:${couleur}">${labelRole(creneau.role)}</span>
+            <span class="creneau-titre">${titre}</span>
+            <span class="creneau-sous-titre creneau-horaire">${sousTitre}</span>`;
+        } else if (options.modeGlobal) {
           corpsCarte = `
             <span class="creneau-badge-role" style="background:${couleur}18;color:${couleur}">${labelRole(creneau.role)}</span>
             <span class="creneau-titre">${titre}</span>
@@ -221,7 +231,7 @@
     }).join('');
 
     cont.innerHTML = `
-      <table class="agenda-table${options.modeGlobal || options.modePatient ? ' agenda-table--global' : ''}">
+      <table class="agenda-table${options.modeGlobal || options.modePatient || options.modePro ? ' agenda-table--global' : ''}">
         <thead><tr><th class="col-heure">Heure</th>${entetes}</tr></thead>
         <tbody>${lignes}</tbody>
       </table>
@@ -263,7 +273,7 @@
     `;
   }
 
-  function renderAgendaGlobalVide(afficher) {
+  function renderAgendaGlobalVide(afficher, options = {}) {
     const vide = $('agenda-global-vide');
     const grille = $('grille-globale');
     if (!vide || !grille) return;
@@ -271,6 +281,26 @@
     if (afficher) {
       grille.hidden = true;
       vide.hidden = false;
+
+      if (options.attentePro) {
+        const roleLabel = options.role ? labelRole(options.role) : 'ce métier';
+        vide.innerHTML = `
+          <div class="agenda-global-vide-icone" aria-hidden="true">👤</div>
+          <h3 class="agenda-global-vide-titre">Aucun professionnel disponible</h3>
+          <p class="agenda-global-vide-texte">Aucun professionnel actif n'est enregistré pour ${roleLabel}.</p>
+        `;
+        return;
+      }
+
+      if (options.sansRdvPro) {
+        vide.innerHTML = `
+          <div class="agenda-global-vide-icone" aria-hidden="true">📅</div>
+          <h3 class="agenda-global-vide-titre">Aucun rendez-vous cette semaine</h3>
+          <p class="agenda-global-vide-texte">Ce professionnel n'a pas de séance planifiée sur la période affichée.</p>
+        `;
+        return;
+      }
+
       vide.innerHTML = `
         <div class="agenda-global-vide-icone" aria-hidden="true">📅</div>
         <h3 class="agenda-global-vide-titre">Aucun rendez-vous cette semaine</h3>
@@ -281,6 +311,172 @@
       grille.hidden = false;
       vide.hidden = true;
     }
+  }
+
+  function employesActifsPourRole(role) {
+    return state.employes
+      .filter(e => e.actif !== false && e.role === role)
+      .sort((a, b) => nomComplet(a).localeCompare(nomComplet(b), 'fr'));
+  }
+
+  function proCorrespondRecherche(employe, requete) {
+    const q = requete.trim().toLowerCase();
+    if (!q) return true;
+    return [employe.prenom, employe.nom, nomComplet(employe)]
+      .some(v => v.toLowerCase().includes(q));
+  }
+
+  function mettreAJourVisibiliteFiltrePro(role) {
+    const label = $('filtre-pro-global-label');
+    if (label) label.hidden = !role;
+  }
+
+  function selectionnerProAgendaGlobal(employeId) {
+    state.agendaGlobalEmployeId = employeId;
+    const employe = state.employes.find(e => e.id === employeId);
+    const input = $('selecteur-pro-agenda-global');
+    if (input) {
+      input.value = employe ? nomComplet(employe) : '';
+    }
+  }
+
+  function renderEnteteProAgendaGlobal(employe) {
+    const entete = $('agenda-global-pro-entete');
+    if (!entete) return;
+
+    if (!employe) {
+      entete.hidden = true;
+      entete.innerHTML = '';
+      return;
+    }
+
+    const couleur = couleurRole(employe.role);
+    entete.hidden = false;
+    entete.innerHTML = `
+      <div class="agenda-global-pro-avatar" style="background:${couleur}">${initiales(employe)}</div>
+      <div class="agenda-global-pro-info">
+        <strong class="agenda-global-pro-nom">${nomComplet(employe)}</strong>
+        <span class="agenda-global-pro-role" style="color:${couleur}">${labelRole(employe.role)}</span>
+      </div>
+    `;
+  }
+
+  function fermerComboboxProGlobal() {
+    const liste = $('liste-options-pro-agenda-global');
+    const input = $('selecteur-pro-agenda-global');
+    if (liste) liste.hidden = true;
+    if (input) input.setAttribute('aria-expanded', 'false');
+  }
+
+  function afficherOptionsComboboxProGlobal(requete = '') {
+    const liste = $('liste-options-pro-agenda-global');
+    const input = $('selecteur-pro-agenda-global');
+    const role = $('filtre-role-global')?.value;
+    if (!liste || !input || !role) return;
+
+    const pros = employesActifsPourRole(role).filter(e => proCorrespondRecherche(e, requete));
+
+    if (!pros.length) {
+      liste.innerHTML = '<li class="combobox-option combobox-option--vide">Aucun professionnel trouvé</li>';
+      liste.hidden = false;
+      input.setAttribute('aria-expanded', 'true');
+      return;
+    }
+
+    liste.innerHTML = pros.map(e => `
+      <li role="option"
+          data-employe-id="${e.id}"
+          class="combobox-option${e.id === state.agendaGlobalEmployeId ? ' is-selected' : ''}"
+          aria-selected="${e.id === state.agendaGlobalEmployeId}">
+        ${nomComplet(e)}
+      </li>
+    `).join('');
+
+    liste.hidden = false;
+    input.setAttribute('aria-expanded', 'true');
+
+    liste.querySelectorAll('[data-employe-id]').forEach(li => {
+      li.addEventListener('mousedown', ev => {
+        ev.preventDefault();
+        selectionnerProAgendaGlobal(li.dataset.employeId);
+        fermerComboboxProGlobal();
+        renderAgendaGlobal();
+      });
+    });
+  }
+
+  function initComboboxProAgendaGlobal() {
+    const input = $('selecteur-pro-agenda-global');
+    const combobox = $('combobox-pro-agenda-global');
+    if (!input || !combobox) return;
+
+    input.addEventListener('input', () => afficherOptionsComboboxProGlobal(input.value));
+    input.addEventListener('focus', () => afficherOptionsComboboxProGlobal(input.value));
+
+    input.addEventListener('keydown', e => {
+      const liste = $('liste-options-pro-agenda-global');
+      const options = [...liste.querySelectorAll('[data-employe-id]')];
+      const active = liste.querySelector('.combobox-option.is-highlighted');
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (!options.length) return;
+        const index = active ? options.indexOf(active) : -1;
+        const suivant = options[Math.min(index + 1, options.length - 1)];
+        options.forEach(o => o.classList.remove('is-highlighted'));
+        suivant.classList.add('is-highlighted');
+        suivant.scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (!options.length) return;
+        const index = active ? options.indexOf(active) : options.length;
+        const precedent = options[Math.max(index - 1, 0)];
+        options.forEach(o => o.classList.remove('is-highlighted'));
+        precedent.classList.add('is-highlighted');
+        precedent.scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const cible = active || options[0];
+        if (cible) {
+          selectionnerProAgendaGlobal(cible.dataset.employeId);
+          fermerComboboxProGlobal();
+          renderAgendaGlobal();
+        }
+      } else if (e.key === 'Escape') {
+        fermerComboboxProGlobal();
+        const employe = state.employes.find(e => e.id === state.agendaGlobalEmployeId);
+        input.value = employe ? nomComplet(employe) : '';
+      }
+    });
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('#combobox-pro-agenda-global')) {
+        fermerComboboxProGlobal();
+        const employe = state.employes.find(e => e.id === state.agendaGlobalEmployeId);
+        if (employe) input.value = nomComplet(employe);
+      }
+    });
+  }
+
+  function reinitialiserFiltreProGlobal() {
+    state.agendaGlobalEmployeId = null;
+    const input = $('selecteur-pro-agenda-global');
+    if (input) input.value = '';
+    fermerComboboxProGlobal();
+  }
+
+  function choisirProAleatoirePourRole(role) {
+    const pros = employesActifsPourRole(role);
+    if (!pros.length) return null;
+    return pros[Math.floor(Math.random() * pros.length)].id;
+  }
+
+  function preparerFiltreProPourRole(role) {
+    reinitialiserFiltreProGlobal();
+    if (!role) return;
+
+    const proId = choisirProAleatoirePourRole(role);
+    if (proId) selectionnerProAgendaGlobal(proId);
   }
 
   async function chargerCreneaux(filtres = {}) {
@@ -409,15 +605,60 @@
     renderNavigationSemaine('nav-semaine-global', renderAgendaGlobal);
 
     const role = $('filtre-role-global').value;
+    mettreAJourVisibiliteFiltrePro(role);
+
     let creneaux = await chargerCreneaux();
-    if (role) creneaux = creneaux.filter(c => c.role === role);
+    let modePro = false;
+
+    if (role) {
+      const pros = employesActifsPourRole(role);
+
+      if (!state.agendaGlobalEmployeId && pros.length) {
+        selectionnerProAgendaGlobal(choisirProAleatoirePourRole(role));
+      }
+
+      if (!state.agendaGlobalEmployeId) {
+        renderEnteteProAgendaGlobal(null);
+        renderStatsAgendaGlobal([]);
+        renderAgendaGlobalVide(true, { attentePro: true, role });
+        return;
+      }
+
+      const employe = state.employes.find(e => e.id === state.agendaGlobalEmployeId);
+      if (!employe || employe.role !== role) {
+        reinitialiserFiltreProGlobal();
+        const proId = choisirProAleatoirePourRole(role);
+        if (proId) {
+          selectionnerProAgendaGlobal(proId);
+        } else {
+          renderEnteteProAgendaGlobal(null);
+          renderStatsAgendaGlobal([]);
+          renderAgendaGlobalVide(true, { attentePro: true, role });
+          return;
+        }
+      }
+
+      creneaux = creneaux.filter(c => c.employe_id === state.agendaGlobalEmployeId);
+      modePro = true;
+      renderEnteteProAgendaGlobal(state.employes.find(e => e.id === state.agendaGlobalEmployeId));
+    } else {
+      reinitialiserFiltreProGlobal();
+      renderEnteteProAgendaGlobal(null);
+    }
 
     renderStatsAgendaGlobal(creneaux);
-    renderAgendaGlobalVide(creneaux.length === 0);
 
-    if (creneaux.length > 0) {
-      renderGrilleAgenda('grille-globale', creneaux, { modeGlobal: true });
+    if (creneaux.length === 0) {
+      renderAgendaGlobalVide(true, modePro ? { sansRdvPro: true } : {});
+      return;
     }
+
+    renderAgendaGlobalVide(false);
+    renderGrilleAgenda(
+      'grille-globale',
+      creneaux,
+      modePro ? { modePro: true } : { modeGlobal: true }
+    );
   }
 
   function patientsActifs() {
@@ -945,8 +1186,12 @@
     });
 
     initComboboxPatientAgenda();
+    initComboboxProAgendaGlobal();
 
-    $('filtre-role-global').addEventListener('change', renderAgendaGlobal);
+    $('filtre-role-global').addEventListener('change', () => {
+      preparerFiltreProPourRole($('filtre-role-global').value);
+      renderAgendaGlobal();
+    });
 
     $('agenda-global-vide')?.addEventListener('click', e => {
       if (e.target.closest('#btn-generer-depuis-vide')) {
