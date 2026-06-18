@@ -1,0 +1,2414 @@
+[
+  {
+    "id": "6457f813-1f18-4103-a8fd-eb72523c1de7",
+    "patient_id": "d73681b2-3557-4a54-9c92-2e0fffec0f38",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "69974c20-3ed5-4140-a554-cfa949438b6d",
+    "patient_id": "d73681b2-3557-4a54-9c92-2e0fffec0f38",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "2614b7c8-fa1f-4c1b-bf62-570048b79374",
+    "patient_id": "d73681b2-3557-4a54-9c92-2e0fffec0f38",
+    "role": "PSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "595a20a4-6a83-4915-bee2-4b2905f01ce8",
+    "patient_id": "d73681b2-3557-4a54-9c92-2e0fffec0f38",
+    "role": "AIDE_SOIGNANT",
+    "seances_par_semaine": 2,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "e995718b-545a-46ac-8d64-45ad33cb7d04",
+    "patient_id": "d73681b2-3557-4a54-9c92-2e0fffec0f38",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 2,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "c3978e10-5e15-4739-89c7-0d7c87e31317",
+    "patient_id": "d73681b2-3557-4a54-9c92-2e0fffec0f38",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "14f38993-595d-4a0d-bc43-38641bb07c85",
+    "patient_id": "d73681b2-3557-4a54-9c92-2e0fffec0f38",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "03987751-fbe7-474e-8676-95df7a33b295",
+    "patient_id": "6876841d-4d06-476c-b0f4-a98363225e5a",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "60560319-cc16-4c69-9ada-caf367058e99",
+    "patient_id": "6876841d-4d06-476c-b0f4-a98363225e5a",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "e4800722-e4e3-4f18-91af-a89dea35ecb0",
+    "patient_id": "6876841d-4d06-476c-b0f4-a98363225e5a",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "3de2b34e-b201-439d-b70f-9627c94427af",
+    "patient_id": "6876841d-4d06-476c-b0f4-a98363225e5a",
+    "role": "AIDE_SOIGNANT",
+    "seances_par_semaine": 3,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "e57228fe-db7f-45fe-a067-809889f47b73",
+    "patient_id": "6876841d-4d06-476c-b0f4-a98363225e5a",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "793cee44-04e8-490c-9204-928b861a7201",
+    "patient_id": "6876841d-4d06-476c-b0f4-a98363225e5a",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "f4e444be-a91a-491f-b520-f3c1f77733d2",
+    "patient_id": "60c44784-6585-4cbe-838d-efb53ab46271",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "686453c0-5fcc-48e6-9a7b-ef4d257143c6",
+    "patient_id": "60c44784-6585-4cbe-838d-efb53ab46271",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "4e67d148-4071-4d6a-852b-6b6c458bf338",
+    "patient_id": "60c44784-6585-4cbe-838d-efb53ab46271",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 2,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "b510bbf2-707d-41f8-acc4-082fa2a1c9a3",
+    "patient_id": "60c44784-6585-4cbe-838d-efb53ab46271",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "e63b419a-7fbc-4b65-9101-e203e8aa9827",
+    "patient_id": "60c44784-6585-4cbe-838d-efb53ab46271",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "336207cf-25c9-485b-babe-7126b7082712",
+    "patient_id": "60c44784-6585-4cbe-838d-efb53ab46271",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "462c0e91-9e81-4e58-a122-3c5f75fedf2b",
+    "patient_id": "60c44784-6585-4cbe-838d-efb53ab46271",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 3,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "ad88611c-8d8e-4629-9b9a-34b62176936f",
+    "patient_id": "c0ffe14f-b8df-4137-afcb-d175e89dd978",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 3,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "843c0e56-ab0d-4289-8f0c-d9ff7ba798f3",
+    "patient_id": "c0ffe14f-b8df-4137-afcb-d175e89dd978",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "86b677db-7503-419c-a28b-f6723e4e3d38",
+    "patient_id": "c0ffe14f-b8df-4137-afcb-d175e89dd978",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "121c10d6-1f36-4b5b-b586-f6ba8ee6d707",
+    "patient_id": "f7142649-64bd-4561-86aa-72981fc15348",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "813f9620-a1e0-414c-a212-5fc539618895",
+    "patient_id": "f7142649-64bd-4561-86aa-72981fc15348",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "64c7fcc2-a0fd-4250-a3ef-e76b1628e395",
+    "patient_id": "f7142649-64bd-4561-86aa-72981fc15348",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 2,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "c93c0dd5-f206-46df-8306-1fc9303d0074",
+    "patient_id": "f7142649-64bd-4561-86aa-72981fc15348",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "c4f8efc5-b0bb-4020-b462-638beb163b08",
+    "patient_id": "f7142649-64bd-4561-86aa-72981fc15348",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 2,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "2e1fff3d-5c6d-4a44-8172-7a1c61ace548",
+    "patient_id": "772ca7d4-a429-4336-970e-5ca10b8b8a24",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "6a3b4bf1-4e43-487a-8174-5572c08bd52c",
+    "patient_id": "772ca7d4-a429-4336-970e-5ca10b8b8a24",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "286aaf38-2fc6-43b7-934f-d71f060fd0c1",
+    "patient_id": "772ca7d4-a429-4336-970e-5ca10b8b8a24",
+    "role": "PSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "6cd68f16-de82-4293-b85a-c7223d3d4fda",
+    "patient_id": "772ca7d4-a429-4336-970e-5ca10b8b8a24",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "ce4185fb-f75b-4eed-bf60-76f1bbe069b8",
+    "patient_id": "772ca7d4-a429-4336-970e-5ca10b8b8a24",
+    "role": "AIDE_SOIGNANT",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "db9a1f07-4806-4f9a-991c-d338ac006bf5",
+    "patient_id": "772ca7d4-a429-4336-970e-5ca10b8b8a24",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "b44b89dc-be1e-4ad7-acc5-ded12107d432",
+    "patient_id": "772ca7d4-a429-4336-970e-5ca10b8b8a24",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "486659e4-8b3c-42a7-b5b8-f84d21d3bbf7",
+    "patient_id": "cda41ce8-86d0-4f4c-b319-bbc6dd234365",
+    "role": "AIDE_SOIGNANT",
+    "seances_par_semaine": 3,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "364197e7-a3ac-4947-9e65-c898a35542c5",
+    "patient_id": "cda41ce8-86d0-4f4c-b319-bbc6dd234365",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "a9ad2aa0-fe0a-4172-bc23-05d3d661a42a",
+    "patient_id": "cda41ce8-86d0-4f4c-b319-bbc6dd234365",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "469d6f0e-f4e6-4e8b-be1a-bd23aa523dd9",
+    "patient_id": "cda41ce8-86d0-4f4c-b319-bbc6dd234365",
+    "role": "PSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "d3508869-e394-4938-b138-b9df9a0eb4a2",
+    "patient_id": "cda41ce8-86d0-4f4c-b319-bbc6dd234365",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "094f92b4-30bf-4b41-88ca-2e38409161fd",
+    "patient_id": "07101b11-03f9-4760-9c56-84fae0765d59",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "51bbf8d9-7a63-467d-b551-9c22796592ed",
+    "patient_id": "07101b11-03f9-4760-9c56-84fae0765d59",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 2,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "0a021563-101a-4b18-b5a9-f6ecf28b046c",
+    "patient_id": "07101b11-03f9-4760-9c56-84fae0765d59",
+    "role": "PSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "e5ab0442-00bb-43bc-ac81-362f85d1c620",
+    "patient_id": "07101b11-03f9-4760-9c56-84fae0765d59",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 3,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "5c8deb89-5e9c-4fee-b0a4-27f9e8b373e3",
+    "patient_id": "07101b11-03f9-4760-9c56-84fae0765d59",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 4,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "7f2bac61-e022-4abd-963a-15d780c433af",
+    "patient_id": "07101b11-03f9-4760-9c56-84fae0765d59",
+    "role": "AIDE_SOIGNANT",
+    "seances_par_semaine": 1,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "d50926e4-19de-44b1-8d99-e647214637d5",
+    "patient_id": "07101b11-03f9-4760-9c56-84fae0765d59",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 2,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "93dd5639-db82-4bb5-837a-bf16e1cf1019",
+    "patient_id": "268dbfe5-c087-4e94-91b5-ad3c3ec44a92",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "fe4fcc50-0644-4457-9d8e-e40c37da5019",
+    "patient_id": "268dbfe5-c087-4e94-91b5-ad3c3ec44a92",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 2,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "37017bc3-4344-4fbf-bb6c-ee551e65083e",
+    "patient_id": "268dbfe5-c087-4e94-91b5-ad3c3ec44a92",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 4,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "3a433d14-379a-4ec4-b303-edca60a1268c",
+    "patient_id": "268dbfe5-c087-4e94-91b5-ad3c3ec44a92",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "2b5868b3-fbc6-4e1c-9988-f464046ecf42",
+    "patient_id": "268dbfe5-c087-4e94-91b5-ad3c3ec44a92",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 2,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "6a12bff8-c5be-4840-9cb3-41d40609ceb4",
+    "patient_id": "268dbfe5-c087-4e94-91b5-ad3c3ec44a92",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "94232dad-d6b2-4a86-a0d3-b39f6ec7184b",
+    "patient_id": "268dbfe5-c087-4e94-91b5-ad3c3ec44a92",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 2,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "4db5cc0e-de70-4a7d-8286-b1119cbb267b",
+    "patient_id": "5948024a-4e5b-4a53-b312-b04f8039f7eb",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "a75a97a6-7bdc-42e6-b4e8-d5d30b512815",
+    "patient_id": "5948024a-4e5b-4a53-b312-b04f8039f7eb",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "49937f95-1f8e-4ea8-8070-131d16afc908",
+    "patient_id": "5948024a-4e5b-4a53-b312-b04f8039f7eb",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 3,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "819fd0e0-c8ac-4a73-bbc4-69d52fceb9e2",
+    "patient_id": "5948024a-4e5b-4a53-b312-b04f8039f7eb",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 2,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "35544e7c-8851-4fb8-8001-eccf4e44e1fd",
+    "patient_id": "5948024a-4e5b-4a53-b312-b04f8039f7eb",
+    "role": "PSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "83a7a3a5-32f8-42bf-8efb-dadfcf8fb06e",
+    "patient_id": "620277e9-bd8b-4132-ab41-86f62fc11008",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 3,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "d03ac937-431f-4e15-8e75-7ac3ff201caf",
+    "patient_id": "620277e9-bd8b-4132-ab41-86f62fc11008",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "4664da45-563d-4090-824d-e22b5bee4313",
+    "patient_id": "620277e9-bd8b-4132-ab41-86f62fc11008",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "3c027de7-394b-4ac3-9334-46b47ac92d73",
+    "patient_id": "620277e9-bd8b-4132-ab41-86f62fc11008",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 3,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "e4961a76-a6b1-4da5-aa15-34ebe7e1d07e",
+    "patient_id": "620277e9-bd8b-4132-ab41-86f62fc11008",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "ba3ae04c-dd50-405f-909e-5cff196f8853",
+    "patient_id": "620277e9-bd8b-4132-ab41-86f62fc11008",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "bf0d0d3c-8def-4b34-9071-c43a6b7a40df",
+    "patient_id": "620277e9-bd8b-4132-ab41-86f62fc11008",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 2,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "19eba73c-9ab7-46ae-b9c3-e6bbaea6404e",
+    "patient_id": "2ed9fe8c-8097-4877-a03a-3925c537ca49",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "958da728-6bd4-4347-8b72-6c9aeb095d57",
+    "patient_id": "2ed9fe8c-8097-4877-a03a-3925c537ca49",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 8,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "5c749561-00e8-4c64-813e-aee5e2dd6785",
+    "patient_id": "2ed9fe8c-8097-4877-a03a-3925c537ca49",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "0cc64b8c-d9f1-4f0e-bdf9-a3c653d32b00",
+    "patient_id": "2f84c35f-412d-4e13-a7d7-70352b844670",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "600bf99b-74c5-43db-b065-620fe3c2fd21",
+    "patient_id": "2f84c35f-412d-4e13-a7d7-70352b844670",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "ccf1bfbb-8990-4fdc-9700-b618729b5f64",
+    "patient_id": "2f84c35f-412d-4e13-a7d7-70352b844670",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 2,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "df6f4acb-69f2-4016-bdfc-7f6f477606f8",
+    "patient_id": "2f84c35f-412d-4e13-a7d7-70352b844670",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 2,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "0537064b-8d1b-4d1a-8349-efd50eb7d26e",
+    "patient_id": "dada80a4-d0cb-4d43-9dc7-bb20fce1742c",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 1,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "931c04e7-776c-48d1-90ef-84962c89b5d2",
+    "patient_id": "dada80a4-d0cb-4d43-9dc7-bb20fce1742c",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "e6a67776-41c2-4d57-9c37-be13bd5128ab",
+    "patient_id": "dada80a4-d0cb-4d43-9dc7-bb20fce1742c",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "7212e997-95b5-4c46-a754-392d22558a12",
+    "patient_id": "b9983d1c-afda-4249-9882-84df201eb616",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "d93d8e89-a4e4-4520-ada9-2dd548bae268",
+    "patient_id": "b9983d1c-afda-4249-9882-84df201eb616",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 2,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "a89d3313-10b9-4b82-bf1d-6d63de69b152",
+    "patient_id": "b9983d1c-afda-4249-9882-84df201eb616",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "d1a2265f-8c8d-4c7d-b582-dd320b8cf315",
+    "patient_id": "654f898c-d860-4f2b-b6dd-cf88146c5ad7",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "94b4a795-68c4-4c0e-9cea-c5fbc0b9ef77",
+    "patient_id": "654f898c-d860-4f2b-b6dd-cf88146c5ad7",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 3,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "c77708ff-db3c-49be-8a72-90077c932a55",
+    "patient_id": "654f898c-d860-4f2b-b6dd-cf88146c5ad7",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "e94279c8-242b-4ab9-8292-fe63cf2f4e72",
+    "patient_id": "654f898c-d860-4f2b-b6dd-cf88146c5ad7",
+    "role": "AIDE_SOIGNANT",
+    "seances_par_semaine": 2,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "0e8aeae9-30dd-4047-aa4f-ed0e23063947",
+    "patient_id": "654f898c-d860-4f2b-b6dd-cf88146c5ad7",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 2,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "b8a77f40-5632-46f7-a198-95567e3fa610",
+    "patient_id": "654f898c-d860-4f2b-b6dd-cf88146c5ad7",
+    "role": "PSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "6f2345cb-8d20-46fc-85cb-fe598e32f9bd",
+    "patient_id": "0bda137f-541e-4c6e-88c0-daae12aa8236",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "cd5bc7d5-93b7-4ab1-95a1-e0405154a6e6",
+    "patient_id": "0bda137f-541e-4c6e-88c0-daae12aa8236",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "c0e12c59-e871-44b1-98b8-cad866139db6",
+    "patient_id": "0bda137f-541e-4c6e-88c0-daae12aa8236",
+    "role": "AIDE_SOIGNANT",
+    "seances_par_semaine": 2,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "cfb51627-fdb9-4263-8eda-853517ab9ea1",
+    "patient_id": "0bda137f-541e-4c6e-88c0-daae12aa8236",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "593ceb08-2f09-454d-8b25-19bdb42181dd",
+    "patient_id": "0bda137f-541e-4c6e-88c0-daae12aa8236",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "ee9849e6-eb97-48a5-ad3b-fd0e19b378ff",
+    "patient_id": "0bda137f-541e-4c6e-88c0-daae12aa8236",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 1,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "b79f3b85-c673-4cc7-ab2e-26a306108f63",
+    "patient_id": "ee686332-22cb-44a4-aa05-db1e4cb4bd12",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 3,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "f8803940-ebc5-43e3-adb5-e84c8b725310",
+    "patient_id": "ee686332-22cb-44a4-aa05-db1e4cb4bd12",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 2,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "3b053232-165f-46ce-859b-6a41306231be",
+    "patient_id": "ee686332-22cb-44a4-aa05-db1e4cb4bd12",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 3,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "f1a31273-d30a-4166-bd79-d9faa5bfad47",
+    "patient_id": "ee686332-22cb-44a4-aa05-db1e4cb4bd12",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "d6183c6f-37a4-4574-affe-6201e8cff818",
+    "patient_id": "ee686332-22cb-44a4-aa05-db1e4cb4bd12",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "32d61d21-f1c2-441f-87ff-59058fc53338",
+    "patient_id": "ee686332-22cb-44a4-aa05-db1e4cb4bd12",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "7da32a82-4d22-43f9-a3f4-5da03cfbea5f",
+    "patient_id": "ee686332-22cb-44a4-aa05-db1e4cb4bd12",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 2,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "2b81aa54-9502-4d22-8f3f-979a103c732c",
+    "patient_id": "6155da58-e536-483d-957d-a71ccff7c8ae",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "4463bfbc-dfcd-4251-972e-45391456cc34",
+    "patient_id": "6155da58-e536-483d-957d-a71ccff7c8ae",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "e39fb06e-6649-477c-b8b8-5559debb0350",
+    "patient_id": "6155da58-e536-483d-957d-a71ccff7c8ae",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 8,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "cbd95d3b-984a-4048-aace-5babdc2c447c",
+    "patient_id": "6155da58-e536-483d-957d-a71ccff7c8ae",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 2,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "13aab5f5-7337-45e5-a218-71925f305095",
+    "patient_id": "6155da58-e536-483d-957d-a71ccff7c8ae",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 3,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "ec64a87a-f139-4fcd-9aa6-e53e8afa0b39",
+    "patient_id": "6155da58-e536-483d-957d-a71ccff7c8ae",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 3,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "21775de6-26c7-47eb-b8a6-ff7ea9829a77",
+    "patient_id": "6724e138-c989-4157-ae2e-e7b8805faee7",
+    "role": "AIDE_SOIGNANT",
+    "seances_par_semaine": 2,
+    "priorite": 8,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "d1f5571a-6155-44a2-8650-235f8abbf32b",
+    "patient_id": "6724e138-c989-4157-ae2e-e7b8805faee7",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 3,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "0a83ea0d-9c4e-4f69-a2f3-6fd980f1d2b8",
+    "patient_id": "6724e138-c989-4157-ae2e-e7b8805faee7",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "6087c827-d0fd-45e6-b31d-9af7ba000665",
+    "patient_id": "6724e138-c989-4157-ae2e-e7b8805faee7",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "8eb3f1a7-522f-49ea-92be-e197672e150f",
+    "patient_id": "6724e138-c989-4157-ae2e-e7b8805faee7",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 2,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "42121cda-cc79-4829-ba46-23f6548f4a6d",
+    "patient_id": "3caf0501-cbde-4076-9307-3dbd00f75168",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 5,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "1072f6e3-dfef-400e-ac97-d9a6ed4a8ead",
+    "patient_id": "3caf0501-cbde-4076-9307-3dbd00f75168",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "ec2ca19b-ed0c-4767-923f-9633b7389d75",
+    "patient_id": "3caf0501-cbde-4076-9307-3dbd00f75168",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "3f8f9e69-aabd-49f6-9700-8084227195d6",
+    "patient_id": "3caf0501-cbde-4076-9307-3dbd00f75168",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "0119a19c-c99e-4852-a0a6-dfac4d85352b",
+    "patient_id": "3caf0501-cbde-4076-9307-3dbd00f75168",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "df44a84e-327d-48f7-aa84-4d097b7927f6",
+    "patient_id": "3caf0501-cbde-4076-9307-3dbd00f75168",
+    "role": "PSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "301d0daf-2913-46fc-9def-2b994ee9daff",
+    "patient_id": "3caf0501-cbde-4076-9307-3dbd00f75168",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "8bf34035-caba-4c35-961f-6d0ea0877233",
+    "patient_id": "c63a8cbb-f52a-4e57-a971-c05e6df594da",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "c95c8ebe-e370-4640-99f7-87207cecd86e",
+    "patient_id": "c63a8cbb-f52a-4e57-a971-c05e6df594da",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "0e4d9586-007f-404c-9c5e-d39effa2f125",
+    "patient_id": "c63a8cbb-f52a-4e57-a971-c05e6df594da",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "6bc7c6c6-333c-4d97-8f99-ece8fc9504c8",
+    "patient_id": "c63a8cbb-f52a-4e57-a971-c05e6df594da",
+    "role": "AIDE_SOIGNANT",
+    "seances_par_semaine": 3,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "b7a7dba2-0455-4e15-a6b6-29bdb619c19a",
+    "patient_id": "c63a8cbb-f52a-4e57-a971-c05e6df594da",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "9a893d6f-361a-40e2-85f2-c55eb3437641",
+    "patient_id": "c63a8cbb-f52a-4e57-a971-c05e6df594da",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "7f22c140-b60a-49e2-b098-b1675437fe3d",
+    "patient_id": "419ce64d-370f-418d-97fd-cd1d7e2c4f06",
+    "role": "AIDE_SOIGNANT",
+    "seances_par_semaine": 3,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "262bca77-fe2d-45ff-b4b3-09c84848d434",
+    "patient_id": "419ce64d-370f-418d-97fd-cd1d7e2c4f06",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 8,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "c0a32050-a223-40ad-ada8-275ad505c9a8",
+    "patient_id": "419ce64d-370f-418d-97fd-cd1d7e2c4f06",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "23332d76-7dc0-4057-92c7-cd97c9651d52",
+    "patient_id": "419ce64d-370f-418d-97fd-cd1d7e2c4f06",
+    "role": "PSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "146b20d7-33a1-44b3-9b1e-4d0ad8d837c6",
+    "patient_id": "419ce64d-370f-418d-97fd-cd1d7e2c4f06",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 3,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "3e9d20e6-67f4-4587-b36d-5364913cf401",
+    "patient_id": "419ce64d-370f-418d-97fd-cd1d7e2c4f06",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 2,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "ec2afede-3768-41d2-a4ab-c2bc8d03a339",
+    "patient_id": "419ce64d-370f-418d-97fd-cd1d7e2c4f06",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "0d450b65-80da-47af-a8b8-b0da7a3a05a4",
+    "patient_id": "a6da8d3d-0486-4826-9ebc-5ad716d45f3a",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 2,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "d85c043a-d1de-455f-9bdd-3684387a116e",
+    "patient_id": "a6da8d3d-0486-4826-9ebc-5ad716d45f3a",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 2,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "35fd7e04-ae1e-459b-ae87-6d8d56aeb246",
+    "patient_id": "a6da8d3d-0486-4826-9ebc-5ad716d45f3a",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "da6455ee-4105-4154-819b-760acece5c62",
+    "patient_id": "a6da8d3d-0486-4826-9ebc-5ad716d45f3a",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 2,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "ee149ad9-7797-4564-855e-6a3abebfdb66",
+    "patient_id": "a6da8d3d-0486-4826-9ebc-5ad716d45f3a",
+    "role": "PSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "d637e723-07e6-4432-a578-d027743498db",
+    "patient_id": "a6da8d3d-0486-4826-9ebc-5ad716d45f3a",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 2,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "65976943-1775-46a0-bab8-d088b0d4936c",
+    "patient_id": "a6da8d3d-0486-4826-9ebc-5ad716d45f3a",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "5fb75f77-4801-44ba-92a7-43dd93cdc232",
+    "patient_id": "8b65e019-790b-4b95-91fb-5bf6da1ab7a2",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "635a70d1-e15e-4253-a485-7fa815e11c06",
+    "patient_id": "8b65e019-790b-4b95-91fb-5bf6da1ab7a2",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "d2732d10-bafa-43ff-b12f-aec1f8a69467",
+    "patient_id": "8b65e019-790b-4b95-91fb-5bf6da1ab7a2",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 3,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "4c0fed20-ba98-49f1-921f-20034bac005d",
+    "patient_id": "8b65e019-790b-4b95-91fb-5bf6da1ab7a2",
+    "role": "AIDE_SOIGNANT",
+    "seances_par_semaine": 2,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "91fd5610-847b-4d7b-b216-8b73df41dcb5",
+    "patient_id": "8b65e019-790b-4b95-91fb-5bf6da1ab7a2",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "a107edaf-cca2-4444-8c98-50def616729b",
+    "patient_id": "8b65e019-790b-4b95-91fb-5bf6da1ab7a2",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 1,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "e210689f-8b99-40a0-9376-a0e6713d8275",
+    "patient_id": "9cfa3515-a4d5-4c81-a860-516b58e1c0ca",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "969667e0-ca08-47ce-9bc2-f243df6d5951",
+    "patient_id": "9cfa3515-a4d5-4c81-a860-516b58e1c0ca",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 1,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "8766edf8-10c7-4d74-b176-0001a5336529",
+    "patient_id": "9cfa3515-a4d5-4c81-a860-516b58e1c0ca",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 5,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "f18fcdec-fe14-479e-92ee-b9eab15b6650",
+    "patient_id": "4ce1baaa-672d-4916-a8f6-ebb8bef13bf4",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "82277045-a19a-4330-b40f-79923ef7dc99",
+    "patient_id": "4ce1baaa-672d-4916-a8f6-ebb8bef13bf4",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "c96efdea-d16f-4805-a9af-34fcfaf44df5",
+    "patient_id": "4ce1baaa-672d-4916-a8f6-ebb8bef13bf4",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 8,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "79f4a72d-9002-4c0e-86d5-b31139946f65",
+    "patient_id": "4ce1baaa-672d-4916-a8f6-ebb8bef13bf4",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "44fe04ab-9021-4777-b41b-fea88f184cff",
+    "patient_id": "4ce1baaa-672d-4916-a8f6-ebb8bef13bf4",
+    "role": "PSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "e5552a02-de16-4fa1-bc87-e04bf51bf739",
+    "patient_id": "0398ed9d-6d25-483f-9afa-b0bb04f7340b",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 3,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "f8bae538-af15-46a3-b66d-016db6ee80d0",
+    "patient_id": "0398ed9d-6d25-483f-9afa-b0bb04f7340b",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 5,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "a3a1dbe8-3aae-48a5-a312-fd94817b231b",
+    "patient_id": "0398ed9d-6d25-483f-9afa-b0bb04f7340b",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "6b5c408b-1c67-41f0-adbd-986ef365bed8",
+    "patient_id": "0398ed9d-6d25-483f-9afa-b0bb04f7340b",
+    "role": "PSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "19fd616c-8c27-46a6-8186-4755918c3b03",
+    "patient_id": "0398ed9d-6d25-483f-9afa-b0bb04f7340b",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "4e4fcf90-199a-48cf-9a7a-b5c21158f70f",
+    "patient_id": "0398ed9d-6d25-483f-9afa-b0bb04f7340b",
+    "role": "AIDE_SOIGNANT",
+    "seances_par_semaine": 2,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "5cb3d24f-0ff7-461b-91e8-29bdd7ae1b60",
+    "patient_id": "6861623e-5d7c-4bea-8c3a-a08868457a4b",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "04d141cb-4c33-49f8-9afd-44dd2996c1db",
+    "patient_id": "6861623e-5d7c-4bea-8c3a-a08868457a4b",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "c637c96e-7b06-4968-9313-23d240078a4d",
+    "patient_id": "6861623e-5d7c-4bea-8c3a-a08868457a4b",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 1,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "298429f2-1e8f-4178-b5f2-7f8595c09bbc",
+    "patient_id": "6861623e-5d7c-4bea-8c3a-a08868457a4b",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 8,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "305ddbb0-4a80-4578-98b7-e4b3d1ea1366",
+    "patient_id": "6861623e-5d7c-4bea-8c3a-a08868457a4b",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "140be825-3871-41da-bb5e-aec3a0713482",
+    "patient_id": "b107aba7-4be0-45c3-8aa9-4b75fb54cea6",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "6b2bc338-7999-4432-971f-192351936da9",
+    "patient_id": "b107aba7-4be0-45c3-8aa9-4b75fb54cea6",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 2,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "d8069cb9-5882-43e0-a939-5c561a72bf97",
+    "patient_id": "b107aba7-4be0-45c3-8aa9-4b75fb54cea6",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 3,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "12c9d760-c638-4353-b7a3-2c753c3f0dbb",
+    "patient_id": "cc802e80-c920-420e-a272-74b0eb729655",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "3bf8fddb-db7a-40d4-9e8c-2c4657e79d0a",
+    "patient_id": "cc802e80-c920-420e-a272-74b0eb729655",
+    "role": "PSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "0ad4a63b-4102-433e-a57c-5e8ea6cb212b",
+    "patient_id": "cc802e80-c920-420e-a272-74b0eb729655",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 8,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "48640f2d-6573-4dad-9ecb-c260b773b759",
+    "patient_id": "8e8bd950-22b5-42a8-ab80-23f410a3ff5e",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "113f49e1-9c69-4bc1-ad46-233cae1d85bd",
+    "patient_id": "8e8bd950-22b5-42a8-ab80-23f410a3ff5e",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 2,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "8030a0e0-a9a7-47e6-9ce5-8b7c59ba377a",
+    "patient_id": "8e8bd950-22b5-42a8-ab80-23f410a3ff5e",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "8e401f18-6cef-42e1-b3f7-9270cb2d5e74",
+    "patient_id": "8e8bd950-22b5-42a8-ab80-23f410a3ff5e",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 3,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "1e301208-a59a-4d50-8779-16ef823d2da4",
+    "patient_id": "8e8bd950-22b5-42a8-ab80-23f410a3ff5e",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "fbb4111f-c8f2-460a-9425-bfe5d198c785",
+    "patient_id": "956d2026-bac5-4310-baf9-fe5b41775107",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "f5e68d69-87a4-45a5-a1cf-8fa75a33f99e",
+    "patient_id": "956d2026-bac5-4310-baf9-fe5b41775107",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 2,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "686ff63b-6c52-47d0-ab2c-be208a7d4765",
+    "patient_id": "956d2026-bac5-4310-baf9-fe5b41775107",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "b7e1d01b-62eb-4c63-91d8-196ae7fb30bb",
+    "patient_id": "956d2026-bac5-4310-baf9-fe5b41775107",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "4fb2b5de-7950-4869-b764-57ba338c12df",
+    "patient_id": "956d2026-bac5-4310-baf9-fe5b41775107",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "4c0a9b15-058c-4abc-b8b4-3751ce698ad8",
+    "patient_id": "956d2026-bac5-4310-baf9-fe5b41775107",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "81c90738-624e-4985-ad4d-775a0baea2c3",
+    "patient_id": "956d2026-bac5-4310-baf9-fe5b41775107",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "54bf4ddf-02d8-4754-a990-15e5552f8a46",
+    "patient_id": "a4fce2a9-a5a6-4ae7-ab77-acb5cb837144",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "e73556d3-ec8d-453d-b2db-abda3121bc53",
+    "patient_id": "a4fce2a9-a5a6-4ae7-ab77-acb5cb837144",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 2,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "46fe3819-8a85-4f8b-933c-401e86967677",
+    "patient_id": "a4fce2a9-a5a6-4ae7-ab77-acb5cb837144",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "c469a379-0520-4bf4-baac-b4c8552cfb86",
+    "patient_id": "a4fce2a9-a5a6-4ae7-ab77-acb5cb837144",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "f27c43b3-e2aa-4250-8f1f-e31ad32517eb",
+    "patient_id": "a4fce2a9-a5a6-4ae7-ab77-acb5cb837144",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 1,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "d48f11e8-a5b4-49bb-ba0d-ee5866cc078e",
+    "patient_id": "a4fce2a9-a5a6-4ae7-ab77-acb5cb837144",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "534c90b9-9948-4612-a1d2-fef8b0671186",
+    "patient_id": "a4fce2a9-a5a6-4ae7-ab77-acb5cb837144",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 2,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "04af48df-87fa-47eb-869c-ab8983d38e02",
+    "patient_id": "fef28094-250c-4023-a59e-5daaaeaf1a29",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "1d693217-f9d2-44e1-b0f0-575b2e27de1c",
+    "patient_id": "fef28094-250c-4023-a59e-5daaaeaf1a29",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 3,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "1ad756b8-5663-4da3-a200-40956f845e9a",
+    "patient_id": "fef28094-250c-4023-a59e-5daaaeaf1a29",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 4,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "6708f165-595c-48f1-b49d-64ceafc81840",
+    "patient_id": "fef28094-250c-4023-a59e-5daaaeaf1a29",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "fdeb31f8-5d85-4ce3-a7e0-9a5c97dbc51d",
+    "patient_id": "fef28094-250c-4023-a59e-5daaaeaf1a29",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 2,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "6969a5f0-524f-4474-b571-a65136e64484",
+    "patient_id": "fef28094-250c-4023-a59e-5daaaeaf1a29",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "03478bf0-4224-4bd6-a414-dba963aa510f",
+    "patient_id": "0ce1cbd5-c1c6-4aca-9367-a4371505dc0d",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "02dc1653-2c0b-4a19-8428-6c87c89d8f31",
+    "patient_id": "0ce1cbd5-c1c6-4aca-9367-a4371505dc0d",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "e2e65443-f49b-492c-a8e7-d7296db8dae8",
+    "patient_id": "0ce1cbd5-c1c6-4aca-9367-a4371505dc0d",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 3,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "f7182c00-34fd-4551-934e-76768c941cac",
+    "patient_id": "0ce1cbd5-c1c6-4aca-9367-a4371505dc0d",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 2,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "e3c3b866-7aba-4313-84a2-0ece0a85bc15",
+    "patient_id": "1ce0260d-5b4e-4a45-87e8-a1796f7ec5d7",
+    "role": "PSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "5927755c-6f24-42e8-9ced-3efa6e5f95be",
+    "patient_id": "1ce0260d-5b4e-4a45-87e8-a1796f7ec5d7",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 2,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "5c8afaaf-07b7-449a-9287-1bfcc1145ebf",
+    "patient_id": "1ce0260d-5b4e-4a45-87e8-a1796f7ec5d7",
+    "role": "AIDE_SOIGNANT",
+    "seances_par_semaine": 2,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "83e37822-3aae-46d6-b696-d883a54767f7",
+    "patient_id": "1ce0260d-5b4e-4a45-87e8-a1796f7ec5d7",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 2,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "8d501a26-c80f-493e-a9df-661f7e36d872",
+    "patient_id": "1ce0260d-5b4e-4a45-87e8-a1796f7ec5d7",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "62203a42-96a9-4538-aa41-f88318ece424",
+    "patient_id": "1ce0260d-5b4e-4a45-87e8-a1796f7ec5d7",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 5,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "213edc45-6e3f-4b2c-81d0-d3f6b0ddf88d",
+    "patient_id": "d6daa7a2-dea9-4e9f-b20a-b88789509718",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "15c52112-36e3-4c61-b80d-9c643b23c1b6",
+    "patient_id": "d6daa7a2-dea9-4e9f-b20a-b88789509718",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 2,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "74f86b65-919c-4e75-8bac-8a778f9cf450",
+    "patient_id": "d6daa7a2-dea9-4e9f-b20a-b88789509718",
+    "role": "PSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "1987f5d5-b4e0-4bce-81d4-f1e41c81ae44",
+    "patient_id": "d6daa7a2-dea9-4e9f-b20a-b88789509718",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "7f70d221-654f-4a88-856a-a0af259cdc1e",
+    "patient_id": "d6daa7a2-dea9-4e9f-b20a-b88789509718",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 5,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "74ed6972-caec-40dc-b359-7cb9ab83e35e",
+    "patient_id": "d6daa7a2-dea9-4e9f-b20a-b88789509718",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 1,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "c9d25709-5a7e-48e4-95cc-a32e231e127f",
+    "patient_id": "3f35b2a0-c8fe-45a6-9dfc-021323540681",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "ea5655ab-b7e8-47f0-8c41-e902473cbdbc",
+    "patient_id": "3f35b2a0-c8fe-45a6-9dfc-021323540681",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "a10e510d-2fda-4aca-8e07-21bcb1fa37df",
+    "patient_id": "3f35b2a0-c8fe-45a6-9dfc-021323540681",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "5d3ffc18-387e-47a2-8af0-1a229867f61f",
+    "patient_id": "3f35b2a0-c8fe-45a6-9dfc-021323540681",
+    "role": "AIDE_SOIGNANT",
+    "seances_par_semaine": 3,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "d6650948-2004-4611-b01b-8bafef434e8f",
+    "patient_id": "3f35b2a0-c8fe-45a6-9dfc-021323540681",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 2,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "68be7d0a-51ce-48db-a0c7-1e0ccce64800",
+    "patient_id": "1c85c967-c66e-4c68-ba5e-e50b2185e485",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "e9c9367b-6e3c-4f7d-88dc-97fda0aa1075",
+    "patient_id": "1c85c967-c66e-4c68-ba5e-e50b2185e485",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 2,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "1d444929-361f-46a8-8136-e4a8a5c25e74",
+    "patient_id": "1c85c967-c66e-4c68-ba5e-e50b2185e485",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "c2d75ca2-068c-4641-8a0a-33bcc9991608",
+    "patient_id": "1c85c967-c66e-4c68-ba5e-e50b2185e485",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 2,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "9ed555f1-7402-486a-88ee-429352e54dfd",
+    "patient_id": "70d6844c-97f0-400a-b92d-b7210287ba81",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "97c5c293-5515-475b-a1bb-0cfb562b5def",
+    "patient_id": "70d6844c-97f0-400a-b92d-b7210287ba81",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "5aa6f7b9-0dad-4afe-9fbf-041f37637441",
+    "patient_id": "70d6844c-97f0-400a-b92d-b7210287ba81",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 1,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "e4400edb-f71d-42da-a57c-d5e6a6b397ed",
+    "patient_id": "70d6844c-97f0-400a-b92d-b7210287ba81",
+    "role": "PSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "3d5aa0d5-352e-4e26-ac1d-cd018614539a",
+    "patient_id": "70d6844c-97f0-400a-b92d-b7210287ba81",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 3,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "ac1faf18-1a86-4226-8f9a-f6e78ae46a07",
+    "patient_id": "70d6844c-97f0-400a-b92d-b7210287ba81",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "dbeb4233-3daf-4443-8802-30083fa7fcdb",
+    "patient_id": "20251760-17f7-4a23-8618-b7f4bd1630b8",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "c5163f09-461e-405c-bb28-5c0287b32e18",
+    "patient_id": "20251760-17f7-4a23-8618-b7f4bd1630b8",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 3,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "f4425473-d3ac-475b-8b5f-b82031dc1467",
+    "patient_id": "20251760-17f7-4a23-8618-b7f4bd1630b8",
+    "role": "PSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "b0c7a2fd-76de-48bd-b567-563709446a01",
+    "patient_id": "20251760-17f7-4a23-8618-b7f4bd1630b8",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "dc38d9b5-22fc-4801-8a66-98329d297747",
+    "patient_id": "f82dfaf4-42b4-476b-b8e0-261e468182f2",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 2,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "374961df-5c36-4bfc-82f7-b7aa3e0d9d8b",
+    "patient_id": "f82dfaf4-42b4-476b-b8e0-261e468182f2",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "2ac9ee1c-c4ef-468f-a655-438a06cccb55",
+    "patient_id": "f82dfaf4-42b4-476b-b8e0-261e468182f2",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "0e21da63-17d9-4079-88ef-2c8d5026992d",
+    "patient_id": "f82dfaf4-42b4-476b-b8e0-261e468182f2",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "b41f7e0d-22ac-46b4-8555-445776308f60",
+    "patient_id": "f82dfaf4-42b4-476b-b8e0-261e468182f2",
+    "role": "KINESITHERAPEUTE",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "7efbcbee-d758-4f50-a479-c9f7566efa89",
+    "patient_id": "f82dfaf4-42b4-476b-b8e0-261e468182f2",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 3,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "8d8da09c-44d0-4e27-a034-fb5b43497fe5",
+    "patient_id": "f82dfaf4-42b4-476b-b8e0-261e468182f2",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 8,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "3f09e8d4-e905-42da-8643-1dd78fe6b4be",
+    "patient_id": "8bf32d58-10bf-4440-bb81-00d0c5f259c5",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "8c9929cb-25c6-4adb-9e4d-2e84d33fc552",
+    "patient_id": "8bf32d58-10bf-4440-bb81-00d0c5f259c5",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 2,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "5cbd038d-fbd3-4fad-b1e6-f74b5e44c7ad",
+    "patient_id": "8bf32d58-10bf-4440-bb81-00d0c5f259c5",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "78eccbb1-013d-4a17-947f-cdcfae391b73",
+    "patient_id": "8bf32d58-10bf-4440-bb81-00d0c5f259c5",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 2,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "44f27752-e909-446d-aa7e-4b1c81908336",
+    "patient_id": "8bf32d58-10bf-4440-bb81-00d0c5f259c5",
+    "role": "AIDE_SOIGNANT",
+    "seances_par_semaine": 2,
+    "priorite": 8,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "ecfd4902-d434-4485-8ada-a4f8fb291e3e",
+    "patient_id": "8bf32d58-10bf-4440-bb81-00d0c5f259c5",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "d1b14a31-62ce-494e-9575-b64491893340",
+    "patient_id": "4b652396-6b38-45d7-909a-267bc920cbb0",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "6347f61d-14b7-4b78-bcd9-75527e2e5c64",
+    "patient_id": "4b652396-6b38-45d7-909a-267bc920cbb0",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "286cb37f-1e44-47cf-9b04-adbb44d1ac77",
+    "patient_id": "4b652396-6b38-45d7-909a-267bc920cbb0",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 3,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "bd2de5b1-dd3e-4bd1-b305-6b64a0f6bfa8",
+    "patient_id": "4b652396-6b38-45d7-909a-267bc920cbb0",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 2,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "cf9b4538-7710-4f4a-bbfe-c8aa1bfe8c97",
+    "patient_id": "12b52d8f-9e0d-4c1a-abb1-f83eb12780f0",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "a5506d17-dcdb-4c84-94e8-83936f648805",
+    "patient_id": "12b52d8f-9e0d-4c1a-abb1-f83eb12780f0",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "8d4e67f5-ebed-458b-a1ac-791a4d06cf01",
+    "patient_id": "12b52d8f-9e0d-4c1a-abb1-f83eb12780f0",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "f8f5af6c-6b4e-42b9-9113-bdb4811866e0",
+    "patient_id": "247a36ed-60df-4fa6-bfa1-3694933eba18",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 2,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "487cb8cb-1998-433c-86e0-1ffa6253bec1",
+    "patient_id": "247a36ed-60df-4fa6-bfa1-3694933eba18",
+    "role": "AIDE_SOIGNANT",
+    "seances_par_semaine": 2,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "ec920777-46e0-43b9-881e-6cdd8ba05826",
+    "patient_id": "247a36ed-60df-4fa6-bfa1-3694933eba18",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 8,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "04f38216-e2f3-4a28-a84f-c2262f0acce2",
+    "patient_id": "247a36ed-60df-4fa6-bfa1-3694933eba18",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 3,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "c751f946-f814-4c96-a5ce-f79945462366",
+    "patient_id": "247a36ed-60df-4fa6-bfa1-3694933eba18",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "3120ada2-cd75-4fb9-ab0a-6a2cacfe3cea",
+    "patient_id": "247a36ed-60df-4fa6-bfa1-3694933eba18",
+    "role": "PSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "f1338945-0c00-4e33-8af0-ac736ad24ce9",
+    "patient_id": "dbdbf6e8-ca5b-4df1-a0ec-1282ee336be4",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 2,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "e269c024-5782-44d9-a16d-be6ea676de92",
+    "patient_id": "dbdbf6e8-ca5b-4df1-a0ec-1282ee336be4",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 2,
+    "priorite": 3,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "6818111a-2399-4844-b8b2-053150a9cb19",
+    "patient_id": "dbdbf6e8-ca5b-4df1-a0ec-1282ee336be4",
+    "role": "AIDE_SOIGNANT",
+    "seances_par_semaine": 2,
+    "priorite": 7,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "8dc8634c-8041-4bf4-b254-d642ebe6fbf6",
+    "patient_id": "dbdbf6e8-ca5b-4df1-a0ec-1282ee336be4",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "cb5a3a3b-b930-4438-860d-d9ff287c9eb0",
+    "patient_id": "26f59f11-e5b5-46dc-b98c-85dd17e54edc",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "ac11ba5f-277a-4135-9d81-488a88e478b7",
+    "patient_id": "26f59f11-e5b5-46dc-b98c-85dd17e54edc",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": false
+  },
+  {
+    "id": "b10f0168-1510-4de9-b049-f989fedeabfc",
+    "patient_id": "26f59f11-e5b5-46dc-b98c-85dd17e54edc",
+    "role": "PSYCHOMOTRICIEN",
+    "seances_par_semaine": 2,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "ee8b494c-b224-43b7-b822-1de747a18669",
+    "patient_id": "26f59f11-e5b5-46dc-b98c-85dd17e54edc",
+    "role": "DIETETICIEN",
+    "seances_par_semaine": 1,
+    "priorite": 6,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "e559a16b-3dfb-4ba0-8bfa-9198de581d83",
+    "patient_id": "26f59f11-e5b5-46dc-b98c-85dd17e54edc",
+    "role": "ASSISTANTE_SOCIALE",
+    "seances_par_semaine": 1,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "72f4a3d5-6f77-4f24-85bf-3fd5a931f08c",
+    "patient_id": "26f59f11-e5b5-46dc-b98c-85dd17e54edc",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "2bb8523b-2159-4ece-aefb-cb65c6126a53",
+    "patient_id": "26f59f11-e5b5-46dc-b98c-85dd17e54edc",
+    "role": "ERGOTHERAPEUTE",
+    "seances_par_semaine": 3,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "5637aff3-9480-4416-987e-cf52b57a1e38",
+    "patient_id": "00d19248-7b0e-4291-9512-debfe6098e65",
+    "role": "MEDECIN_SMR",
+    "seances_par_semaine": 1,
+    "priorite": 1,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "300d8619-4dcb-472d-b51d-5b4154106ad1",
+    "patient_id": "00d19248-7b0e-4291-9512-debfe6098e65",
+    "role": "IDE_COORDINATRICE",
+    "seances_par_semaine": 1,
+    "priorite": 2,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "def6502c-7e12-42b6-ac9e-2d5402985326",
+    "patient_id": "00d19248-7b0e-4291-9512-debfe6098e65",
+    "role": "ORTHOPHONISTE",
+    "seances_par_semaine": 1,
+    "priorite": 5,
+    "professionnel_prefere_id": null,
+    "actif": true
+  },
+  {
+    "id": "feebcfa3-0f4d-45f5-a3c9-14abbacf7033",
+    "patient_id": "00d19248-7b0e-4291-9512-debfe6098e65",
+    "role": "NEUROPSYCHOLOGUE",
+    "seances_par_semaine": 1,
+    "priorite": 4,
+    "professionnel_prefere_id": null,
+    "actif": true
+  }
+]

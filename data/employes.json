@@ -1,0 +1,102 @@
+[
+  {
+    "id": "85c3db78-4171-4e8e-aeb4-e091ae4b7f18",
+    "nom": "Renard",
+    "prenom": "Sophie",
+    "email": "sophie.renard@clinique-smr.fr",
+    "mot_de_passe_hash": "$2a$10$EF64aH1on5uv31291J7b.ufZHcno2DybVXqWkmeA09tyfyRGlrdZu",
+    "role": "MEDECIN_SMR",
+    "actif": true,
+    "created_at": "2026-06-18T15:01:44.875Z"
+  },
+  {
+    "id": "2dc207a3-844d-4866-b283-ef79bbb55af6",
+    "nom": "Dupont",
+    "prenom": "Claire",
+    "email": "claire.dupont@clinique-smr.fr",
+    "mot_de_passe_hash": "$2a$10$EF64aH1on5uv31291J7b.ufZHcno2DybVXqWkmeA09tyfyRGlrdZu",
+    "role": "KINESITHERAPEUTE",
+    "actif": true,
+    "created_at": "2026-06-18T15:01:44.876Z"
+  },
+  {
+    "id": "a183016b-5b91-4280-8d73-db42a3f4498e",
+    "nom": "Lefevre",
+    "prenom": "Marc",
+    "email": "marc.lefevre@clinique-smr.fr",
+    "mot_de_passe_hash": "$2a$10$EF64aH1on5uv31291J7b.ufZHcno2DybVXqWkmeA09tyfyRGlrdZu",
+    "role": "KINESITHERAPEUTE",
+    "actif": true,
+    "created_at": "2026-06-18T15:01:44.876Z"
+  },
+  {
+    "id": "a3959e39-9fac-46e8-970a-6afe276a33ea",
+    "nom": "Moreau",
+    "prenom": "Julie",
+    "email": "julie.moreau@clinique-smr.fr",
+    "mot_de_passe_hash": "$2a$10$EF64aH1on5uv31291J7b.ufZHcno2DybVXqWkmeA09tyfyRGlrdZu",
+    "role": "ERGOTHERAPEUTE",
+    "actif": true,
+    "created_at": "2026-06-18T15:01:44.876Z"
+  },
+  {
+    "id": "a8b7a760-00d2-45b9-8cca-1349e04dcd76",
+    "nom": "Belkacem",
+    "prenom": "Nadia",
+    "email": "nadia.belkacem@clinique-smr.fr",
+    "mot_de_passe_hash": "$2a$10$EF64aH1on5uv31291J7b.ufZHcno2DybVXqWkmeA09tyfyRGlrdZu",
+    "role": "ORTHOPHONISTE",
+    "actif": true,
+    "created_at": "2026-06-18T15:01:44.876Z"
+  },
+  {
+    "id": "787b10df-8a26-4b72-8e35-9c713e6ad48c",
+    "nom": "Girard",
+    "prenom": "Thomas",
+    "email": "thomas.girard@clinique-smr.fr",
+    "mot_de_passe_hash": "$2a$10$EF64aH1on5uv31291J7b.ufZHcno2DybVXqWkmeA09tyfyRGlrdZu",
+    "role": "NEUROPSYCHOLOGUE",
+    "actif": true,
+    "created_at": "2026-06-18T15:01:44.876Z"
+  },
+  {
+    "id": "7becb6e0-7673-4efd-a0dc-1989138d46eb",
+    "nom": "Picard",
+    "prenom": "Elise",
+    "email": "elise.picard@clinique-smr.fr",
+    "mot_de_passe_hash": "$2a$10$EF64aH1on5uv31291J7b.ufZHcno2DybVXqWkmeA09tyfyRGlrdZu",
+    "role": "DIETETICIEN",
+    "actif": true,
+    "created_at": "2026-06-18T15:01:44.876Z"
+  },
+  {
+    "id": "13059334-704f-4316-a901-d57ff3fa2eff",
+    "nom": "Roussel",
+    "prenom": "Sandra",
+    "email": "sandra.roussel@clinique-smr.fr",
+    "mot_de_passe_hash": "$2a$10$EF64aH1on5uv31291J7b.ufZHcno2DybVXqWkmeA09tyfyRGlrdZu",
+    "role": "ASSISTANTE_SOCIALE",
+    "actif": true,
+    "created_at": "2026-06-18T15:01:44.876Z"
+  },
+  {
+    "id": "67040f56-77d3-45f2-b010-05d232c01054",
+    "nom": "Fontaine",
+    "prenom": "Valerie",
+    "email": "valerie.fontaine@clinique-smr.fr",
+    "mot_de_passe_hash": "$2a$10$EF64aH1on5uv31291J7b.ufZHcno2DybVXqWkmeA09tyfyRGlrdZu",
+    "role": "IDE_COORDINATRICE",
+    "actif": true,
+    "created_at": "2026-06-18T15:01:44.876Z"
+  },
+  {
+    "id": "91266069-ce83-4be5-9a19-6f7b5062ba5f",
+    "nom": "Haddad",
+    "prenom": "Karim",
+    "email": "karim.haddad@clinique-smr.fr",
+    "mot_de_passe_hash": "$2a$10$EF64aH1on5uv31291J7b.ufZHcno2DybVXqWkmeA09tyfyRGlrdZu",
+    "role": "AIDE_SOIGNANT",
+    "actif": true,
+    "created_at": "2026-06-18T15:01:44.876Z"
+  }
+]

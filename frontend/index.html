@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMR Planning — Clinique de soins de suite et réadaptation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- ÉCRAN DE CONNEXION -->
+<!-- ============================================ -->
+<div id="ecran-login" class="ecran ecran-login">
+  <div class="login-fond-motif" aria-hidden="true"></div>
+  <div class="login-layout">
+    <div class="login-visuel" aria-hidden="true">
+      <img src="login-illustration.png" alt="" class="login-illustration">
+    </div>
+    <div class="login-carte">
+      <div class="login-entete">
+        <div class="login-monogramme">SMR</div>
+        <h1 class="login-titre">SMR Planner</h1>
+        <p class="login-soustitre">Soins de suite et réadaptation</p>
+      </div>
+
+      <form id="form-login" class="login-formulaire" novalidate>
+        <label class="champ">
+          <span class="champ-label">Adresse e-mail professionnelle</span>
+          <input type="email" id="login-email" autocomplete="username" required placeholder="prenom.nom@clinique-smr.fr">
+        </label>
+        <label class="champ">
+          <span class="champ-label">Mot de passe</span>
+          <input type="password" id="login-password" autocomplete="current-password" required placeholder="••••••••">
+        </label>
+
+        <div id="login-erreur" class="message-erreur" role="alert" hidden></div>
+
+        <button type="submit" class="bouton bouton-principal bouton-pleine-largeur" id="btn-login">
+          <span class="btn-texte">Se connecter</span>
+          <span class="btn-spinner" hidden></span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- APPLICATION PRINCIPALE -->
+<!-- ============================================ -->
+<div id="app" class="app" hidden>
+
+  <!-- Barre latérale de navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-haut">
+      <div class="sidebar-brand">
+        <div class="sidebar-monogramme">
+          <span class="sidebar-monogramme-smr">SMR Planner</span>
+        </div>
+      </div>
+      <nav class="sidebar-nav" aria-label="Navigation principale">
+        <button class="nav-item" data-vue="mon-agenda">
+          <span class="nav-icone" aria-hidden="true">◐</span>
+          <span>Mon agenda</span>
+        </button>
+        <button class="nav-item" data-vue="agenda-global">
+          <span class="nav-icone" aria-hidden="true">▦</span>
+          <span>Agenda global</span>
+        </button>
+        <button class="nav-item" data-vue="agenda-patient">
+          <span class="nav-icone" aria-hidden="true">◑</span>
+          <span>Agenda patient</span>
+        </button>
+        <button class="nav-item" data-vue="patients">
+          <span class="nav-icone" aria-hidden="true">▤</span>
+          <span>Patients</span>
+        </button>
+        <button class="nav-item" data-vue="horaires">
+          <span class="nav-icone" aria-hidden="true">◷</span>
+          <span>Mes horaires</span>
+        </button>
+        <button class="nav-item" data-vue="equipe" id="nav-equipe">
+          <span class="nav-icone" aria-hidden="true">⚇</span>
+          <span>Équipe</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="sidebar-bas">
+      <div class="sidebar-profil">
+        <div class="profil-avatar" id="profil-avatar">--</div>
+        <div class="profil-info">
+          <span class="profil-nom" id="profil-nom">—</span>
+          <span class="profil-role" id="profil-role">—</span>
+        </div>
+      </div>
+      <button class="bouton-deconnexion" id="btn-logout" title="Se déconnecter">⏻</button>
+    </div>
+  </aside>
+
+  <!-- Zone de contenu principal -->
+  <main class="contenu">
+
+    <!-- VUE : Mon agenda -->
+    <section class="vue" id="vue-mon-agenda" data-vue="mon-agenda">
+      <header class="vue-entete">
+        <div>
+          <p class="vue-eyebrow">Vue personnelle</p>
+          <h2 class="vue-titre">Mon agenda</h2>
+        </div>
+        <div class="vue-actions">
+          <button type="button" class="bouton-icone" id="btn-export-ics" title="Exporter vers Google Calendar ou Apple Calendrier" aria-label="Exporter mon agenda">
+            <svg class="icone-partage" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3v12"/>
+              <path d="m7 8 5-5 5 5"/>
+              <path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/>
+            </svg>
+          </button>
+          <div class="navigation-semaine" id="nav-semaine-mon-agenda"></div>
+        </div>
+      </header>
+      <div class="grille-agenda" id="grille-mon-agenda"></div>
+    </section>
+
+    <!-- VUE : Agenda global -->
+    <section class="vue" id="vue-agenda-global" data-vue="agenda-global" hidden>
+      <header class="vue-entete vue-entete--global">
+        <div>
+          <p class="vue-eyebrow">Vue d'ensemble</p>
+          <h2 class="vue-titre">Agenda global de la clinique</h2>
+        </div>
+        <div class="vue-actions">
+          <div class="navigation-semaine" id="nav-semaine-global"></div>
+        </div>
+      </header>
+
+      <div class="bandeau-generation" id="bandeau-generation">
+        <div class="bandeau-generation-texte">
+          <strong>Génération automatique du planning</strong>
+        </div>
+        <div class="bandeau-generation-actions">
+          <button class="bouton bouton-principal" id="btn-lancer-generation">
+            <span class="btn-texte-generation">Générer la semaine</span>
+            <span class="btn-spinner" id="spinner-generation" hidden></span>
+          </button>
+        </div>
+      </div>
+
+      <div id="agenda-global-stats" class="agenda-global-stats"></div>
+
+      <div class="agenda-global-toolbar">
+        <label class="agenda-filtre-metier" for="filtre-role-global">
+          <span class="agenda-filtre-metier-label">Métier</span>
+          <select id="filtre-role-global" class="select-filtre-metier">
+            <option value="">Tous les métiers</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="grille-agenda grille-agenda--globale" id="grille-globale"></div>
+      <div id="agenda-global-vide" class="agenda-global-vide" hidden></div>
+    </section>
+
+    <!-- VUE : Agenda patient -->
+    <section class="vue vue-agenda-patient" id="vue-agenda-patient" data-vue="agenda-patient" hidden>
+      <header class="vue-entete vue-entete--patient">
+        <div>
+          <p class="vue-eyebrow">Suivi individuel</p>
+          <h2 class="vue-titre">Agenda d'un patient</h2>
+          <p class="vue-sous-titre-global">Consultez le planning hebdomadaire et les besoins de rééducation</p>
+        </div>
+        <div class="vue-actions vue-actions--patient">
+          <div class="combobox-patient" id="combobox-patient-agenda">
+            <input
+              type="text"
+              id="selecteur-patient-agenda"
+              class="combobox-patient-input"
+              placeholder="Rechercher un patient…"
+              autocomplete="off"
+              role="combobox"
+              aria-expanded="false"
+              aria-controls="liste-options-patient-agenda"
+              aria-autocomplete="list"
+            >
+            <ul id="liste-options-patient-agenda" class="combobox-patient-liste" role="listbox" hidden></ul>
+          </div>
+          <div class="navigation-semaine" id="nav-semaine-patient"></div>
+        </div>
+      </header>
+
+      <div id="agenda-patient-vide" class="agenda-patient-vide" hidden>
+        <div class="agenda-patient-vide-icone" aria-hidden="true">◑</div>
+        <h3 class="agenda-patient-vide-titre">Aucun patient actif</h3>
+        <p class="agenda-patient-vide-texte">Ajoutez un patient pour consulter son agenda hebdomadaire.</p>
+      </div>
+
+      <div id="agenda-patient-contenu" class="agenda-patient-contenu" hidden>
+        <div id="fiche-patient-resume" class="fiche-patient-resume"></div>
+        <div class="grille-agenda grille-agenda--patient" id="grille-patient"></div>
+        <div id="agenda-patient-sans-rdv" class="agenda-patient-sans-rdv" hidden></div>
+      </div>
+    </section>
+
+    <!-- VUE : Gestion des patients -->
+    <section class="vue" id="vue-patients" data-vue="patients" hidden>
+      <header class="vue-entete">
+        <div>
+          <p class="vue-eyebrow">Dossiers</p>
+          <h2 class="vue-titre">Patients</h2>
+        </div>
+        <div class="vue-actions">
+          <div class="segmented" id="filtre-statut-patient">
+            <button class="segmented-item is-active" data-statut="ACTIF">Actifs</button>
+            <button class="segmented-item" data-statut="ARCHIVE">Archivés</button>
+          </div>
+          <button class="bouton bouton-principal" id="btn-nouveau-patient">+ Nouveau patient</button>
+        </div>
+      </header>
+
+      <div class="patients-outils">
+        <div class="barre-recherche-patient">
+          <svg class="barre-recherche-icone" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="m20 20-3-3"/>
+          </svg>
+          <input type="search" id="recherche-patient" placeholder="Rechercher un patient…" autocomplete="off" aria-label="Rechercher un patient par nom">
+        </div>
+      </div>
+
+      <div class="liste-patients" id="liste-patients"></div>
+    </section>
+
+    <!-- VUE : Mes horaires -->
+    <section class="vue" id="vue-horaires" data-vue="horaires" hidden>
+      <header class="vue-entete">
+        <div>
+          <p class="vue-eyebrow">Disponibilités</p>
+          <h2 class="vue-titre">Mes horaires de travail</h2>
+        </div>
+      </header>
+      <div class="editeur-horaires" id="editeur-horaires"></div>
+      <div class="horaires-actions">
+        <button class="bouton bouton-principal" id="btn-enregistrer-horaires">Enregistrer mes horaires</button>
+        <span class="message-confirmation" id="confirmation-horaires" hidden>Horaires enregistrés ✓</span>
+      </div>
+    </section>
+
+    <!-- VUE : Équipe (employés) -->
+    <section class="vue" id="vue-equipe" data-vue="equipe" hidden>
+      <header class="vue-entete">
+        <div>
+          <p class="vue-eyebrow">Ressources humaines</p>
+          <h2 class="vue-titre">Équipe de la clinique</h2>
+        </div>
+        <button class="bouton bouton-principal" id="btn-nouvel-employe">+ Nouvel employé</button>
+      </header>
+      <div class="liste-equipe" id="liste-equipe"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============================================ -->
+<!-- MODALES -->
+<!-- ============================================ -->
+
+<!-- Modale : créer/éditer un patient -->
+<div class="modale-fond" id="modale-patient-fond" hidden>
+  <div class="modale" role="dialog" aria-modal="true" aria-labelledby="modale-patient-titre">
+    <div class="modale-entete">
+      <h3 id="modale-patient-titre">Nouveau patient</h3>
+      <button class="modale-fermer" data-fermer-modale="modale-patient-fond" aria-label="Fermer">×</button>
+    </div>
+    <form id="form-patient" class="modale-corps">
+      <input type="hidden" id="patient-id">
+      <div class="champs-ligne">
+        <label class="champ">
+          <span class="champ-label">Prénom</span>
+          <input type="text" id="patient-prenom" required>
+        </label>
+        <label class="champ">
+          <span class="champ-label">Nom</span>
+          <input type="text" id="patient-nom" required>
+        </label>
+      </div>
+      <label class="champ">
+        <span class="champ-label">Date de naissance</span>
+        <input type="date" id="patient-naissance">
+      </label>
+
+      <div class="besoins-entete">
+        <span class="champ-label">Besoins de rééducation hebdomadaires</span>
+        <button type="button" class="bouton bouton-mini" id="btn-ajouter-besoin">+ Ajouter un besoin</button>
+      </div>
+      <div id="liste-besoins-form"></div>
+
+      <div class="message-erreur" id="patient-erreur" role="alert" hidden></div>
+    </form>
+    <div class="modale-pied">
+      <button class="bouton bouton-discret" data-fermer-modale="modale-patient-fond">Annuler</button>
+      <button class="bouton bouton-principal" id="btn-enregistrer-patient">Enregistrer le patient</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modale : créer un employé -->
+<div class="modale-fond" id="modale-employe-fond" hidden>
+  <div class="modale" role="dialog" aria-modal="true" aria-labelledby="modale-employe-titre">
+    <div class="modale-entete">
+      <h3 id="modale-employe-titre">Nouvel employé</h3>
+      <button class="modale-fermer" data-fermer-modale="modale-employe-fond" aria-label="Fermer">×</button>
+    </div>
+    <form id="form-employe" class="modale-corps">
+      <div class="champs-ligne">
+        <label class="champ">
+          <span class="champ-label">Prénom</span>
+          <input type="text" id="employe-prenom" required>
+        </label>
+        <label class="champ">
+          <span class="champ-label">Nom</span>
+          <input type="text" id="employe-nom" required>
+        </label>
+      </div>
+      <label class="champ">
+        <span class="champ-label">E-mail professionnel</span>
+        <input type="email" id="employe-email" required>
+      </label>
+      <label class="champ">
+        <span class="champ-label">Mot de passe initial</span>
+        <input type="password" id="employe-password" required minlength="6">
+      </label>
+      <label class="champ">
+        <span class="champ-label">Métier</span>
+        <select id="employe-role" required></select>
+      </label>
+      <div class="message-erreur" id="employe-erreur" role="alert" hidden></div>
+    </form>
+    <div class="modale-pied">
+      <button class="bouton bouton-discret" data-fermer-modale="modale-employe-fond">Annuler</button>
+      <button class="bouton bouton-principal" id="btn-enregistrer-employe">Créer le compte</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modale : détail d'un créneau -->
+<div class="modale-fond" id="modale-creneau-fond" hidden>
+  <div class="modale modale--petite" role="dialog" aria-modal="true" aria-labelledby="modale-creneau-titre">
+    <div class="modale-entete">
+      <h3 id="modale-creneau-titre">Détail du rendez-vous</h3>
+      <button class="modale-fermer" data-fermer-modale="modale-creneau-fond" aria-label="Fermer">×</button>
+    </div>
+    <div class="modale-corps" id="modale-creneau-corps"></div>
+    <div class="modale-pied">
+      <button class="bouton bouton-danger" id="btn-annuler-creneau">Annuler ce rendez-vous</button>
+      <button class="bouton bouton-discret" data-fermer-modale="modale-creneau-fond">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modale : synchronisation calendrier -->
+<div class="modale-fond" id="modale-sync-fond" hidden>
+  <div class="modale modale--petite" role="dialog" aria-modal="true" aria-labelledby="modale-sync-titre">
+    <div class="modale-entete">
+      <h3 id="modale-sync-titre">Synchroniser mon agenda</h3>
+      <button class="modale-fermer" data-fermer-modale="modale-sync-fond" aria-label="Fermer">×</button>
+    </div>
+    <div class="modale-corps modale-sync-corps">
+      <p class="modale-sync-intro">
+        Pour avoir connecter votre agenda externe (Google, Apple, Outlook) en lecture seule,
+        collez l'URL ci-dessous dans « Ajouter un calendrier par URL ».
+      </p>
+      <div id="sync-etat-vide" class="sync-etat-vide" hidden>
+        <p>Générez une URL sécurisée.</p>
+      </div>
+      <div id="sync-etat-actif" hidden>
+        <label class="champ-label" for="sync-url">URL d'abonnement</label>
+        <div class="sync-url-ligne">
+          <input type="text" id="sync-url" class="sync-url-input" readonly>
+          <button type="button" class="bouton bouton-discret" id="btn-copier-sync-url">Copier</button>
+        </div>
+        <p class="sync-meta" id="sync-meta"></p>
+      </div>
+      <div id="sync-url-nouvelle" class="sync-url-nouvelle" hidden>
+        <p class="sync-alerte">Copiez ce lien maintenant — il ne sera plus affiché en entier.</p>
+        <div class="sync-url-ligne">
+          <input type="text" id="sync-url-nouvelle-input" class="sync-url-input" readonly>
+          <button type="button" class="bouton bouton-discret" id="btn-copier-sync-url-nouvelle">Copier</button>
+        </div>
+      </div>
+    </div>
+    <div class="modale-pied modale-pied--sync">
+      <button type="button" class="bouton bouton-danger" id="btn-revoquer-sync" hidden>Révoquer le lien</button>
+      <button type="button" class="bouton bouton-principal" id="btn-generer-sync-url">Générer un lien</button>
+    </div>
+  </div>
+</div>
+
+<!-- Zone de notifications toast -->
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="api.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

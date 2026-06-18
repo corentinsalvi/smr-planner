@@ -1,0 +1,3 @@
+PORT=4000
+JWT_SECRET=change_moi_en_production_clinique_smr_secret_2026
+JWT_EXPIRES_IN=8h

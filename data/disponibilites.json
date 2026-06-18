@@ -1,0 +1,702 @@
+[
+  {
+    "id": "7af356d1-dd38-4b1c-b2fb-c50889d63f78",
+    "employe_id": "85c3db78-4171-4e8e-aeb4-e091ae4b7f18",
+    "jour_semaine": 1,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "b2d9835c-390c-4bfe-884f-3666592a9efe",
+    "employe_id": "85c3db78-4171-4e8e-aeb4-e091ae4b7f18",
+    "jour_semaine": 1,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "f155b8dd-4dc4-4e71-8cc9-86a45a41fb6d",
+    "employe_id": "85c3db78-4171-4e8e-aeb4-e091ae4b7f18",
+    "jour_semaine": 2,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "874ed7a9-c371-4a47-b555-7a3629e906b0",
+    "employe_id": "85c3db78-4171-4e8e-aeb4-e091ae4b7f18",
+    "jour_semaine": 2,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "cbc6c812-b23c-495e-a22d-dc7e85f1c0b8",
+    "employe_id": "85c3db78-4171-4e8e-aeb4-e091ae4b7f18",
+    "jour_semaine": 3,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "2cdea415-c4b3-4f03-9c10-60fb79bdfe51",
+    "employe_id": "85c3db78-4171-4e8e-aeb4-e091ae4b7f18",
+    "jour_semaine": 3,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "664f6952-ec19-419a-8d4b-590b02203b4e",
+    "employe_id": "85c3db78-4171-4e8e-aeb4-e091ae4b7f18",
+    "jour_semaine": 4,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "e11a2d83-4a50-46f3-8f61-5a7a5f0d4934",
+    "employe_id": "85c3db78-4171-4e8e-aeb4-e091ae4b7f18",
+    "jour_semaine": 4,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "55d51e0b-2d7e-435a-9f42-103e20646718",
+    "employe_id": "85c3db78-4171-4e8e-aeb4-e091ae4b7f18",
+    "jour_semaine": 5,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "74281f4b-f6d8-4d40-a413-d7191160ab4e",
+    "employe_id": "85c3db78-4171-4e8e-aeb4-e091ae4b7f18",
+    "jour_semaine": 5,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "4e54c48c-81f7-4b05-87ab-5e7a1b3e6d2c",
+    "employe_id": "2dc207a3-844d-4866-b283-ef79bbb55af6",
+    "jour_semaine": 1,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "3f86cce9-d177-4ea9-9e05-c82c0e6bc5eb",
+    "employe_id": "2dc207a3-844d-4866-b283-ef79bbb55af6",
+    "jour_semaine": 1,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "1ea2dd30-7307-4f33-b00c-957913382ec8",
+    "employe_id": "2dc207a3-844d-4866-b283-ef79bbb55af6",
+    "jour_semaine": 2,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "bbfcb882-7244-4c85-90bd-f67a5928cfea",
+    "employe_id": "2dc207a3-844d-4866-b283-ef79bbb55af6",
+    "jour_semaine": 2,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "6b111257-2c21-425b-8a3e-59cb99ee2664",
+    "employe_id": "2dc207a3-844d-4866-b283-ef79bbb55af6",
+    "jour_semaine": 3,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "96075c9e-4968-4c20-b87a-7449a7ddee9b",
+    "employe_id": "2dc207a3-844d-4866-b283-ef79bbb55af6",
+    "jour_semaine": 3,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "d5a427aa-ee0a-4fd0-a99c-539edbbf22de",
+    "employe_id": "2dc207a3-844d-4866-b283-ef79bbb55af6",
+    "jour_semaine": 4,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "94cb5a0a-baf9-4884-aa2c-31eecb2d2c8f",
+    "employe_id": "2dc207a3-844d-4866-b283-ef79bbb55af6",
+    "jour_semaine": 4,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "b3b53665-fa3c-4d51-91dd-02c526edfc3f",
+    "employe_id": "2dc207a3-844d-4866-b283-ef79bbb55af6",
+    "jour_semaine": 5,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "3dbea7a7-feb3-4f7f-9dae-78e08a64147c",
+    "employe_id": "2dc207a3-844d-4866-b283-ef79bbb55af6",
+    "jour_semaine": 5,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "ffb9595e-52cc-4c81-9cfa-da2d8cbe099a",
+    "employe_id": "a183016b-5b91-4280-8d73-db42a3f4498e",
+    "jour_semaine": 1,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "3571cfb8-a9eb-4b87-98a8-e23af14e9d59",
+    "employe_id": "a183016b-5b91-4280-8d73-db42a3f4498e",
+    "jour_semaine": 1,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "7ac8bc8a-a196-481f-b5d4-6c5ce1b3dbe7",
+    "employe_id": "a183016b-5b91-4280-8d73-db42a3f4498e",
+    "jour_semaine": 2,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "84fbb322-a638-4b20-acc2-6fc4e4574417",
+    "employe_id": "a183016b-5b91-4280-8d73-db42a3f4498e",
+    "jour_semaine": 2,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "02fdbfbe-9ff1-496f-a6bf-3b1e24192582",
+    "employe_id": "a183016b-5b91-4280-8d73-db42a3f4498e",
+    "jour_semaine": 3,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "afb71e92-93bc-47d9-a504-d2c63d3664cf",
+    "employe_id": "a183016b-5b91-4280-8d73-db42a3f4498e",
+    "jour_semaine": 3,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "eb9fca74-41bb-4f77-a185-6b9262da2e12",
+    "employe_id": "a183016b-5b91-4280-8d73-db42a3f4498e",
+    "jour_semaine": 4,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "a927fda3-94b6-4eb0-8a5e-2f86000b30ae",
+    "employe_id": "a183016b-5b91-4280-8d73-db42a3f4498e",
+    "jour_semaine": 4,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "5eb28194-5021-4455-b63b-37b3865d5e06",
+    "employe_id": "a183016b-5b91-4280-8d73-db42a3f4498e",
+    "jour_semaine": 5,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "765fee8c-de54-4f4a-b162-41b53741eb04",
+    "employe_id": "a183016b-5b91-4280-8d73-db42a3f4498e",
+    "jour_semaine": 5,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "add90dd0-315e-4962-8076-b020a4c961cb",
+    "employe_id": "a3959e39-9fac-46e8-970a-6afe276a33ea",
+    "jour_semaine": 1,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "8e7b80f4-cbc0-4737-996d-6d27c9deff1d",
+    "employe_id": "a3959e39-9fac-46e8-970a-6afe276a33ea",
+    "jour_semaine": 1,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "7e72faa9-1371-4df0-b35e-a37554aa7186",
+    "employe_id": "a3959e39-9fac-46e8-970a-6afe276a33ea",
+    "jour_semaine": 2,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "df46c234-9df0-4efb-a03d-3666b2602ac7",
+    "employe_id": "a3959e39-9fac-46e8-970a-6afe276a33ea",
+    "jour_semaine": 2,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "56396924-9b86-43b0-bc27-577b6b718d8d",
+    "employe_id": "a3959e39-9fac-46e8-970a-6afe276a33ea",
+    "jour_semaine": 3,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "42ad8cad-600a-4ff1-8bc5-cb71d382e1c0",
+    "employe_id": "a3959e39-9fac-46e8-970a-6afe276a33ea",
+    "jour_semaine": 3,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "0b84700a-787b-46ec-9805-7c75a3413350",
+    "employe_id": "a3959e39-9fac-46e8-970a-6afe276a33ea",
+    "jour_semaine": 4,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "7e209b75-5612-4f5a-8f0f-3709588e592c",
+    "employe_id": "a3959e39-9fac-46e8-970a-6afe276a33ea",
+    "jour_semaine": 4,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "99e6a8e2-1b2e-4dc0-ae65-3892eb0fa1f4",
+    "employe_id": "a3959e39-9fac-46e8-970a-6afe276a33ea",
+    "jour_semaine": 5,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "02dcee7c-1386-4c17-a840-9c4dc9e649ca",
+    "employe_id": "a3959e39-9fac-46e8-970a-6afe276a33ea",
+    "jour_semaine": 5,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "b16a2fac-08e1-4086-af5f-fbd3ca442dc0",
+    "employe_id": "a8b7a760-00d2-45b9-8cca-1349e04dcd76",
+    "jour_semaine": 1,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "af23cd42-0664-4bf8-b833-1a32a078ec97",
+    "employe_id": "a8b7a760-00d2-45b9-8cca-1349e04dcd76",
+    "jour_semaine": 1,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "5b6651c6-fbe6-4141-a4cb-63cc27734fb9",
+    "employe_id": "a8b7a760-00d2-45b9-8cca-1349e04dcd76",
+    "jour_semaine": 2,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "4d55c8cb-f23d-4703-9a82-b05ea5685844",
+    "employe_id": "a8b7a760-00d2-45b9-8cca-1349e04dcd76",
+    "jour_semaine": 2,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "e676e504-6da3-4468-8657-d931530d9e10",
+    "employe_id": "a8b7a760-00d2-45b9-8cca-1349e04dcd76",
+    "jour_semaine": 3,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "d7e03988-33af-4fec-9762-dc77fa9c5e85",
+    "employe_id": "a8b7a760-00d2-45b9-8cca-1349e04dcd76",
+    "jour_semaine": 3,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "1bcd46e6-b472-47f2-bc58-6ceaed7fb93f",
+    "employe_id": "a8b7a760-00d2-45b9-8cca-1349e04dcd76",
+    "jour_semaine": 4,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "4cb41e1a-9ff3-4ad3-b229-5547a6de590a",
+    "employe_id": "a8b7a760-00d2-45b9-8cca-1349e04dcd76",
+    "jour_semaine": 4,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "a7911f47-81df-45ba-9e60-d451ffa2cb0c",
+    "employe_id": "a8b7a760-00d2-45b9-8cca-1349e04dcd76",
+    "jour_semaine": 5,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "b6806668-76c4-44cd-8db7-d7af80022695",
+    "employe_id": "a8b7a760-00d2-45b9-8cca-1349e04dcd76",
+    "jour_semaine": 5,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "4901e00f-cbcd-493c-83b8-1733ce04cc97",
+    "employe_id": "787b10df-8a26-4b72-8e35-9c713e6ad48c",
+    "jour_semaine": 1,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "360a5a1f-67e7-4c76-81cd-5fda3ad0f0a0",
+    "employe_id": "787b10df-8a26-4b72-8e35-9c713e6ad48c",
+    "jour_semaine": 1,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "fbe07be1-e6cb-4a56-9af6-64590e436fab",
+    "employe_id": "787b10df-8a26-4b72-8e35-9c713e6ad48c",
+    "jour_semaine": 2,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "41694e7f-c31b-48e0-a636-3d48f826e689",
+    "employe_id": "787b10df-8a26-4b72-8e35-9c713e6ad48c",
+    "jour_semaine": 2,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "b804b762-a513-4779-8d39-dc4e0354de62",
+    "employe_id": "787b10df-8a26-4b72-8e35-9c713e6ad48c",
+    "jour_semaine": 3,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "dc72a353-22d5-4572-8215-2c2e9e9f22f3",
+    "employe_id": "787b10df-8a26-4b72-8e35-9c713e6ad48c",
+    "jour_semaine": 3,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "4fdde266-4422-42cf-8ecd-9ca50d70b903",
+    "employe_id": "787b10df-8a26-4b72-8e35-9c713e6ad48c",
+    "jour_semaine": 4,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "79eb22be-c359-4c87-9a6b-2cf3ce6e4fa8",
+    "employe_id": "787b10df-8a26-4b72-8e35-9c713e6ad48c",
+    "jour_semaine": 4,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "5f8240d8-6da2-4204-94a5-159a2a81be83",
+    "employe_id": "787b10df-8a26-4b72-8e35-9c713e6ad48c",
+    "jour_semaine": 5,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "2f29ee02-7c50-46d8-8ca6-4d8ffd09352b",
+    "employe_id": "787b10df-8a26-4b72-8e35-9c713e6ad48c",
+    "jour_semaine": 5,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "fb9d3fc8-b824-4260-a601-90f52f5929ad",
+    "employe_id": "7becb6e0-7673-4efd-a0dc-1989138d46eb",
+    "jour_semaine": 1,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "e26e9725-596c-4455-a9a8-e2548c9b5e0a",
+    "employe_id": "7becb6e0-7673-4efd-a0dc-1989138d46eb",
+    "jour_semaine": 1,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "49b28fba-b844-4aaa-8a87-f46c11f32c77",
+    "employe_id": "7becb6e0-7673-4efd-a0dc-1989138d46eb",
+    "jour_semaine": 2,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "a6c81c6a-fc59-4e9b-8b49-91b95711a0b3",
+    "employe_id": "7becb6e0-7673-4efd-a0dc-1989138d46eb",
+    "jour_semaine": 2,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "83245e7f-17fa-4883-bb15-09f27189bb47",
+    "employe_id": "7becb6e0-7673-4efd-a0dc-1989138d46eb",
+    "jour_semaine": 3,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "22f6e080-be91-4765-9824-00e23bbcc72f",
+    "employe_id": "7becb6e0-7673-4efd-a0dc-1989138d46eb",
+    "jour_semaine": 3,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "9037fe65-6ef1-4d07-88a4-6d282eb9ba07",
+    "employe_id": "7becb6e0-7673-4efd-a0dc-1989138d46eb",
+    "jour_semaine": 4,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "a0de62f1-c81e-48c3-9460-e55ff9288cc6",
+    "employe_id": "7becb6e0-7673-4efd-a0dc-1989138d46eb",
+    "jour_semaine": 4,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "75bbfb8b-dd84-4019-8bbc-d3f16ba5fa19",
+    "employe_id": "7becb6e0-7673-4efd-a0dc-1989138d46eb",
+    "jour_semaine": 5,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "31df1827-8077-4523-ad03-5a9008c928f5",
+    "employe_id": "7becb6e0-7673-4efd-a0dc-1989138d46eb",
+    "jour_semaine": 5,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "ac6f23d4-3992-4be5-834a-caa782764ae3",
+    "employe_id": "13059334-704f-4316-a901-d57ff3fa2eff",
+    "jour_semaine": 1,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "bf031595-4a1a-4ad8-9954-d24b70d4e49b",
+    "employe_id": "13059334-704f-4316-a901-d57ff3fa2eff",
+    "jour_semaine": 1,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "852a0e1b-8074-410f-ab8a-5300dea036bc",
+    "employe_id": "13059334-704f-4316-a901-d57ff3fa2eff",
+    "jour_semaine": 2,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "2433568e-bc76-4042-ac8a-2781525123fb",
+    "employe_id": "13059334-704f-4316-a901-d57ff3fa2eff",
+    "jour_semaine": 2,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "e40b7f0d-a347-429e-996d-af5174e69ad9",
+    "employe_id": "13059334-704f-4316-a901-d57ff3fa2eff",
+    "jour_semaine": 3,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "071ffc3d-16e2-4a13-a9f7-fff10fe0ea69",
+    "employe_id": "13059334-704f-4316-a901-d57ff3fa2eff",
+    "jour_semaine": 3,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "27b353f4-b3ed-43d1-b41c-4b2b4d2fb5c0",
+    "employe_id": "13059334-704f-4316-a901-d57ff3fa2eff",
+    "jour_semaine": 4,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "d16f52fd-0c70-43a9-9707-2b1b6bdba0aa",
+    "employe_id": "13059334-704f-4316-a901-d57ff3fa2eff",
+    "jour_semaine": 4,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "7ff238b1-bca5-42e1-8dc7-e02c454dbab5",
+    "employe_id": "13059334-704f-4316-a901-d57ff3fa2eff",
+    "jour_semaine": 5,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "1374bc71-7e2c-4c08-b9cd-94563705dd0d",
+    "employe_id": "13059334-704f-4316-a901-d57ff3fa2eff",
+    "jour_semaine": 5,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "40198ab1-1669-4f65-989a-baa281d981b0",
+    "employe_id": "67040f56-77d3-45f2-b010-05d232c01054",
+    "jour_semaine": 1,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "bb31f67e-aaaf-4976-8c41-dc9815c058f1",
+    "employe_id": "67040f56-77d3-45f2-b010-05d232c01054",
+    "jour_semaine": 1,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "4547aee6-0752-49e6-8107-d5a0f3e24f65",
+    "employe_id": "67040f56-77d3-45f2-b010-05d232c01054",
+    "jour_semaine": 2,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "4f742b2c-94fc-4c07-98c7-e8728c37bdbb",
+    "employe_id": "67040f56-77d3-45f2-b010-05d232c01054",
+    "jour_semaine": 2,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "4d06864c-a814-4851-ace2-5ac9781b874a",
+    "employe_id": "67040f56-77d3-45f2-b010-05d232c01054",
+    "jour_semaine": 3,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "6f426127-100c-47f0-9c33-cb1dc4e9d7a0",
+    "employe_id": "67040f56-77d3-45f2-b010-05d232c01054",
+    "jour_semaine": 3,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "d615acc3-03e4-442f-9a7a-e446f2e258f9",
+    "employe_id": "67040f56-77d3-45f2-b010-05d232c01054",
+    "jour_semaine": 4,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "799ae4c7-335b-4fe7-9a52-265f5de30fa7",
+    "employe_id": "67040f56-77d3-45f2-b010-05d232c01054",
+    "jour_semaine": 4,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "21c5f027-8f65-46bc-b866-d2c17e2dfad2",
+    "employe_id": "67040f56-77d3-45f2-b010-05d232c01054",
+    "jour_semaine": 5,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "488c321f-6eb7-4a8d-81b6-fb7e3e9af3ba",
+    "employe_id": "67040f56-77d3-45f2-b010-05d232c01054",
+    "jour_semaine": 5,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "9c25db62-73aa-4e91-9f57-07cd6cfbaa52",
+    "employe_id": "91266069-ce83-4be5-9a19-6f7b5062ba5f",
+    "jour_semaine": 1,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "4f97932f-09e4-437d-a104-1544ff3ce61d",
+    "employe_id": "91266069-ce83-4be5-9a19-6f7b5062ba5f",
+    "jour_semaine": 1,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "aa831b41-0f1c-478e-aaf2-ae4c4fdad29b",
+    "employe_id": "91266069-ce83-4be5-9a19-6f7b5062ba5f",
+    "jour_semaine": 2,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "b2ff65d0-ccbe-430c-8e0b-c77223425dfc",
+    "employe_id": "91266069-ce83-4be5-9a19-6f7b5062ba5f",
+    "jour_semaine": 2,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "97e02d2b-884b-4fc0-a47f-2cab4bb6319a",
+    "employe_id": "91266069-ce83-4be5-9a19-6f7b5062ba5f",
+    "jour_semaine": 3,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "f590e06d-0481-4563-9f49-ee09ad5ff551",
+    "employe_id": "91266069-ce83-4be5-9a19-6f7b5062ba5f",
+    "jour_semaine": 3,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "8e6451a1-1119-47b7-871a-3d36a7e44b81",
+    "employe_id": "91266069-ce83-4be5-9a19-6f7b5062ba5f",
+    "jour_semaine": 4,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "a82ceb37-aff4-46f6-95ca-7b2d0cb234d0",
+    "employe_id": "91266069-ce83-4be5-9a19-6f7b5062ba5f",
+    "jour_semaine": 4,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  },
+  {
+    "id": "4a262898-a83c-4a6f-a13c-d0108b24d5d3",
+    "employe_id": "91266069-ce83-4be5-9a19-6f7b5062ba5f",
+    "jour_semaine": 5,
+    "heure_debut": "08:00",
+    "heure_fin": "11:20"
+  },
+  {
+    "id": "237b7c0b-947e-43fc-8f9d-f0b1c28b6ed7",
+    "employe_id": "91266069-ce83-4be5-9a19-6f7b5062ba5f",
+    "jour_semaine": 5,
+    "heure_debut": "13:30",
+    "heure_fin": "16:50"
+  }
+]
