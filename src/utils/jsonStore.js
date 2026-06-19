@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const DATA_DIR = path.join(__dirname, '..', '..', 'data');
-const COLLECTIONS = ['employes', 'disponibilites', 'patients', 'besoins', 'creneaux', 'calendar_sync_tokens'];
+const COLLECTIONS = ['employes', 'disponibilites', 'patients', 'besoins', 'creneaux', 'calendar_sync_tokens', 'absences'];
 const locks = {};
 
 function ensureDataDir() {

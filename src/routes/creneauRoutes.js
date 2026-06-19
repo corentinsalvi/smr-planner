@@ -6,6 +6,7 @@ const { genererPlanningHebdomadaire } = require('../services/planningService');
 const { seChevauchent, lundiDeLaSemaine, lesCinqJoursDeLaSemaine } = require('../utils/dateUtils');
 const { genererFichierIcs } = require('../utils/icsUtils');
 const { TEMPS_PLANNING } = require('../constants');
+const { estProAbsent } = require('../utils/absenceUtils');
 
 // GET /api/creneaux/export/ics?date_debut=...&date_fin=...
 // Exporte uniquement l'agenda du professionnel connecté (semaine affichée par défaut).
@@ -63,6 +64,12 @@ router.get('/', (req, res) => {
 
 // Vérifie qu'un créneau manuel ne crée pas de conflit pro ou patient
 function verifierConflit(creneauxExistants, candidat, idAIgnorer = null) {
+  const absences = readAll('absences');
+
+  if (estProAbsent(absences, candidat.employe_id, candidat.date, candidat.heure_debut, candidat.heure_fin)) {
+    return 'Le professionnel est absent sur ce créneau.';
+  }
+
   const conflitsPro = creneauxExistants.filter(c =>
     c.id !== idAIgnorer &&
     c.employe_id === candidat.employe_id &&

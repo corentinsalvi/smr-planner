@@ -8,6 +8,7 @@ const authRoutes = require('./routes/authRoutes');
 const employeRoutes = require('./routes/employeRoutes');
 const patientRoutes = require('./routes/patientRoutes');
 const creneauRoutes = require('./routes/creneauRoutes');
+const absenceRoutes = require('./routes/absenceRoutes');
 const calendarRoutes = require('./routes/calendarRoutes');
 const { creerRoutesGestion } = require('./routes/calendarRoutes');
 
@@ -31,6 +32,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/employes', authMiddleware, employeRoutes);
 app.use('/api/patients', authMiddleware, patientRoutes);
 app.use('/api/creneaux', authMiddleware, creneauRoutes);
+app.use('/api/absences', authMiddleware, absenceRoutes);
 app.use('/api/calendar/sync', authMiddleware, creerRoutesGestion());
 
 app.get('/api/sante', (req, res) => {

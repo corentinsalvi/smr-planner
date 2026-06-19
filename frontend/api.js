@@ -56,6 +56,19 @@ const API = {
     return this.request('PUT', `/employes/${employeId}/disponibilites`, { disponibilites });
   },
 
+  getAbsences(params = {}) {
+    const q = new URLSearchParams(params).toString();
+    return this.request('GET', `/absences${q ? `?${q}` : ''}`);
+  },
+
+  createAbsence(data) {
+    return this.request('POST', '/absences', data);
+  },
+
+  deleteAbsence(id) {
+    return this.request('DELETE', `/absences/${id}`);
+  },
+
   getPatients(statut) {
     const q = statut ? `?statut=${statut}` : '';
     return this.request('GET', `/patients${q}`);

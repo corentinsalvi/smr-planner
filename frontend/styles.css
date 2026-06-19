@@ -663,6 +663,11 @@ button, input, select {
 .agenda-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.agenda-table th:not(.col-heure) {
+  width: calc((100% - 76px) / 5);
 }
 
 .agenda-table th {
@@ -704,9 +709,12 @@ button, input, select {
   border-bottom: 1px solid rgba(15, 40, 80, 0.05);
   padding: 5px;
   vertical-align: top;
-  height: 54px;
+  height: 62px;
+  max-height: 62px;
+  overflow: hidden;
   background: #fff;
   transition: background 0.15s ease;
+  box-sizing: border-box;
 }
 
 .agenda-table tr:hover td:not(.col-heure) {
@@ -765,12 +773,44 @@ button, input, select {
   padding: 8px 10px;
   font-size: 11.5px;
   cursor: pointer;
-  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 3px;
   transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow var(--transition);
   box-shadow: 0 2px 6px rgba(0, 60, 140, 0.06);
+}
+
+.creneau-carte--perso {
+  height: 52px;
+  max-height: 52px;
+  min-height: 52px;
+  padding: 7px 10px 6px;
+  gap: 2px;
+  justify-content: center;
+}
+
+.creneau-ligne-titre {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.creneau-ligne-titre .creneau-pastille {
+  flex-shrink: 0;
+  margin-right: 0;
+}
+
+.creneau-ligne-titre .creneau-titre {
+  flex: 1;
+  min-width: 0;
+}
+
+.creneau-carte--perso .creneau-sous-titre {
+  padding-left: 12px;
+  line-height: 1.2;
 }
 
 .creneau-carte:hover {
@@ -790,12 +830,18 @@ button, input, select {
   color: var(--encre);
   line-height: 1.25;
   letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .creneau-sous-titre {
   color: var(--encre-douce);
   font-size: 10.5px;
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .creneau-pastille {
@@ -989,6 +1035,7 @@ button, input, select {
 
 .agenda-table--global td {
   height: 72px;
+  max-height: 72px;
   padding: 6px;
 }
 
@@ -998,10 +1045,13 @@ button, input, select {
   color: var(--accent-encre);
 }
 
-.creneau-carte--global {
+.creneau-carte--global,
+.creneau-carte--pro-global {
   border-left-width: 4px;
-  padding: 10px 10px 8px;
-  gap: 5px;
+  padding: 8px 10px;
+  gap: 4px;
+  height: 60px;
+  max-height: 60px;
   min-height: 60px;
 }
 
@@ -1951,9 +2001,11 @@ button, input, select {
 
 .creneau-carte--patient {
   border-left-width: 4px;
-  padding: 10px 10px 8px;
-  gap: 5px;
-  min-height: 62px;
+  padding: 8px 10px;
+  gap: 4px;
+  height: 60px;
+  max-height: 60px;
+  min-height: 60px;
 }
 
 .creneau-carte--patient .creneau-titre {
@@ -2122,6 +2174,189 @@ button, input, select {
   align-items: center;
   gap: 16px;
   margin-top: 22px;
+}
+
+/* ============================================================
+   MON ESPACE & ABSENCES
+   ============================================================ */
+
+.espace-onglets {
+  margin-bottom: 24px;
+  width: fit-content;
+}
+
+/* ============================================================
+   ABSENCES
+   ============================================================ */
+
+.absences-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+  align-items: start;
+}
+
+.absences-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.absences-selecteur-pro .champ-compact select {
+  min-width: 260px;
+}
+
+.calendrier-absences-grille {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.calendrier-absences-jour {
+  background: var(--fond-releve);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  overflow: hidden;
+  box-shadow: var(--ombre-carte);
+}
+
+.calendrier-absences-jour-entete {
+  padding: 12px 14px;
+  background: var(--fond-creux);
+  border-bottom: 1px solid var(--bordure);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.calendrier-absences-jour-nom {
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.calendrier-absences-jour-date {
+  font-size: 12px;
+  color: var(--encre-discrete);
+}
+
+.calendrier-absences-jour-corps {
+  padding: 14px;
+  min-height: 72px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-content: flex-start;
+}
+
+.calendrier-absences-vide {
+  font-size: 12px;
+  color: var(--encre-discrete);
+}
+
+.absence-puce {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid;
+}
+
+.liste-absences-titre {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.liste-absences-vide {
+  color: var(--encre-discrete);
+  font-size: 14px;
+}
+
+.liste-absences-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.absence-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--fond-releve);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-petit);
+}
+
+.absence-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.absence-item-type {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.absence-item-dates {
+  font-size: 13px;
+}
+
+.absence-item-commentaire {
+  font-size: 12px;
+  color: var(--encre-discrete);
+}
+
+.absences-formulaire {
+  background: var(--fond-releve);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: 20px;
+  box-shadow: var(--ombre-carte);
+  position: sticky;
+  top: 16px;
+}
+
+.absences-formulaire-titre {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+
+.formulaire-absence {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.champ-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.champ-checkbox input {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 960px) {
+  .absences-layout { grid-template-columns: 1fr; }
+  .absences-formulaire { position: static; }
+  .calendrier-absences-grille { grid-template-columns: 1fr; }
 }
 
 /* ============================================================

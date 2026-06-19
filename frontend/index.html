@@ -61,9 +61,9 @@
         </div>
       </div>
       <nav class="sidebar-nav" aria-label="Navigation principale">
-        <button class="nav-item" data-vue="mon-agenda">
+        <button class="nav-item" data-vue="mon-espace">
           <span class="nav-icone" aria-hidden="true">◐</span>
-          <span>Mon agenda</span>
+          <span>Mon espace</span>
         </button>
         <button class="nav-item" data-vue="agenda-global">
           <span class="nav-icone" aria-hidden="true">▦</span>
@@ -76,10 +76,6 @@
         <button class="nav-item" data-vue="patients">
           <span class="nav-icone" aria-hidden="true">▤</span>
           <span>Patients</span>
-        </button>
-        <button class="nav-item" data-vue="horaires">
-          <span class="nav-icone" aria-hidden="true">◷</span>
-          <span>Mes horaires</span>
         </button>
         <button class="nav-item" data-vue="equipe" id="nav-equipe">
           <span class="nav-icone" aria-hidden="true">⚇</span>
@@ -103,39 +99,120 @@
   <!-- Zone de contenu principal -->
   <main class="contenu">
 
-    <!-- VUE : Mon agenda -->
-    <section class="vue" id="vue-mon-agenda" data-vue="mon-agenda">
-      <header class="vue-entete">
-        <div>
-          <p class="vue-eyebrow">Vue personnelle</p>
-          <h2 class="vue-titre">Mon agenda</h2>
-        </div>
-        <div class="vue-actions">
-          <button type="button" class="bouton-icone" id="btn-export-ics" title="Exporter vers Google Calendar ou Apple Calendrier" aria-label="Exporter mon agenda">
-            <svg class="icone-partage" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M12 3v12"/>
-              <path d="m7 8 5-5 5 5"/>
-              <path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/>
-            </svg>
-          </button>
-          <div class="navigation-semaine" id="nav-semaine-mon-agenda"></div>
-        </div>
-      </header>
+    <!-- VUE : Mon espace (agenda + horaires + absences) -->
+    <section class="vue" id="vue-mon-espace" data-vue="mon-espace">
+      <div class="espace-onglets segmented" id="espace-onglets" role="tablist">
+        <button type="button" class="segmented-item is-active" data-espace-onglet="agenda" role="tab" aria-selected="true">Mon agenda</button>
+        <button type="button" class="segmented-item" data-espace-onglet="horaires" role="tab" aria-selected="false">Mes horaires</button>
+        <button type="button" class="segmented-item" data-espace-onglet="absences" role="tab" aria-selected="false">Absences</button>
+      </div>
 
-      <div class="bandeau-generation" id="bandeau-generation">
-        <div class="bandeau-generation-texte">
-          <strong>Génération automatique</strong>
-          <span>Planifiez vos séances selon vos disponibilités et les besoins de vos patients.</span>
+      <!-- Onglet Agenda -->
+      <div class="espace-panel" id="espace-panel-agenda" data-espace-panel="agenda">
+        <header class="vue-entete">
+          <div>
+            <p class="vue-eyebrow">Vue personnelle</p>
+            <h2 class="vue-titre">Mon agenda</h2>
+          </div>
+          <div class="vue-actions">
+            <button type="button" class="bouton-icone" id="btn-export-ics" title="Exporter vers Google Calendar ou Apple Calendrier" aria-label="Exporter mon agenda">
+              <svg class="icone-partage" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 3v12"/>
+                <path d="m7 8 5-5 5 5"/>
+                <path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/>
+              </svg>
+            </button>
+            <div class="navigation-semaine" id="nav-semaine-mon-agenda"></div>
+          </div>
+        </header>
+
+        <div class="bandeau-generation" id="bandeau-generation">
+          <div class="bandeau-generation-texte">
+            <strong>Génération automatique</strong>
+            <span>Planifiez vos séances selon vos disponibilités et les besoins de vos patients.</span>
+          </div>
+          <div class="bandeau-generation-actions">
+            <button class="bouton bouton-principal" id="btn-lancer-generation">
+              <span class="btn-texte-generation">Générer mon agenda</span>
+              <span class="btn-spinner" id="spinner-generation" hidden></span>
+            </button>
+          </div>
         </div>
-        <div class="bandeau-generation-actions">
-          <button class="bouton bouton-principal" id="btn-lancer-generation">
-            <span class="btn-texte-generation">Générer mon agenda</span>
-            <span class="btn-spinner" id="spinner-generation" hidden></span>
-          </button>
+
+        <div class="grille-agenda" id="grille-mon-agenda"></div>
+      </div>
+
+      <!-- Onglet Horaires -->
+      <div class="espace-panel" id="espace-panel-horaires" data-espace-panel="horaires" hidden>
+        <header class="vue-entete">
+          <div>
+            <p class="vue-eyebrow">Disponibilités</p>
+            <h2 class="vue-titre">Mes horaires de travail</h2>
+          </div>
+        </header>
+        <div class="editeur-horaires" id="editeur-horaires"></div>
+        <div class="horaires-actions">
+          <button class="bouton bouton-principal" id="btn-enregistrer-horaires">Enregistrer mes horaires</button>
+          <span class="message-confirmation" id="confirmation-horaires" hidden>Horaires enregistrés ✓</span>
         </div>
       </div>
 
-      <div class="grille-agenda" id="grille-mon-agenda"></div>
+      <!-- Onglet Absences -->
+      <div class="espace-panel" id="espace-panel-absences" data-espace-panel="absences" hidden>
+        <div class="absences-layout">
+          <div class="absences-principal">
+            <div class="absences-toolbar">
+              <div id="absences-selecteur-pro" class="absences-selecteur-pro" hidden>
+                <label class="champ champ-compact" for="select-absence-employe">
+                  <span class="champ-label">Professionnel</span>
+                  <select id="select-absence-employe"></select>
+                </label>
+              </div>
+              <div class="navigation-semaine" id="nav-semaine-absences"></div>
+            </div>
+            <div class="calendrier-absences" id="calendrier-absences"></div>
+            <div class="liste-absences" id="liste-absences"></div>
+          </div>
+          <aside class="absences-formulaire">
+            <h3 class="absences-formulaire-titre">Déclarer une absence</h3>
+            <form id="form-absence" class="formulaire-absence" novalidate>
+              <label class="champ">
+                <span class="champ-label">Type</span>
+                <select id="absence-type" required></select>
+              </label>
+              <div class="champs-ligne">
+                <label class="champ">
+                  <span class="champ-label">Du</span>
+                  <input type="date" id="absence-date-debut" required>
+                </label>
+                <label class="champ">
+                  <span class="champ-label">Au</span>
+                  <input type="date" id="absence-date-fin" required>
+                </label>
+              </div>
+              <label class="champ champ-checkbox">
+                <input type="checkbox" id="absence-journee-entiere" checked>
+                <span>Journée(s) entière(s)</span>
+              </label>
+              <div id="absence-horaires-partiels" class="champs-ligne" hidden>
+                <label class="champ">
+                  <span class="champ-label">De</span>
+                  <input type="time" id="absence-heure-debut" step="300">
+                </label>
+                <label class="champ">
+                  <span class="champ-label">À</span>
+                  <input type="time" id="absence-heure-fin" step="300">
+                </label>
+              </div>
+              <label class="champ">
+                <span class="champ-label">Commentaire (optionnel)</span>
+                <input type="text" id="absence-commentaire" placeholder="Ex. formation kiné…">
+              </label>
+              <button type="submit" class="bouton bouton-principal bouton-pleine-largeur">Enregistrer l'absence</button>
+            </form>
+          </aside>
+        </div>
+      </div>
     </section>
 
     <!-- VUE : Agenda global -->
@@ -253,22 +330,7 @@
       <div class="liste-patients" id="liste-patients"></div>
     </section>
 
-    <!-- VUE : Mes horaires -->
-    <section class="vue" id="vue-horaires" data-vue="horaires" hidden>
-      <header class="vue-entete">
-        <div>
-          <p class="vue-eyebrow">Disponibilités</p>
-          <h2 class="vue-titre">Mes horaires de travail</h2>
-        </div>
-      </header>
-      <div class="editeur-horaires" id="editeur-horaires"></div>
-      <div class="horaires-actions">
-        <button class="bouton bouton-principal" id="btn-enregistrer-horaires">Enregistrer mes horaires</button>
-        <span class="message-confirmation" id="confirmation-horaires" hidden>Horaires enregistrés ✓</span>
-      </div>
-    </section>
-
-    <!-- VUE : Équipe (employés) -->
+    <!-- VUE : Agenda global -->
     <section class="vue" id="vue-equipe" data-vue="equipe" hidden>
       <header class="vue-entete">
         <div>

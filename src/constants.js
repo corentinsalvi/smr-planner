@@ -32,4 +32,12 @@ const JOURS_SEMAINE = [
   { numero: 5, label: 'Vendredi', abrev: 'Ven' }
 ];
 
-module.exports = { ROLES, JOURS_SEMAINE, REGLES_PLANNING, TEMPS_PLANNING };
+const GESTIONNAIRE_ROLES = ['IDE_COORDINATRICE'];
+
+const TYPES_ABSENCE = {
+  CONGE: { label: 'Congé', couleur: '#FF9500' },
+  ARRET_MALADIE: { label: 'Arrêt maladie', couleur: '#FF3B30' },
+  FORMATION: { label: 'Formation', couleur: '#5856D6' }
+};
+
+module.exports = { ROLES, JOURS_SEMAINE, REGLES_PLANNING, TEMPS_PLANNING, GESTIONNAIRE_ROLES, TYPES_ABSENCE };

@@ -9,7 +9,10 @@
     creneauSelectionne: null,
     patientAgendaId: null,
     agendaGlobalEmployeId: null,
-    patientAgendaMode: 'agenda'
+    patientAgendaMode: 'agenda',
+    espaceOnglet: 'agenda',
+    absencesCourantes: [],
+    espaceEmployeId: null
   };
 
   const $ = id => document.getElementById(id);
@@ -31,6 +34,11 @@
     return h * 60 + m;
   }
 
+  function finHeureSlot(heureDebut) {
+    const fin = minutesDepuis(heureDebut) + CONFIG.DUREE_SEANCE;
+    return `${String(Math.floor(fin / 60)).padStart(2, '0')}:${String(fin % 60).padStart(2, '0')}`;
+  }
+
   function lundiDe(date = new Date()) {
     const d = new Date(date);
     const jour = d.getDay();
@@ -49,11 +57,13 @@
   }
 
   function heuresAgenda(creneaux = []) {
-    const heures = new Set(CONFIG.HEURES_AGENDA);
+    const heures = [...CONFIG.HEURES_AGENDA];
     creneaux.forEach(c => {
-      if (c.statut !== 'ANNULE' && c.heure_debut) heures.add(c.heure_debut);
+      if (c.statut !== 'ANNULE' && c.heure_debut && !heures.includes(c.heure_debut)) {
+        heures.push(c.heure_debut);
+      }
     });
-    return [...heures].sort((a, b) => minutesDepuis(a) - minutesDepuis(b));
+    return heures.sort((a, b) => minutesDepuis(a) - minutesDepuis(b));
   }
 
   function lignesAgenda(creneaux = []) {
@@ -136,6 +146,46 @@
     return state.roles[role]?.label || role;
   }
 
+  function estGestionnaire() {
+    return CONFIG.GESTIONNAIRE_ROLES.includes(state.utilisateur?.role);
+  }
+
+  function employeAbsenceId() {
+    return estGestionnaire() && state.espaceEmployeId
+      ? state.espaceEmployeId
+      : state.utilisateur.id;
+  }
+
+  function labelTypeAbsence(type) {
+    return CONFIG.TYPES_ABSENCE[type]?.label || type;
+  }
+
+  function couleurTypeAbsence(type) {
+    return CONFIG.TYPES_ABSENCE[type]?.couleur || '#8E8E93';
+  }
+
+  function dateDansPlage(date, debut, fin) {
+    return date >= debut && date <= fin;
+  }
+
+  function absenceCouvreCreneau(absence, date, heureDebut, heureFin) {
+    if (!dateDansPlage(date, absence.date_debut, absence.date_fin)) return false;
+    if (absence.journee_entiere !== false) return true;
+    if (!absence.heure_debut || !absence.heure_fin) return true;
+    const d1 = minutesDepuis(heureDebut);
+    const f1 = minutesDepuis(heureFin);
+    const d2 = minutesDepuis(absence.heure_debut);
+    const f2 = minutesDepuis(absence.heure_fin);
+    return d1 < f2 && d2 < f1;
+  }
+
+  function absencePourCreneau(absences, employeId, date, heureDebut, heureFin) {
+    return absences.find(a =>
+      a.employe_id === employeId &&
+      absenceCouvreCreneau(a, date, heureDebut, heureFin)
+    ) || null;
+  }
+
   function renderGrilleAgenda(containerId, creneaux, options = {}) {
     const cont = $(containerId);
     const jours = joursDeLaSemaine(state.semaineLundi);
@@ -188,7 +238,8 @@
         const couleur = couleurRole(creneau.role);
         const classeVariante = options.modeGlobal ? ' creneau-carte--global'
           : options.modePatient ? ' creneau-carte--patient'
-          : options.modePro ? ' creneau-carte--pro-global' : '';
+          : options.modePro ? ' creneau-carte--pro-global'
+          : ' creneau-carte--perso';
 
         let corpsCarte;
         if (options.modePro) {
@@ -213,9 +264,12 @@
               <span class="creneau-sous-titre creneau-horaire">${sousTitre}</span>
             </div>`;
         } else {
+          const titreEchappe = titre.replace(/"/g, '&quot;');
           corpsCarte = `
-            <span class="creneau-pastille" style="background:${couleur}"></span>
-            <span class="creneau-titre">${titre}</span>
+            <div class="creneau-ligne-titre">
+              <span class="creneau-pastille" style="background:${couleur}"></span>
+              <span class="creneau-titre" title="${titreEchappe}">${titre}</span>
+            </div>
             <span class="creneau-sous-titre">${sousTitre}</span>`;
         }
 
@@ -303,7 +357,7 @@
 
       vide.innerHTML = `
         <h3 class="agenda-global-vide-titre">Aucun rendez-vous cette semaine</h3>
-        <p class="agenda-global-vide-texte">Les professionnels peuvent générer leur agenda depuis la page Mon agenda.</p>
+        <p class="agenda-global-vide-texte">Les professionnels peuvent générer leur agenda depuis Mon espace.</p>
       `;
     } else {
       grille.hidden = false;
@@ -597,6 +651,158 @@
     renderNavigationSemaine('nav-semaine-mon-agenda', renderMonAgenda);
     const creneaux = await chargerCreneaux({ employe_id: state.utilisateur.id });
     renderGrilleAgenda('grille-mon-agenda', creneaux);
+  }
+
+  function activerEspaceOnglet(onglet) {
+    state.espaceOnglet = onglet;
+    document.querySelectorAll('[data-espace-onglet]').forEach(btn => {
+      const actif = btn.dataset.espaceOnglet === onglet;
+      btn.classList.toggle('is-active', actif);
+      btn.setAttribute('aria-selected', actif ? 'true' : 'false');
+    });
+    document.querySelectorAll('[data-espace-panel]').forEach(panel => {
+      panel.hidden = panel.dataset.espacePanel !== onglet;
+    });
+
+    const actions = {
+      agenda: renderMonAgenda,
+      horaires: async () => {
+        state.disponibilitesCourantes = await API.getDisponibilites(state.utilisateur.id);
+        renderEditeurHoraires();
+      },
+      absences: renderAbsences
+    };
+    actions[onglet]?.();
+  }
+
+  async function renderMonEspace() {
+    if (!state.espaceEmployeId) state.espaceEmployeId = state.utilisateur.id;
+    preparerSelecteurAbsenceEmploye();
+    activerEspaceOnglet(state.espaceOnglet || 'agenda');
+  }
+
+  function preparerSelecteurAbsenceEmploye() {
+    const zone = $('absences-selecteur-pro');
+    const select = $('select-absence-employe');
+    if (!zone || !select) return;
+
+    if (!estGestionnaire()) {
+      zone.hidden = true;
+      state.espaceEmployeId = state.utilisateur.id;
+      return;
+    }
+
+    zone.hidden = false;
+    const actifs = state.employes.filter(e => e.actif !== false);
+    select.innerHTML = actifs.map(e =>
+      `<option value="${e.id}" ${e.id === state.espaceEmployeId ? 'selected' : ''}>${nomComplet(e)} — ${labelRole(e.role)}</option>`
+    ).join('');
+  }
+
+  function absencesPourJour(date) {
+    return state.absencesCourantes.filter(a => dateDansPlage(date, a.date_debut, a.date_fin));
+  }
+
+  function formatPeriodeAbsence(absence) {
+    const debut = formatDateCourte(absence.date_debut);
+    const fin = formatDateCourte(absence.date_fin);
+    const dates = absence.date_debut === absence.date_fin ? debut : `${debut} → ${fin}`;
+    if (absence.journee_entiere === false && absence.heure_debut) {
+      return `${dates}, ${absence.heure_debut} – ${absence.heure_fin}`;
+    }
+    return dates;
+  }
+
+  async function chargerAbsencesSemaine() {
+    const jours = joursDeLaSemaine(state.semaineLundi);
+    state.absencesCourantes = await API.getAbsences({
+      employe_id: employeAbsenceId(),
+      date_debut: jours[0],
+      date_fin: jours[4]
+    });
+  }
+
+  async function renderAbsences() {
+    preparerSelecteurAbsenceEmploye();
+    renderNavigationSemaine('nav-semaine-absences', renderAbsences);
+    await chargerAbsencesSemaine();
+
+    const jours = joursDeLaSemaine(state.semaineLundi);
+    const calendrier = $('calendrier-absences');
+    if (calendrier) {
+      calendrier.innerHTML = `
+        <div class="calendrier-absences-grille">
+          ${jours.map(date => {
+            const absencesJour = absencesPourJour(date);
+            const dateObj = parseDateLocale(date);
+            const jourNom = dateObj.toLocaleDateString('fr-FR', { weekday: 'long' });
+            const jourNum = dateObj.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+            const puces = absencesJour.length
+              ? absencesJour.map(a => {
+                  const couleur = couleurTypeAbsence(a.type);
+                  return `<span class="absence-puce" style="background:${couleur}22;color:${couleur};border-color:${couleur}55">${labelTypeAbsence(a.type)}</span>`;
+                }).join('')
+              : '<span class="calendrier-absences-vide">Disponible</span>';
+            return `
+              <article class="calendrier-absences-jour">
+                <header class="calendrier-absences-jour-entete">
+                  <span class="calendrier-absences-jour-nom">${jourNom}</span>
+                  <span class="calendrier-absences-jour-date">${jourNum}</span>
+                </header>
+                <div class="calendrier-absences-jour-corps">${puces}</div>
+              </article>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    const liste = $('liste-absences');
+    if (liste) {
+      const triees = [...state.absencesCourantes].sort((a, b) => a.date_debut.localeCompare(b.date_debut));
+      if (!triees.length) {
+        liste.innerHTML = '<p class="liste-absences-vide">Aucune absence sur cette semaine.</p>';
+      } else {
+        liste.innerHTML = `
+          <h3 class="liste-absences-titre">Absences de la semaine</h3>
+          <ul class="liste-absences-items">
+            ${triees.map(a => {
+              const couleur = couleurTypeAbsence(a.type);
+              return `
+                <li class="absence-item">
+                  <div class="absence-item-info">
+                    <span class="absence-item-type" style="color:${couleur}">${labelTypeAbsence(a.type)}</span>
+                    <span class="absence-item-dates">${formatPeriodeAbsence(a)}</span>
+                    ${a.commentaire ? `<span class="absence-item-commentaire">${a.commentaire.replace(/</g, '&lt;')}</span>` : ''}
+                  </div>
+                  <button type="button" class="bouton bouton-mini bouton-danger" data-supprimer-absence="${a.id}">Supprimer</button>
+                </li>
+              `;
+            }).join('')}
+          </ul>
+        `;
+        liste.querySelectorAll('[data-supprimer-absence]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            if (!confirm('Supprimer cette absence ?')) return;
+            try {
+              await API.deleteAbsence(btn.dataset.supprimerAbsence);
+              toast('Absence supprimée.');
+              await renderAbsences();
+              if (state.espaceOnglet === 'agenda') await renderMonAgenda();
+            } catch (err) {
+              toast(err.message, 'erreur');
+            }
+          });
+        });
+      }
+    }
+
+    const selectType = $('absence-type');
+    if (selectType && !selectType.options.length) {
+      selectType.innerHTML = Object.entries(CONFIG.TYPES_ABSENCE).map(([code, info]) =>
+        `<option value="${code}">${info.label}</option>`
+      ).join('');
+    }
   }
 
   async function renderAgendaGlobal() {
@@ -1757,14 +1963,10 @@
     });
 
     const actions = {
-      'mon-agenda': renderMonAgenda,
+      'mon-espace': renderMonEspace,
       'agenda-global': renderAgendaGlobal,
       'agenda-patient': preparerAgendaPatient,
       'patients': renderListePatients,
-      'horaires': async () => {
-        state.disponibilitesCourantes = await API.getDisponibilites(state.utilisateur.id);
-        renderEditeurHoraires();
-      },
       'equipe': renderListeEquipe
     };
     actions[nomVue]?.();
@@ -1775,7 +1977,7 @@
     await chargerDonnees();
     await rafraichirPatients();
     afficherApp();
-    activerVue('mon-agenda');
+    activerVue('mon-espace');
   }
 
   async function handleLogin(e) {
@@ -1940,12 +2142,54 @@
       }
     });
 
+    document.querySelectorAll('[data-espace-onglet]').forEach(btn => {
+      btn.addEventListener('click', () => activerEspaceOnglet(btn.dataset.espaceOnglet));
+    });
+
+    $('select-absence-employe')?.addEventListener('change', e => {
+      state.espaceEmployeId = e.target.value;
+      if (state.espaceOnglet === 'absences') renderAbsences();
+    });
+
+    $('absence-journee-entiere')?.addEventListener('change', e => {
+      $('absence-horaires-partiels').hidden = e.target.checked;
+    });
+
+    $('form-absence')?.addEventListener('submit', async e => {
+      e.preventDefault();
+      const journeeEntiere = $('absence-journee-entiere').checked;
+      const data = {
+        employe_id: employeAbsenceId(),
+        type: $('absence-type').value,
+        date_debut: $('absence-date-debut').value,
+        date_fin: $('absence-date-fin').value,
+        journee_entiere: journeeEntiere,
+        commentaire: $('absence-commentaire').value.trim()
+      };
+      if (!journeeEntiere) {
+        data.heure_debut = $('absence-heure-debut').value;
+        data.heure_fin = $('absence-heure-fin').value;
+      }
+
+      try {
+        await API.createAbsence(data);
+        $('form-absence').reset();
+        $('absence-journee-entiere').checked = true;
+        $('absence-horaires-partiels').hidden = true;
+        toast('Absence enregistrée.');
+        await renderAbsences();
+        if (state.espaceOnglet === 'agenda') await renderMonAgenda();
+      } catch (err) {
+        toast(err.message, 'erreur');
+      }
+    });
+
     $('btn-annuler-creneau').addEventListener('click', async () => {
       if (!state.creneauSelectionne) return;
       await API.annulerCreneau(state.creneauSelectionne.id);
       fermerModale('modale-creneau-fond');
       toast('Rendez-vous annulé.');
-      activerVue(document.querySelector('.nav-item.is-active')?.dataset.vue || 'mon-agenda');
+      activerVue(document.querySelector('.nav-item.is-active')?.dataset.vue || 'mon-espace');
     });
 
     document.querySelectorAll('[data-fermer-modale]').forEach(btn => {

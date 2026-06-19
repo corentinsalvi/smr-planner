@@ -7,6 +7,7 @@ const {
   minutesDepuisMinuit
 } = require('../utils/dateUtils');
 const { REGLES_PLANNING } = require('../constants');
+const { estProAbsent } = require('../utils/absenceUtils');
 
 const INTENSIFS = new Set(REGLES_PLANNING.ROLES_INTENSIFS);
 
@@ -134,6 +135,7 @@ function ordonnerJours(jours, besoin, creneaux) {
 function genererPlanningHebdomadaire(lundi, options = {}) {
   const employes = readAll('employes').filter(e => e.actif !== false);
   const disponibilites = readAll('disponibilites');
+  const absences = readAll('absences');
   const patients = readAll('patients').filter(p => p.statut === 'ACTIF');
   const besoins = readAll('besoins').filter(b => b.actif !== false);
 
@@ -242,6 +244,11 @@ function genererPlanningHebdomadaire(lundi, options = {}) {
             );
 
             if (conflitPro || conflitPatient) continue;
+
+            if (estProAbsent(absences, pro.id, candidat.date, candidat.heure_debut, candidat.heure_fin)) {
+              continue;
+            }
+
             if (reglePatient) {
               derniereRaison = reglePatient;
               continue;
