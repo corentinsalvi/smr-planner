@@ -1149,35 +1149,57 @@
     return `Semaine du ${debutTexte} au ${finTexte}`;
   }
 
+  function lignesImpressionJour() {
+    const result = [];
+    let pauseMidiInseree = false;
+
+    for (const heure of CONFIG.HEURES_AGENDA) {
+      if (!pauseMidiInseree && minutesDepuis(heure) >= minutesDepuis('13:30')) {
+        result.push({ type: 'pause-midi' });
+        pauseMidiInseree = true;
+      }
+      result.push({ type: 'seance', heure });
+    }
+
+    return result;
+  }
+
   function genererFeuilleImpressionPatient(patient, creneaux, lundi) {
     const jours = joursDeLaSemaine(lundi);
     const actifs = creneaux.filter(c => c.statut !== 'ANNULE');
+    const lignes = lignesImpressionJour();
 
     const sectionsJours = jours.map(date => {
-      const rdvJour = actifs
-        .filter(c => c.date === date)
-        .sort((a, b) => minutesDepuis(a.heure_debut) - minutesDepuis(b.heure_debut));
+      const lignesJour = lignes.map(ligne => {
+        if (ligne.type === 'pause-midi') {
+          return '<li class="feuille-patient-pause">Pause déjeuner</li>';
+        }
 
-      const contenu = rdvJour.length
-        ? `<ul class="feuille-patient-liste">
-            ${rdvJour.map(creneau => {
-              const employe = state.employes.find(e => e.id === creneau.employe_id);
-              const pro = employe ? nomComplet(employe) : '—';
-              const metier = labelRole(creneau.role);
-              return `
-                <li class="feuille-patient-rdv">
-                  <span class="feuille-patient-rdv-heure">${creneau.heure_debut}</span>
-                  <span class="feuille-patient-rdv-detail">${metier} — ${pro}</span>
-                </li>
-              `;
-            }).join('')}
-          </ul>`
-        : '<p class="feuille-patient-jour-vide">—</p>';
+        const creneau = actifs.find(c => c.date === date && c.heure_debut === ligne.heure);
+        if (creneau) {
+          const employe = state.employes.find(e => e.id === creneau.employe_id);
+          const pro = employe ? nomComplet(employe) : '—';
+          const metier = labelRole(creneau.role);
+          const couleur = couleurRole(creneau.role);
+          return `
+            <li class="feuille-patient-rdv" style="border-left-color:${couleur}">
+              <span class="feuille-patient-rdv-heure">${creneau.heure_debut}</span>
+              <span class="feuille-patient-rdv-detail">${metier} — ${pro}</span>
+            </li>
+          `;
+        }
+
+        return `
+          <li class="feuille-patient-creneau-vide">
+            <span class="feuille-patient-rdv-heure">${ligne.heure}</span>
+          </li>
+        `;
+      }).join('');
 
       return `
         <section class="feuille-patient-jour">
           <h2 class="feuille-patient-jour-titre">${formaterJourCourtImpression(date)}</h2>
-          ${contenu}
+          <ul class="feuille-patient-liste">${lignesJour}</ul>
         </section>
       `;
     }).join('');
@@ -1195,6 +1217,139 @@
     `;
   }
 
+  function stylesImpressionPatient() {
+    return `<style>
+      @page { size: A4 landscape; margin: 10mm; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+        color: #1a1a1a;
+        background: #fff;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .feuille-patient {
+        width: 100%;
+        max-height: 185mm;
+        overflow: hidden;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+      }
+      .feuille-patient-entete {
+        text-align: center;
+        margin-bottom: 8mm;
+        padding-bottom: 4mm;
+        border-bottom: 2px solid #007AFF;
+      }
+      .feuille-patient-nom {
+        margin: 0 0 2mm;
+        font-size: 24pt;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+      .feuille-patient-periode {
+        margin: 0;
+        font-size: 13pt;
+        font-weight: 500;
+        color: #5c6370;
+      }
+      .feuille-patient-jours {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 3mm;
+        align-items: stretch;
+      }
+      .feuille-patient-jour {
+        background: #f5f8fc;
+        border: 1px solid #d8e2ef;
+        border-radius: 8px;
+        padding: 3mm;
+        min-height: 0;
+        page-break-inside: avoid;
+      }
+      .feuille-patient-jour-titre {
+        margin: 0 0 3mm;
+        padding: 2.5mm 2mm;
+        font-size: 11.5pt;
+        font-weight: 700;
+        text-align: center;
+        color: #fff;
+        background: #007AFF;
+        border-radius: 6px;
+        line-height: 1.2;
+      }
+      .feuille-patient-liste {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .feuille-patient-rdv,
+      .feuille-patient-creneau-vide {
+        background: #fff;
+        margin-bottom: 1.5mm;
+        padding: 2mm 2.5mm;
+        border: 1px solid #e4ebf4;
+        border-radius: 5px;
+        line-height: 1.25;
+        min-height: 9.5mm;
+      }
+      .feuille-patient-rdv {
+        border-left: 3px solid #007AFF;
+      }
+      .feuille-patient-creneau-vide {
+        border-style: dashed;
+        border-color: #dce4ee;
+        background: #fafcff;
+      }
+      .feuille-patient-rdv:last-child,
+      .feuille-patient-creneau-vide:last-child,
+      .feuille-patient-pause:last-child { margin-bottom: 0; }
+      .feuille-patient-rdv-heure {
+        display: block;
+        font-size: 10.5pt;
+        font-weight: 700;
+        color: #111;
+        margin-bottom: 0.5mm;
+      }
+      .feuille-patient-rdv-detail {
+        display: block;
+        font-size: 9pt;
+        font-weight: 500;
+        color: #3d4654;
+      }
+      .feuille-patient-pause {
+        list-style: none;
+        margin: 1.5mm 0;
+        padding: 1.5mm 0;
+        font-size: 8pt;
+        font-weight: 600;
+        text-align: center;
+        color: #8a93a3;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        border-top: 1px dashed #d0d8e4;
+        border-bottom: 1px dashed #d0d8e4;
+      }
+    </style>`;
+  }
+
+  function genererDocumentImpressionPatient(patient, creneaux, lundi) {
+    return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  ${stylesImpressionPatient()}
+</head>
+<body>
+  ${genererFeuilleImpressionPatient(patient, creneaux, lundi)}
+</body>
+</html>`;
+  }
+
   async function imprimerSemainePatient() {
     const patientId = state.patientAgendaId;
     if (!patientId) {
@@ -1206,20 +1361,30 @@
     if (!patient) return;
 
     const creneaux = await chargerCreneaux({ patient_id: patientId });
-    const zone = $('zone-impression-patient');
-    if (!zone) return;
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('aria-hidden', 'true');
+    iframe.style.cssText = 'position:fixed;width:0;height:0;border:0;opacity:0;pointer-events:none';
+    document.body.appendChild(iframe);
 
-    zone.innerHTML = genererFeuilleImpressionPatient(patient, creneaux, state.semaineLundi);
-    zone.hidden = false;
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(genererDocumentImpressionPatient(patient, creneaux, state.semaineLundi));
+    doc.close();
 
-    const restaurer = () => {
-      zone.hidden = true;
-      zone.innerHTML = '';
-      window.removeEventListener('afterprint', restaurer);
+    const lancerImpression = () => {
+      try {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      } finally {
+        setTimeout(() => iframe.remove(), 1000);
+      }
     };
 
-    window.addEventListener('afterprint', restaurer);
-    window.print();
+    if (iframe.contentDocument?.readyState === 'complete') {
+      setTimeout(lancerImpression, 50);
+    } else {
+      iframe.onload = () => setTimeout(lancerImpression, 50);
+    }
   }
 
   async function renderAgendaPatient() {
