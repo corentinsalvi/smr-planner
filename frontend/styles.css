@@ -1446,10 +1446,6 @@ button, input, select {
 }
 
 .fiche-patient-toggle-vue {
-  position: absolute;
-  right: 20px;
-  bottom: 18px;
-  z-index: 1;
   width: 38px;
   height: 38px;
   border-radius: 50%;
@@ -1460,6 +1456,7 @@ button, input, select {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  flex-shrink: 0;
   transition: border-color var(--transition), color var(--transition), background var(--transition), box-shadow var(--transition);
 }
 
@@ -1842,7 +1839,6 @@ button, input, select {
   flex-wrap: wrap;
   gap: 8px;
   padding-top: 16px;
-  padding-right: 52px;
   position: relative;
 }
 
@@ -1851,7 +1847,7 @@ button, input, select {
   position: absolute;
   top: 0;
   left: 0;
-  right: 52px;
+  right: 0;
   height: 1px;
   background: var(--bordure);
 }
@@ -1861,7 +1857,15 @@ button, input, select {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding-right: 52px;
+}
+
+.fiche-patient-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  padding-top: 4px;
 }
 
 .fiche-patient-conformite--vide .conformite-valeur {
@@ -2372,19 +2376,23 @@ button, input, select {
   .fiche-patient-resume {
     grid-template-columns: auto 1fr;
     grid-template-rows: auto auto auto;
-    padding-bottom: 58px;
   }
 
   .fiche-patient-conformite {
     padding-right: 0;
   }
 
-  .fiche-patient-avatar { grid-row: auto; }
-
-  .fiche-patient-toggle-vue {
-    right: 16px;
-    bottom: 14px;
+  .fiche-patient-actions {
+    flex-wrap: wrap;
+    justify-content: stretch;
   }
+
+  .fiche-patient-actions .bouton-imprimer-patient {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .fiche-patient-avatar { grid-row: auto; }
 
   .graphique-conformite-ligne {
     grid-template-columns: 64px 1fr 48px;
@@ -2405,6 +2413,201 @@ button, input, select {
   .login-visuel { padding: 0; }
   .login-illustration { max-width: 100%; border-radius: 20px; }
   .login-carte { max-width: 100%; justify-self: center; }
+}
+
+.bouton-imprimer-patient {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.bouton-imprimer-patient svg {
+  flex-shrink: 0;
+}
+
+/* Feuille imprimable — agenda patient */
+.zone-impression-patient {
+  display: none;
+}
+
+.feuille-patient {
+  color: #111;
+  font-family: Arial, sans-serif;
+}
+
+.feuille-patient-entete {
+  text-align: center;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #111;
+}
+
+.feuille-patient-nom {
+  margin: 0 0 4px;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.feuille-patient-periode {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.feuille-patient-jours {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.feuille-patient-jour {
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  padding: 6px;
+  min-height: 0;
+}
+
+.feuille-patient-jour-titre {
+  margin: 0 0 6px;
+  padding-bottom: 4px;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.feuille-patient-liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.feuille-patient-rdv {
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
+  line-height: 1.25;
+}
+
+.feuille-patient-rdv:last-child {
+  border-bottom: none;
+}
+
+.feuille-patient-rdv-heure {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+}
+
+.feuille-patient-rdv-detail {
+  display: block;
+  font-size: 13px;
+  color: #333;
+}
+
+.feuille-patient-jour-vide {
+  margin: 0;
+  padding: 8px 0;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  color: #999;
+}
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 8mm;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .zone-impression-patient,
+  .zone-impression-patient * {
+    visibility: visible;
+  }
+
+  .zone-impression-patient {
+    display: block !important;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  .feuille-patient {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  .feuille-patient-entete {
+    flex-shrink: 0;
+    margin-bottom: 6mm;
+    padding-bottom: 3mm;
+  }
+
+  .feuille-patient-nom {
+    font-size: 22pt;
+  }
+
+  .feuille-patient-periode {
+    font-size: 13pt;
+  }
+
+  .feuille-patient-jours {
+    flex: 1;
+    min-height: 0;
+    gap: 3mm;
+    align-items: stretch;
+  }
+
+  .feuille-patient-jour {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    page-break-inside: avoid;
+  }
+
+  .feuille-patient-jour-titre {
+    flex-shrink: 0;
+    font-size: 12pt;
+  }
+
+  .feuille-patient-liste {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .feuille-patient-rdv-heure {
+    font-size: 12pt;
+  }
+
+  .feuille-patient-rdv-detail {
+    font-size: 10.5pt;
+  }
 }
 
 @media (max-width: 960px) {

@@ -1125,6 +1125,103 @@
     `;
   }
 
+  function formaterJourCourtImpression(dateStr) {
+    const date = parseDateLocale(dateStr);
+    const jour = date.toLocaleDateString('fr-FR', { weekday: 'long' });
+    const num = date.getDate();
+    return `${jour.charAt(0).toUpperCase()}${jour.slice(1)} ${num}`;
+  }
+
+  function formaterPeriodeSemaineCourte(lundi) {
+    const jours = joursDeLaSemaine(lundi);
+    const debut = parseDateLocale(jours[0]);
+    const fin = parseDateLocale(jours[4]);
+    const memeMois = debut.getMonth() === fin.getMonth();
+    const debutTexte = debut.toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: memeMois ? undefined : 'long'
+    });
+    const finTexte = fin.toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+    return `Semaine du ${debutTexte} au ${finTexte}`;
+  }
+
+  function genererFeuilleImpressionPatient(patient, creneaux, lundi) {
+    const jours = joursDeLaSemaine(lundi);
+    const actifs = creneaux.filter(c => c.statut !== 'ANNULE');
+
+    const sectionsJours = jours.map(date => {
+      const rdvJour = actifs
+        .filter(c => c.date === date)
+        .sort((a, b) => minutesDepuis(a.heure_debut) - minutesDepuis(b.heure_debut));
+
+      const contenu = rdvJour.length
+        ? `<ul class="feuille-patient-liste">
+            ${rdvJour.map(creneau => {
+              const employe = state.employes.find(e => e.id === creneau.employe_id);
+              const pro = employe ? nomComplet(employe) : '—';
+              const metier = labelRole(creneau.role);
+              return `
+                <li class="feuille-patient-rdv">
+                  <span class="feuille-patient-rdv-heure">${creneau.heure_debut}</span>
+                  <span class="feuille-patient-rdv-detail">${metier} — ${pro}</span>
+                </li>
+              `;
+            }).join('')}
+          </ul>`
+        : '<p class="feuille-patient-jour-vide">—</p>';
+
+      return `
+        <section class="feuille-patient-jour">
+          <h2 class="feuille-patient-jour-titre">${formaterJourCourtImpression(date)}</h2>
+          ${contenu}
+        </section>
+      `;
+    }).join('');
+
+    return `
+      <article class="feuille-patient">
+        <header class="feuille-patient-entete">
+          <h1 class="feuille-patient-nom">${nomComplet(patient)}</h1>
+          <p class="feuille-patient-periode">${formaterPeriodeSemaineCourte(lundi)}</p>
+        </header>
+        <div class="feuille-patient-jours">
+          ${sectionsJours}
+        </div>
+      </article>
+    `;
+  }
+
+  async function imprimerSemainePatient() {
+    const patientId = state.patientAgendaId;
+    if (!patientId) {
+      toast('Sélectionnez un patient pour imprimer son planning.', 'erreur');
+      return;
+    }
+
+    const patient = state.patients.find(p => p.id === patientId);
+    if (!patient) return;
+
+    const creneaux = await chargerCreneaux({ patient_id: patientId });
+    const zone = $('zone-impression-patient');
+    if (!zone) return;
+
+    zone.innerHTML = genererFeuilleImpressionPatient(patient, creneaux, state.semaineLundi);
+    zone.hidden = false;
+
+    const restaurer = () => {
+      zone.hidden = true;
+      zone.innerHTML = '';
+      window.removeEventListener('afterprint', restaurer);
+    };
+
+    window.addEventListener('afterprint', restaurer);
+    window.print();
+  }
+
   async function renderAgendaPatient() {
     renderNavigationSemaine('nav-semaine-patient', renderAgendaPatient);
 
@@ -1167,19 +1264,34 @@
         `).join('') : '<span class="fiche-patient-aucun-besoin">Aucun besoin défini</span>'}
       </div>
       ${renderBarreConformiteForfait(besoins, creneaux)}
-      <button type="button"
-              class="bouton-icone fiche-patient-toggle-vue"
-              id="btn-toggle-vue-patient"
-              aria-label="${modeGraphique ? 'Afficher l\'agenda' : 'Afficher la répartition par métier'}"
-              title="${modeGraphique ? 'Voir l\'agenda' : 'Voir la répartition par métier'}">
-        ${iconeTogglePatientAgenda(state.patientAgendaMode)}
-      </button>
+      <div class="fiche-patient-actions">
+        <button type="button"
+                class="bouton bouton-discret bouton-imprimer-patient"
+                id="btn-imprimer-semaine-patient"
+                title="Imprimer la semaine du patient">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+            <path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/>
+            <rect x="6" y="14" width="12" height="8" rx="1"/>
+          </svg>
+          <span>Imprimer la semaine</span>
+        </button>
+        <button type="button"
+                class="bouton-icone fiche-patient-toggle-vue"
+                id="btn-toggle-vue-patient"
+                aria-label="${modeGraphique ? 'Afficher l\'agenda' : 'Afficher la répartition par métier'}"
+                title="${modeGraphique ? 'Voir l\'agenda' : 'Voir la répartition par métier'}">
+          ${iconeTogglePatientAgenda(state.patientAgendaMode)}
+        </button>
+      </div>
     `;
 
     $('btn-toggle-vue-patient')?.addEventListener('click', () => {
       state.patientAgendaMode = modeGraphique ? 'agenda' : 'graphique';
       renderAgendaPatient();
     });
+
+    $('btn-imprimer-semaine-patient')?.addEventListener('click', imprimerSemainePatient);
 
     if (modeGraphique) {
       grille.hidden = true;
