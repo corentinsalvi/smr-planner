@@ -781,6 +781,90 @@
     await renderAgendaPatient();
   }
 
+  function formaterHeuresForfait(heures) {
+    const arrondi = Math.round(heures * 10) / 10;
+    if (!arrondi) return '0 h';
+    return Number.isInteger(arrondi)
+      ? `${arrondi} h`
+      : `${String(arrondi).replace('.', ',')} h`;
+  }
+
+  function calculerScoreConformiteForfait(besoins, creneaux) {
+    const dureeSeanceMin = CONFIG.DUREE_SEANCE;
+    const besoinsActifs = (besoins || []).filter(b => b.actif !== false);
+
+    const seancesPrevues = besoinsActifs.reduce(
+      (total, besoin) => total + (Number(besoin.seances_par_semaine) || 0),
+      0
+    );
+    const seancesPlanifiees = creneaux.filter(c => c.statut !== 'ANNULE').length;
+
+    const heuresForfait = (seancesPrevues * dureeSeanceMin) / 60;
+    const heuresPlanifiees = (seancesPlanifiees * dureeSeanceMin) / 60;
+
+    let score = 0;
+    if (heuresForfait > 0) {
+      score = Math.round((heuresPlanifiees / heuresForfait) * 100);
+    } else if (seancesPlanifiees > 0) {
+      score = 100;
+    }
+
+    const scoreAffiche = Math.min(score, 100);
+    const conforme = heuresForfait > 0 && score >= 100;
+
+    return {
+      score: scoreAffiche,
+      conforme,
+      heuresPlanifiees,
+      heuresForfait,
+      seancesPlanifiees,
+      seancesPrevues,
+      forfaitDefini: heuresForfait > 0
+    };
+  }
+
+  function renderBarreConformiteForfait(besoins, creneaux) {
+    const conformite = calculerScoreConformiteForfait(besoins, creneaux);
+
+    if (!conformite.forfaitDefini) {
+      return `
+        <div class="fiche-patient-conformite fiche-patient-conformite--vide">
+          <div class="conformite-entete">
+            <span class="conformite-label">Score de conformité du forfait</span>
+            <span class="conformite-valeur">—</span>
+          </div>
+          <div class="conformite-barre-fond" aria-hidden="true">
+            <div class="conformite-barre-remplissage conformite-barre--neutre" style="width: 0%"></div>
+          </div>
+          <p class="conformite-message">Aucun forfait défini pour ce patient.</p>
+        </div>
+      `;
+    }
+
+    const classeBarre = conformite.conforme ? 'conformite-barre--succes' : 'conformite-barre--alerte';
+    const message = conformite.conforme
+      ? 'Planning 100% conforme'
+      : `${formaterHeuresForfait(conformite.heuresPlanifiees)} planifiées sur ${formaterHeuresForfait(conformite.heuresForfait)} prévues`;
+
+    return `
+      <div class="fiche-patient-conformite">
+        <div class="conformite-entete">
+          <span class="conformite-label">Score de conformité du forfait</span>
+          <span class="conformite-valeur${conformite.conforme ? ' conformite-valeur--succes' : ' conformite-valeur--alerte'}">${conformite.score}%</span>
+        </div>
+        <div class="conformite-barre-fond"
+             role="progressbar"
+             aria-valuemin="0"
+             aria-valuemax="100"
+             aria-valuenow="${conformite.score}"
+             aria-label="Score de conformité du forfait">
+          <div class="conformite-barre-remplissage ${classeBarre}" style="width: ${conformite.score}%"></div>
+        </div>
+        <p class="conformite-message${conformite.conforme ? ' conformite-message--succes' : ''}">${message}</p>
+      </div>
+    `;
+  }
+
   function iconeTogglePatientAgenda(mode) {
     if (mode === 'graphique') {
       return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -838,70 +922,205 @@
     return `M ${cx} ${cy} L ${x1} ${y1} A ${rayon} ${rayon} 0 ${grandArc} 1 ${x2} ${y2} Z`;
   }
 
-  function renderGraphiqueRepartitionPatient(creneaux) {
+  function calculerConformiteParProfession(besoins, creneaux) {
+    const besoinsActifs = (besoins || []).filter(b => b.actif !== false);
+    const creneauxActifs = creneaux.filter(c => c.statut !== 'ANNULE');
+    const parRole = new Map();
+
+    besoinsActifs.forEach(besoin => {
+      const role = besoin.role || 'AUTRE';
+      const ligne = parRole.get(role) || { role, necessaires: 0, planifiees: 0 };
+      ligne.necessaires += Number(besoin.seances_par_semaine) || 0;
+      parRole.set(role, ligne);
+    });
+
+    creneauxActifs.forEach(creneau => {
+      const role = creneau.role || 'AUTRE';
+      const ligne = parRole.get(role) || { role, necessaires: 0, planifiees: 0 };
+      ligne.planifiees += 1;
+      parRole.set(role, ligne);
+    });
+
+    return [...parRole.values()]
+      .filter(ligne => ligne.necessaires > 0 || ligne.planifiees > 0)
+      .map(ligne => {
+        const ratio = ligne.necessaires > 0
+          ? ligne.planifiees / ligne.necessaires
+          : (ligne.planifiees > 0 ? 1 : 0);
+        const conforme = ligne.necessaires > 0
+          ? ligne.planifiees >= ligne.necessaires
+          : ligne.planifiees === 0;
+
+        return {
+          ...ligne,
+          label: labelRole(ligne.role),
+          couleur: couleurRole(ligne.role),
+          ratio,
+          ratioAffiche: Math.min(ratio, 1),
+          conforme
+        };
+      })
+      .sort((a, b) => {
+        if (a.conforme !== b.conforme) return a.conforme ? 1 : -1;
+        return a.label.localeCompare(b.label, 'fr');
+      });
+  }
+
+  function renderGraphiqueConformiteForfait(besoins, creneaux) {
+    const conformite = calculerScoreConformiteForfait(besoins, creneaux);
+    const metiers = calculerConformiteParProfession(besoins, creneaux);
+
+    if (!conformite.forfaitDefini) {
+      return `
+        <section class="graphique-conformite graphique-conformite--vide">
+          <div class="graphique-conformite-entete">
+            <h4 class="graphique-conformite-titre">Score de conformité du forfait</h4>
+            <span class="graphique-conformite-pourcent">—</span>
+          </div>
+          <p class="graphique-conformite-message">Aucun forfait défini pour ce patient.</p>
+        </section>
+      `;
+    }
+
+    const message = conformite.conforme
+      ? 'Planning 100% conforme'
+      : `${formaterHeuresForfait(conformite.heuresPlanifiees)} planifiées sur ${formaterHeuresForfait(conformite.heuresForfait)} prévues`;
+
+    const lignesMetiers = metiers.length
+      ? metiers.map(metier => {
+        const classeBarre = metier.conforme
+          ? 'graphique-conformite-barre--succes'
+          : 'graphique-conformite-barre--alerte';
+        const classeRatio = metier.conforme
+          ? 'graphique-conformite-metier-ratio--succes'
+          : 'graphique-conformite-metier-ratio--alerte';
+        const ratioTexte = metier.necessaires > 0
+          ? `${metier.planifiees}/${metier.necessaires}`
+          : `${metier.planifiees}/0`;
+
+        return `
+          <li class="graphique-conformite-metier">
+            <div class="graphique-conformite-metier-entete">
+              <span class="graphique-conformite-pastille" style="background:${metier.couleur}"></span>
+              <span class="graphique-conformite-metier-nom">${metier.label}</span>
+              <span class="graphique-conformite-metier-ratio ${classeRatio}">${ratioTexte}</span>
+            </div>
+            <div class="graphique-conformite-piste" aria-hidden="true">
+              <div class="graphique-conformite-barre ${classeBarre}" style="width: ${Math.round(metier.ratioAffiche * 100)}%; background: linear-gradient(90deg, ${metier.couleur}99, ${metier.couleur})"></div>
+            </div>
+            <span class="graphique-conformite-metier-detail">
+              ${metier.planifiees} séance${metier.planifiees > 1 ? 's' : ''} planifiée${metier.planifiees > 1 ? 's' : ''}
+              · ${metier.necessaires} nécessaire${metier.necessaires > 1 ? 's' : ''}
+            </span>
+          </li>
+        `;
+      }).join('')
+      : `
+        <li class="graphique-conformite-metier graphique-conformite-metier--vide">
+          <p class="graphique-conformite-message">Aucune profession à suivre pour ce forfait.</p>
+        </li>
+      `;
+
+    return `
+      <section class="graphique-conformite">
+        <div class="graphique-conformite-entete">
+          <h4 class="graphique-conformite-titre">Score de conformité du forfait</h4>
+          <span class="graphique-conformite-pourcent${conformite.conforme ? ' graphique-conformite-pourcent--succes' : ' graphique-conformite-pourcent--alerte'}">${conformite.score}%</span>
+        </div>
+
+        <ul class="graphique-conformite-metiers">
+          ${lignesMetiers}
+        </ul>
+
+        <div class="conformite-barre-fond graphique-conformite-progression"
+             role="progressbar"
+             aria-valuemin="0"
+             aria-valuemax="100"
+             aria-valuenow="${conformite.score}"
+             aria-label="Score de conformité du forfait">
+          <div class="conformite-barre-remplissage ${conformite.conforme ? 'conformite-barre--succes' : 'conformite-barre--alerte'}" style="width: ${conformite.score}%"></div>
+        </div>
+
+        <p class="graphique-conformite-message${conformite.conforme ? ' graphique-conformite-message--succes' : ''}">${message}</p>
+      </section>
+    `;
+  }
+
+  function renderGraphiqueRepartitionPatient(besoins, creneaux) {
     const cont = $('agenda-patient-graphique');
     if (!cont) return;
 
     const segments = calculerRepartitionPatient(creneaux);
     const total = segments.reduce((s, seg) => s + seg.count, 0);
     const dureeTotale = total * CONFIG.DUREE_SEANCE;
+    const sectionConformite = renderGraphiqueConformiteForfait(besoins, creneaux);
 
+    let sectionRepartition;
     if (!total) {
-      cont.innerHTML = `
-        <div class="graphique-patient-vide">
-          <div class="graphique-patient-vide-icone" aria-hidden="true">◔</div>
-          <h3 class="graphique-patient-vide-titre">Aucune donnée cette semaine</h3>
-          <p class="graphique-patient-vide-texte">Planifiez des séances pour visualiser la répartition par métier.</p>
+      sectionRepartition = `
+        <div class="graphique-patient-section graphique-patient-section--vide">
+          <div class="graphique-patient-vide graphique-patient-vide--inline">
+            <div class="graphique-patient-vide-icone" aria-hidden="true">◔</div>
+            <h3 class="graphique-patient-vide-titre">Aucune séance planifiée</h3>
+            <p class="graphique-patient-vide-texte">La répartition par métier apparaîtra dès que des séances seront ajoutées au planning.</p>
+          </div>
         </div>
       `;
-      return;
+    } else {
+      let cumul = 0;
+      const parts = segments.map(seg => {
+        const debut = cumul;
+        cumul += seg.partExacte;
+        return { ...seg, debut, fin: cumul };
+      });
+
+      const cx = 100;
+      const cy = 100;
+      const rayon = 88;
+      const partsSvg = parts.map(seg => `
+        <path class="graphique-patient-part"
+              d="${cheminPartCamembert(cx, cy, rayon, seg.debut, seg.fin)}"
+              fill="${seg.couleur}"
+              data-role="${seg.role}">
+          <title>${seg.label} : ${seg.pourcent}% (${seg.count} séance${seg.count > 1 ? 's' : ''})</title>
+        </path>
+      `).join('');
+
+      sectionRepartition = `
+        <div class="graphique-patient-section">
+          <div class="graphique-patient-entete">
+            <h3 class="graphique-patient-titre">Répartition du temps de rééducation</h3>
+            <p class="graphique-patient-sous-titre">
+              ${total} séance${total > 1 ? 's' : ''} · ${dureeTotale} min cette semaine
+            </p>
+          </div>
+          <div class="graphique-patient-corps">
+            <div class="graphique-patient-visuel">
+              <svg class="graphique-patient-svg" viewBox="0 0 200 200" role="img" aria-label="Camembert de répartition par métier">
+                ${partsSvg}
+                <circle cx="${cx}" cy="${cy}" r="46" fill="var(--fond-releve)"/>
+              </svg>
+            </div>
+            <ul class="graphique-patient-legende">
+              ${segments.map(seg => `
+                <li class="graphique-patient-legende-item">
+                  <span class="graphique-patient-pastille" style="background:${seg.couleur}"></span>
+                  <span class="graphique-patient-legende-label">${seg.label}</span>
+                  <span class="graphique-patient-legende-valeur">${seg.pourcent}%</span>
+                  <span class="graphique-patient-legende-detail">${seg.count} séance${seg.count > 1 ? 's' : ''}</span>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        </div>
+      `;
     }
-
-    let cumul = 0;
-    const parts = segments.map(seg => {
-      const debut = cumul;
-      cumul += seg.partExacte;
-      return { ...seg, debut, fin: cumul };
-    });
-
-    const cx = 100;
-    const cy = 100;
-    const rayon = 88;
-    const partsSvg = parts.map(seg => `
-      <path class="graphique-patient-part"
-            d="${cheminPartCamembert(cx, cy, rayon, seg.debut, seg.fin)}"
-            fill="${seg.couleur}"
-            data-role="${seg.role}">
-        <title>${seg.label} : ${seg.pourcent}% (${seg.count} séance${seg.count > 1 ? 's' : ''})</title>
-      </path>
-    `).join('');
 
     cont.innerHTML = `
       <div class="graphique-patient-carte">
-        <div class="graphique-patient-entete">
-          <h3 class="graphique-patient-titre">Répartition du temps de rééducation</h3>
-          <p class="graphique-patient-sous-titre">
-            ${total} séance${total > 1 ? 's' : ''} · ${dureeTotale} min cette semaine
-          </p>
-        </div>
-        <div class="graphique-patient-corps">
-          <div class="graphique-patient-visuel">
-            <svg class="graphique-patient-svg" viewBox="0 0 200 200" role="img" aria-label="Camembert de répartition par métier">
-              ${partsSvg}
-              <circle cx="${cx}" cy="${cy}" r="46" fill="var(--fond-releve)"/>
-            </svg>
-          </div>
-          <ul class="graphique-patient-legende">
-            ${segments.map(seg => `
-              <li class="graphique-patient-legende-item">
-                <span class="graphique-patient-pastille" style="background:${seg.couleur}"></span>
-                <span class="graphique-patient-legende-label">${seg.label}</span>
-                <span class="graphique-patient-legende-valeur">${seg.pourcent}%</span>
-                <span class="graphique-patient-legende-detail">${seg.count} séance${seg.count > 1 ? 's' : ''}</span>
-              </li>
-            `).join('')}
-          </ul>
-        </div>
+        ${sectionRepartition}
+        <div class="graphique-patient-separateur" aria-hidden="true"></div>
+        ${sectionConformite}
       </div>
     `;
   }
@@ -947,6 +1166,7 @@
           </span>
         `).join('') : '<span class="fiche-patient-aucun-besoin">Aucun besoin défini</span>'}
       </div>
+      ${renderBarreConformiteForfait(besoins, creneaux)}
       <button type="button"
               class="bouton-icone fiche-patient-toggle-vue"
               id="btn-toggle-vue-patient"
@@ -965,7 +1185,7 @@
       grille.hidden = true;
       sansRdv.hidden = true;
       if (graphique) graphique.hidden = false;
-      renderGraphiqueRepartitionPatient(creneaux);
+      renderGraphiqueRepartitionPatient(besoins, creneaux);
       return;
     }
 

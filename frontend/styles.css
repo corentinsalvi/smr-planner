@@ -1493,6 +1493,195 @@ button, input, select {
   margin-bottom: 22px;
 }
 
+.graphique-patient-section--vide {
+  padding-bottom: 4px;
+}
+
+.graphique-patient-vide--inline {
+  padding: 28px 20px;
+  box-shadow: none;
+  border: 1px dashed var(--bordure);
+  border-radius: var(--rayon-petit);
+  background: var(--fond);
+}
+
+.graphique-patient-separateur {
+  height: 1px;
+  background: var(--bordure);
+  margin: 28px 0;
+}
+
+.graphique-conformite {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.graphique-conformite-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.graphique-conformite-titre {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--encre);
+}
+
+.graphique-conformite-pourcent {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.graphique-conformite-pourcent--alerte {
+  color: var(--alerte);
+}
+
+.graphique-conformite-pourcent--succes {
+  color: #34C759;
+}
+
+.graphique-conformite-comparaison {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.graphique-conformite-metiers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.graphique-conformite-metier {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: var(--rayon-petit);
+  background: var(--fond);
+  border: 1px solid var(--bordure);
+}
+
+.graphique-conformite-metier--vide {
+  padding: 18px 16px;
+}
+
+.graphique-conformite-metier-entete {
+  display: grid;
+  grid-template-columns: 12px 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.graphique-conformite-pastille {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.graphique-conformite-metier-nom {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--encre);
+}
+
+.graphique-conformite-metier-ratio {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.graphique-conformite-metier-ratio--alerte {
+  color: var(--alerte);
+}
+
+.graphique-conformite-metier-ratio--succes {
+  color: #34C759;
+}
+
+.graphique-conformite-metier-detail {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--encre-discrete);
+}
+
+.graphique-conformite-ligne {
+  display: grid;
+  grid-template-columns: 72px 1fr 52px;
+  gap: 12px;
+  align-items: center;
+}
+
+.graphique-conformite-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--encre-douce);
+}
+
+.graphique-conformite-piste {
+  height: 14px;
+  border-radius: var(--rayon-pill);
+  background: var(--fond-creux);
+  overflow: hidden;
+}
+
+.graphique-conformite-barre {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.graphique-conformite-barre--alerte {
+  background: linear-gradient(90deg, #FFB340, var(--alerte));
+}
+
+.graphique-conformite-barre--succes {
+  background: linear-gradient(90deg, #5DD879, #34C759);
+}
+
+.graphique-conformite-barre--forfait {
+  background: linear-gradient(90deg, #C7D2E3, #9AA8BC);
+}
+
+.graphique-conformite-valeur {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--encre);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.graphique-conformite-progression {
+  height: 10px;
+}
+
+.graphique-conformite-message {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--encre-discrete);
+}
+
+.graphique-conformite-message--succes {
+  color: #248A3D;
+  font-weight: 600;
+}
+
+.graphique-conformite--vide .graphique-conformite-pourcent {
+  color: var(--encre-discrete);
+}
+
 .graphique-patient-titre {
   margin: 0 0 6px;
   font-size: 18px;
@@ -1665,6 +1854,84 @@ button, input, select {
   right: 52px;
   height: 1px;
   background: var(--bordure);
+}
+
+.fiche-patient-conformite {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 52px;
+}
+
+.fiche-patient-conformite--vide .conformite-valeur {
+  color: var(--encre-discrete);
+}
+
+.conformite-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.conformite-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--encre-douce);
+  letter-spacing: -0.01em;
+}
+
+.conformite-valeur {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.conformite-valeur--alerte {
+  color: var(--alerte);
+}
+
+.conformite-valeur--succes {
+  color: #34C759;
+}
+
+.conformite-barre-fond {
+  width: 100%;
+  height: 8px;
+  border-radius: var(--rayon-pill);
+  background: var(--fond-creux);
+  overflow: hidden;
+}
+
+.conformite-barre-remplissage {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 0.35s cubic-bezier(0.25, 0.1, 0.25, 1), background-color var(--transition);
+}
+
+.conformite-barre--alerte {
+  background: linear-gradient(90deg, #FFB340, var(--alerte));
+}
+
+.conformite-barre--succes {
+  background: linear-gradient(90deg, #5DD879, #34C759);
+}
+
+.conformite-barre--neutre {
+  background: var(--encre-discrete);
+}
+
+.conformite-message {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--encre-discrete);
+}
+
+.conformite-message--succes {
+  color: #248A3D;
+  font-weight: 600;
 }
 
 .fiche-patient-aucun-besoin {
@@ -2108,11 +2375,20 @@ button, input, select {
     padding-bottom: 58px;
   }
 
+  .fiche-patient-conformite {
+    padding-right: 0;
+  }
+
   .fiche-patient-avatar { grid-row: auto; }
 
   .fiche-patient-toggle-vue {
     right: 16px;
     bottom: 14px;
+  }
+
+  .graphique-conformite-ligne {
+    grid-template-columns: 64px 1fr 48px;
+    gap: 8px;
   }
 
   .graphique-patient-corps {
