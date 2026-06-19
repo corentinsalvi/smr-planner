@@ -1442,6 +1442,173 @@ button, input, select {
   gap: 16px 20px;
   align-items: center;
   box-shadow: var(--ombre-carte);
+  position: relative;
+}
+
+.fiche-patient-toggle-vue {
+  position: absolute;
+  right: 20px;
+  bottom: 18px;
+  z-index: 1;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--bordure);
+  background: var(--fond);
+  color: var(--encre-douce);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition), background var(--transition), box-shadow var(--transition);
+}
+
+.fiche-patient-toggle-vue:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-clair);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.12);
+}
+
+.fiche-patient-toggle-vue:focus {
+  outline: none;
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-clair);
+}
+
+.agenda-patient-graphique {
+  margin-bottom: 20px;
+}
+
+.graphique-patient-carte {
+  background: var(--fond-releve);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: 24px 28px;
+  box-shadow: var(--ombre-carte);
+}
+
+.graphique-patient-entete {
+  margin-bottom: 22px;
+}
+
+.graphique-patient-titre {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--encre);
+}
+
+.graphique-patient-sous-titre {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--encre-discrete);
+}
+
+.graphique-patient-corps {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) 1fr;
+  gap: 28px;
+  align-items: center;
+}
+
+.graphique-patient-visuel {
+  display: flex;
+  justify-content: center;
+}
+
+.graphique-patient-svg {
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 1;
+  filter: drop-shadow(0 8px 18px rgba(15, 23, 42, 0.08));
+}
+
+.graphique-patient-part {
+  transition: opacity var(--transition);
+}
+
+.graphique-patient-part:hover {
+  opacity: 0.88;
+}
+
+.graphique-patient-legende {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.graphique-patient-legende-item {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 2px 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: var(--rayon-petit);
+  background: var(--fond);
+  border: 1px solid var(--bordure);
+}
+
+.graphique-patient-pastille {
+  grid-row: 1 / span 2;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.graphique-patient-legende-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--encre);
+}
+
+.graphique-patient-legende-valeur {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--encre);
+  letter-spacing: -0.02em;
+}
+
+.graphique-patient-legende-detail {
+  grid-column: 2;
+  font-size: 12px;
+  color: var(--encre-discrete);
+}
+
+.graphique-patient-vide {
+  background: var(--fond-releve);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: 48px 24px;
+  text-align: center;
+  box-shadow: var(--ombre-carte);
+}
+
+.graphique-patient-vide-icone {
+  font-size: 36px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.graphique-patient-vide-titre {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--encre);
+}
+
+.graphique-patient-vide-texte {
+  margin: 0;
+  font-size: 14px;
+  color: var(--encre-discrete);
 }
 
 .fiche-patient-avatar {
@@ -1485,8 +1652,19 @@ button, input, select {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding-top: 4px;
-  border-top: 1px solid var(--bordure);
+  padding-top: 16px;
+  padding-right: 52px;
+  position: relative;
+}
+
+.fiche-patient-besoins::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 52px;
+  height: 1px;
+  background: var(--bordure);
 }
 
 .fiche-patient-aucun-besoin {
@@ -1927,9 +2105,20 @@ button, input, select {
   .fiche-patient-resume {
     grid-template-columns: auto 1fr;
     grid-template-rows: auto auto auto;
+    padding-bottom: 58px;
   }
 
   .fiche-patient-avatar { grid-row: auto; }
+
+  .fiche-patient-toggle-vue {
+    right: 16px;
+    bottom: 14px;
+  }
+
+  .graphique-patient-corps {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 
   .login-layout {
     grid-template-columns: 1fr;

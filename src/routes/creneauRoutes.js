@@ -174,7 +174,7 @@ router.delete('/:id', async (req, res) => {
 // Génération automatique du planning hebdomadaire
 // ===========================================================
 
-// POST /api/creneaux/generer - lance l'algorithme pour la semaine de la date donnée
+// POST /api/creneaux/generer - génère l'agenda du professionnel connecté pour la semaine
 // Body : { date: "2026-06-22" } (n'importe quel jour de la semaine cible)
 router.post('/generer', async (req, res) => {
   const { date } = req.body;
@@ -185,16 +185,29 @@ router.post('/generer', async (req, res) => {
   const lundi = lundiDeLaSemaine(date);
   const jours = lesCinqJoursDeLaSemaine(lundi);
   const datesSemaine = new Set(jours.map(j => j.date));
-  const { planningGenere, conflits } = genererPlanningHebdomadaire(lundi, { remplacerSemaine: true });
+  const employeId = req.utilisateur.id;
 
-  const creneauxSauvegardes = await withWriteLock('creneaux', async (creneauxActuels) => {
-    const horsSemaine = creneauxActuels.filter(c => !datesSemaine.has(c.date));
-    return { data: [...horsSemaine, ...planningGenere], returnValue: planningGenere };
+  const { planningGenere, conflits, erreur, employe } = genererPlanningHebdomadaire(lundi, {
+    remplacerSemaine: true,
+    employeId
   });
 
+  if (erreur) {
+    return res.status(404).json({ erreur });
+  }
+
+  const creneauxSauvegardes = await withWriteLock('creneaux', async (creneauxActuels) => {
+    const conserves = creneauxActuels.filter(c =>
+      !(datesSemaine.has(c.date) && c.employe_id === employeId)
+    );
+    return { data: [...conserves, ...planningGenere], returnValue: planningGenere };
+  });
+
+  const nomPro = employe ? `${employe.prenom} ${employe.nom}` : 'Votre agenda';
   res.json({
-    message: `Planning régénéré pour la semaine du ${lundi} (ancien agenda de la semaine remplacé).`,
+    message: `${nomPro} : ${creneauxSauvegardes.length} rendez-vous planifié(s) pour la semaine du ${lundi}.`,
     lundi,
+    employe_id: employeId,
     creneaux_crees: creneauxSauvegardes.length,
     creneaux: creneauxSauvegardes,
     conflits

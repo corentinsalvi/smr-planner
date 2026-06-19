@@ -8,7 +8,8 @@
     semaineLundi: null,
     creneauSelectionne: null,
     patientAgendaId: null,
-    agendaGlobalEmployeId: null
+    agendaGlobalEmployeId: null,
+    patientAgendaMode: 'agenda'
   };
 
   const $ = id => document.getElementById(id);
@@ -294,7 +295,6 @@
 
       if (options.sansRdvPro) {
         vide.innerHTML = `
-          <div class="agenda-global-vide-icone" aria-hidden="true">📅</div>
           <h3 class="agenda-global-vide-titre">Aucun rendez-vous cette semaine</h3>
           <p class="agenda-global-vide-texte">Ce professionnel n'a pas de séance planifiée sur la période affichée.</p>
         `;
@@ -302,10 +302,8 @@
       }
 
       vide.innerHTML = `
-        <div class="agenda-global-vide-icone" aria-hidden="true">📅</div>
         <h3 class="agenda-global-vide-titre">Aucun rendez-vous cette semaine</h3>
-        <p class="agenda-global-vide-texte">Générez le planning automatiquement ou planifiez des séances manuellement.</p>
-        <button type="button" class="bouton bouton-principal" id="btn-generer-depuis-vide">Générer la semaine</button>
+        <p class="agenda-global-vide-texte">Les professionnels peuvent générer leur agenda depuis la page Mon agenda.</p>
       `;
     } else {
       grille.hidden = false;
@@ -673,6 +671,7 @@
 
   function selectionnerPatientAgenda(patientId) {
     state.patientAgendaId = patientId;
+    state.patientAgendaMode = 'agenda';
     const patient = state.patients.find(p => p.id === patientId);
     const input = $('selecteur-patient-agenda');
     if (input) {
@@ -782,6 +781,131 @@
     await renderAgendaPatient();
   }
 
+  function iconeTogglePatientAgenda(mode) {
+    if (mode === 'graphique') {
+      return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="18" rx="2"/>
+        <path d="M16 2v4M8 2v4M3 10h18"/>
+      </svg>`;
+    }
+    return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M12 2v10l7 7"/>
+    </svg>`;
+  }
+
+  function calculerRepartitionPatient(creneaux) {
+    const actifs = creneaux.filter(c => c.statut !== 'ANNULE');
+    const parRole = new Map();
+
+    actifs.forEach(c => {
+      const role = c.role || 'AUTRE';
+      parRole.set(role, (parRole.get(role) || 0) + 1);
+    });
+
+    const total = actifs.length;
+    return [...parRole.entries()]
+      .map(([role, count]) => {
+        const partExacte = total ? (count / total) * 100 : 0;
+        return {
+          role,
+          label: labelRole(role),
+          couleur: couleurRole(role),
+          count,
+          partExacte,
+          pourcent: Math.round(partExacte)
+        };
+      })
+      .sort((a, b) => b.count - a.count);
+  }
+
+  function cheminPartCamembert(cx, cy, rayon, debutPct, finPct) {
+    if (finPct - debutPct >= 99.99) {
+      return [
+        `M ${cx} ${cy - rayon}`,
+        `A ${rayon} ${rayon} 0 1 1 ${cx - 0.01} ${cy - rayon}`,
+        'Z'
+      ].join(' ');
+    }
+
+    const angle = pct => (pct / 100) * 2 * Math.PI - Math.PI / 2;
+    const x1 = cx + rayon * Math.cos(angle(debutPct));
+    const y1 = cy + rayon * Math.sin(angle(debutPct));
+    const x2 = cx + rayon * Math.cos(angle(finPct));
+    const y2 = cy + rayon * Math.sin(angle(finPct));
+    const grandArc = finPct - debutPct > 50 ? 1 : 0;
+
+    return `M ${cx} ${cy} L ${x1} ${y1} A ${rayon} ${rayon} 0 ${grandArc} 1 ${x2} ${y2} Z`;
+  }
+
+  function renderGraphiqueRepartitionPatient(creneaux) {
+    const cont = $('agenda-patient-graphique');
+    if (!cont) return;
+
+    const segments = calculerRepartitionPatient(creneaux);
+    const total = segments.reduce((s, seg) => s + seg.count, 0);
+    const dureeTotale = total * CONFIG.DUREE_SEANCE;
+
+    if (!total) {
+      cont.innerHTML = `
+        <div class="graphique-patient-vide">
+          <div class="graphique-patient-vide-icone" aria-hidden="true">◔</div>
+          <h3 class="graphique-patient-vide-titre">Aucune donnée cette semaine</h3>
+          <p class="graphique-patient-vide-texte">Planifiez des séances pour visualiser la répartition par métier.</p>
+        </div>
+      `;
+      return;
+    }
+
+    let cumul = 0;
+    const parts = segments.map(seg => {
+      const debut = cumul;
+      cumul += seg.partExacte;
+      return { ...seg, debut, fin: cumul };
+    });
+
+    const cx = 100;
+    const cy = 100;
+    const rayon = 88;
+    const partsSvg = parts.map(seg => `
+      <path class="graphique-patient-part"
+            d="${cheminPartCamembert(cx, cy, rayon, seg.debut, seg.fin)}"
+            fill="${seg.couleur}"
+            data-role="${seg.role}">
+        <title>${seg.label} : ${seg.pourcent}% (${seg.count} séance${seg.count > 1 ? 's' : ''})</title>
+      </path>
+    `).join('');
+
+    cont.innerHTML = `
+      <div class="graphique-patient-carte">
+        <div class="graphique-patient-entete">
+          <h3 class="graphique-patient-titre">Répartition du temps de rééducation</h3>
+          <p class="graphique-patient-sous-titre">
+            ${total} séance${total > 1 ? 's' : ''} · ${dureeTotale} min cette semaine
+          </p>
+        </div>
+        <div class="graphique-patient-corps">
+          <div class="graphique-patient-visuel">
+            <svg class="graphique-patient-svg" viewBox="0 0 200 200" role="img" aria-label="Camembert de répartition par métier">
+              ${partsSvg}
+              <circle cx="${cx}" cy="${cy}" r="46" fill="var(--fond-releve)"/>
+            </svg>
+          </div>
+          <ul class="graphique-patient-legende">
+            ${segments.map(seg => `
+              <li class="graphique-patient-legende-item">
+                <span class="graphique-patient-pastille" style="background:${seg.couleur}"></span>
+                <span class="graphique-patient-legende-label">${seg.label}</span>
+                <span class="graphique-patient-legende-valeur">${seg.pourcent}%</span>
+                <span class="graphique-patient-legende-detail">${seg.count} séance${seg.count > 1 ? 's' : ''}</span>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
   async function renderAgendaPatient() {
     renderNavigationSemaine('nav-semaine-patient', renderAgendaPatient);
 
@@ -790,7 +914,9 @@
     const contenu = $('agenda-patient-contenu');
     const resume = $('fiche-patient-resume');
     const grille = $('grille-patient');
+    const graphique = $('agenda-patient-graphique');
     const sansRdv = $('agenda-patient-sans-rdv');
+    const modeGraphique = state.patientAgendaMode === 'graphique';
 
     if (!patientId) {
       vide.hidden = false;
@@ -821,13 +947,34 @@
           </span>
         `).join('') : '<span class="fiche-patient-aucun-besoin">Aucun besoin défini</span>'}
       </div>
+      <button type="button"
+              class="bouton-icone fiche-patient-toggle-vue"
+              id="btn-toggle-vue-patient"
+              aria-label="${modeGraphique ? 'Afficher l\'agenda' : 'Afficher la répartition par métier'}"
+              title="${modeGraphique ? 'Voir l\'agenda' : 'Voir la répartition par métier'}">
+        ${iconeTogglePatientAgenda(state.patientAgendaMode)}
+      </button>
     `;
+
+    $('btn-toggle-vue-patient')?.addEventListener('click', () => {
+      state.patientAgendaMode = modeGraphique ? 'agenda' : 'graphique';
+      renderAgendaPatient();
+    });
+
+    if (modeGraphique) {
+      grille.hidden = true;
+      sansRdv.hidden = true;
+      if (graphique) graphique.hidden = false;
+      renderGraphiqueRepartitionPatient(creneaux);
+      return;
+    }
+
+    if (graphique) graphique.hidden = true;
 
     if (creneaux.length === 0) {
       grille.hidden = true;
       sansRdv.hidden = false;
       sansRdv.innerHTML = `
-        <div class="agenda-patient-vide-icone" aria-hidden="true">📅</div>
         <h3 class="agenda-patient-vide-titre">Aucun rendez-vous cette semaine</h3>
         <p class="agenda-patient-vide-texte">Ce patient n'a pas encore de séances planifiées pour la semaine affichée.</p>
       `;
@@ -1193,12 +1340,6 @@
       renderAgendaGlobal();
     });
 
-    $('agenda-global-vide')?.addEventListener('click', e => {
-      if (e.target.closest('#btn-generer-depuis-vide')) {
-        $('btn-lancer-generation').click();
-      }
-    });
-
     document.querySelectorAll('#filtre-statut-patient .segmented-item').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('#filtre-statut-patient .segmented-item').forEach(b => b.classList.remove('is-active'));
@@ -1292,13 +1433,13 @@
         if (resultat.conflits?.length) {
           toast(`${resultat.conflits.length} séance(s) non planifiée(s)`, 'erreur');
         }
-        await renderAgendaGlobal();
+        await renderMonAgenda();
       } catch (err) {
         toast(err.message, 'erreur');
       } finally {
         btn.disabled = false;
         if (spinner) spinner.hidden = true;
-        if (texte) texte.textContent = 'Générer la semaine';
+        if (texte) texte.textContent = 'Générer mon agenda';
       }
     });
 

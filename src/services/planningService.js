@@ -140,10 +140,23 @@ function genererPlanningHebdomadaire(lundi, options = {}) {
   const jours = lesCinqJoursDeLaSemaine(lundi);
   const datesSemaine = new Set(jours.map(j => j.date));
 
+  const employeCible = options.employeId
+    ? employes.find(e => e.id === options.employeId)
+    : null;
+
+  if (options.employeId && !employeCible) {
+    return { planningGenere: [], conflits: [], erreur: 'Professionnel introuvable ou inactif.' };
+  }
+
   let creneauxExistants = readAll('creneaux').filter(c => c.statut !== 'ANNULE');
-  if (options.remplacerSemaine) {
+  if (options.remplacerSemaine && options.employeId) {
+    creneauxExistants = creneauxExistants.filter(c =>
+      !(datesSemaine.has(c.date) && c.employe_id === options.employeId)
+    );
+  } else if (options.remplacerSemaine) {
     creneauxExistants = creneauxExistants.filter(c => !datesSemaine.has(c.date));
   }
+
   const planningGenere = [];
   const conflits = [];
 
@@ -151,8 +164,22 @@ function genererPlanningHebdomadaire(lundi, options = {}) {
   for (const patient of patients) {
     const besoinsPatient = besoins.filter(b => b.patient_id === patient.id);
     for (const besoin of besoinsPatient) {
-      for (let i = 0; i < besoin.seances_par_semaine; i++) {
-        besoinsAPlacer.push({ ...besoin, patient, tentative: i });
+      if (employeCible) {
+        if (besoin.role !== employeCible.role) continue;
+        if (besoin.professionnel_prefere_id && besoin.professionnel_prefere_id !== employeCible.id) {
+          continue;
+        }
+      }
+
+      const dejaPlacees = creneauxExistants.filter(c =>
+        c.patient_id === patient.id &&
+        c.role === besoin.role &&
+        datesSemaine.has(c.date)
+      ).length;
+      const restantes = Math.max(0, besoin.seances_par_semaine - dejaPlacees);
+
+      for (let i = 0; i < restantes; i++) {
+        besoinsAPlacer.push({ ...besoin, patient, tentative: i, seancesRestantes: restantes });
       }
     }
   }
@@ -161,6 +188,8 @@ function genererPlanningHebdomadaire(lundi, options = {}) {
   const tousLesCreneaux = [...creneauxExistants];
 
   function prosPourRole(role, prefId) {
+    if (employeCible) return [employeCible];
+
     let pros = employes.filter(e => e.role === role);
     if (prefId) {
       const pref = pros.find(e => e.id === prefId);
@@ -241,17 +270,18 @@ function genererPlanningHebdomadaire(lundi, options = {}) {
     }
 
     if (!place) {
+      const total = besoin.seancesRestantes ?? besoin.seances_par_semaine;
       conflits.push({
         patient: `${besoin.patient.prenom} ${besoin.patient.nom}`,
         role: besoin.role,
         message: derniereRaison
-          ? `${derniereRaison} (${besoin.tentative + 1}/${besoin.seances_par_semaine})`
-          : `Impossible de placer une séance (${besoin.tentative + 1}/${besoin.seances_par_semaine})`
+          ? `${derniereRaison} (${besoin.tentative + 1}/${total})`
+          : `Impossible de placer une séance (${besoin.tentative + 1}/${total})`
       });
     }
   }
 
-  return { planningGenere, conflits };
+  return { planningGenere, conflits, employe: employeCible };
 }
 
 module.exports = { genererPlanningHebdomadaire };

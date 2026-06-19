@@ -121,6 +121,20 @@
           <div class="navigation-semaine" id="nav-semaine-mon-agenda"></div>
         </div>
       </header>
+
+      <div class="bandeau-generation" id="bandeau-generation">
+        <div class="bandeau-generation-texte">
+          <strong>Génération automatique</strong>
+          <span>Planifiez vos séances selon vos disponibilités et les besoins de vos patients.</span>
+        </div>
+        <div class="bandeau-generation-actions">
+          <button class="bouton bouton-principal" id="btn-lancer-generation">
+            <span class="btn-texte-generation">Générer mon agenda</span>
+            <span class="btn-spinner" id="spinner-generation" hidden></span>
+          </button>
+        </div>
+      </div>
+
       <div class="grille-agenda" id="grille-mon-agenda"></div>
     </section>
 
@@ -135,18 +149,6 @@
           <div class="navigation-semaine" id="nav-semaine-global"></div>
         </div>
       </header>
-
-      <div class="bandeau-generation" id="bandeau-generation">
-        <div class="bandeau-generation-texte">
-          <strong>Génération automatique du planning</strong>
-        </div>
-        <div class="bandeau-generation-actions">
-          <button class="bouton bouton-principal" id="btn-lancer-generation">
-            <span class="btn-texte-generation">Générer la semaine</span>
-            <span class="btn-spinner" id="spinner-generation" hidden></span>
-          </button>
-        </div>
-      </div>
 
       <div id="agenda-global-stats" class="agenda-global-stats"></div>
 
@@ -216,6 +218,7 @@
 
       <div id="agenda-patient-contenu" class="agenda-patient-contenu" hidden>
         <div id="fiche-patient-resume" class="fiche-patient-resume"></div>
+        <div id="agenda-patient-graphique" class="agenda-patient-graphique" hidden></div>
         <div class="grille-agenda grille-agenda--patient" id="grille-patient"></div>
         <div id="agenda-patient-sans-rdv" class="agenda-patient-sans-rdv" hidden></div>
       </div>
