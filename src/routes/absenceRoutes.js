@@ -1,43 +1,41 @@
 const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
-const { readAll, withWriteLock } = require('../utils/jsonStore');
+const { Absence, Employe } = require('../models');
 const { TYPES_ABSENCE } = require('../utils/absenceUtils');
 const { plageHoraireValide } = require('../utils/dateUtils');
+const { GESTIONNAIRE_ROLES, ROLES_VUE_GLOBALE } = require('../constants');
+const { getClinicIdFromRequest } = require('../utils/clinicScope');
 
-const GESTIONNAIRE_ROLES = new Set(['IDE_COORDINATRICE']);
+const GESTIONNAIRES = new Set(GESTIONNAIRE_ROLES);
+const VUE_GLOBALE = new Set(ROLES_VUE_GLOBALE);
 
 function peutGererAbsences(utilisateur, employeId) {
-  return utilisateur.id === employeId || GESTIONNAIRE_ROLES.has(utilisateur.role);
+  return utilisateur.id === employeId || GESTIONNAIRES.has(utilisateur.role);
 }
 
 // GET /api/absences?employe_id=&date_debut=&date_fin=
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
+  const clinicId = getClinicIdFromRequest(req);
   const { employe_id, date_debut, date_fin } = req.query;
-  let absences = readAll('absences');
+  const filtre = { clinic_id: clinicId };
 
   if (employe_id) {
-    if (!peutGererAbsences(req.utilisateur, employe_id)) {
-      return res.status(403).json({ erreur: 'Accès non autorisé aux absences de ce professionnel.' });
-    }
-    absences = absences.filter(a => a.employe_id === employe_id);
-  } else if (!GESTIONNAIRE_ROLES.has(req.utilisateur.role)) {
-    absences = absences.filter(a => a.employe_id === req.utilisateur.id);
+    filtre.employe_id = employe_id;
+  } else if (!VUE_GLOBALE.has(req.utilisateur.role)) {
+    filtre.employe_id = req.utilisateur.id;
   }
 
-  if (date_debut) {
-    absences = absences.filter(a => a.date_fin >= date_debut);
-  }
-  if (date_fin) {
-    absences = absences.filter(a => a.date_debut <= date_fin);
-  }
+  if (date_debut) filtre.date_fin = { $gte: date_debut };
+  if (date_fin) filtre.date_debut = { ...(filtre.date_debut || {}), $lte: date_fin };
 
-  absences.sort((a, b) => a.date_debut.localeCompare(b.date_debut));
-  res.json(absences);
+  const absences = await Absence.find(filtre).sort({ date_debut: 1 });
+  res.json(absences.map(a => a.toJSON()));
 });
 
 // POST /api/absences
 router.post('/', async (req, res) => {
+  const clinicId = getClinicIdFromRequest(req);
   const {
     employe_id,
     type,
@@ -65,7 +63,11 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ erreur: 'La date de fin doit être postérieure ou égale à la date de début.' });
   }
 
-  const employe = readAll('employes').find(e => e.id === employeId && e.actif !== false);
+  const employe = await Employe.findOne({
+    id: employeId,
+    clinic_id: clinicId,
+    actif: { $ne: false }
+  });
   if (!employe) {
     return res.status(404).json({ erreur: 'Professionnel introuvable ou inactif.' });
   }
@@ -84,24 +86,21 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const nouvelle = await withWriteLock('absences', async (absences) => {
-      const absence = {
-        id: uuidv4(),
-        employe_id: employeId,
-        type,
-        date_debut,
-        date_fin,
-        journee_entiere: journee_entiere !== false,
-        heure_debut: journee_entiere !== false ? null : heure_debut,
-        heure_fin: journee_entiere !== false ? null : heure_fin,
-        commentaire: commentaire?.trim() || '',
-        created_at: new Date().toISOString(),
-        created_by: req.utilisateur.id
-      };
-      return { data: [...absences, absence], returnValue: absence };
+    const nouvelle = await Absence.create({
+      id: uuidv4(),
+      clinic_id: clinicId,
+      employe_id: employeId,
+      type,
+      date_debut,
+      date_fin,
+      journee_entiere: journee_entiere !== false,
+      heure_debut: journee_entiere !== false ? null : heure_debut,
+      heure_fin: journee_entiere !== false ? null : heure_fin,
+      commentaire: commentaire?.trim() || '',
+      created_by: req.utilisateur.id
     });
 
-    res.status(201).json(nouvelle);
+    res.status(201).json(nouvelle.toJSON());
   } catch (err) {
     console.error(err);
     res.status(500).json({ erreur: 'Erreur lors de l\'enregistrement de l\'absence.' });
@@ -110,8 +109,9 @@ router.post('/', async (req, res) => {
 
 // DELETE /api/absences/:id
 router.delete('/:id', async (req, res) => {
-  const absences = readAll('absences');
-  const absence = absences.find(a => a.id === req.params.id);
+  const clinicId = getClinicIdFromRequest(req);
+  const absence = await Absence.findOne({ id: req.params.id, clinic_id: clinicId });
+
   if (!absence) {
     return res.status(404).json({ erreur: 'Absence introuvable.' });
   }
@@ -119,11 +119,7 @@ router.delete('/:id', async (req, res) => {
     return res.status(403).json({ erreur: 'Vous ne pouvez pas supprimer cette absence.' });
   }
 
-  await withWriteLock('absences', async (toutes) => ({
-    data: toutes.filter(a => a.id !== req.params.id),
-    returnValue: true
-  }));
-
+  await Absence.deleteOne({ id: req.params.id, clinic_id: clinicId });
   res.json({ message: 'Absence supprimée.' });
 });
 

@@ -15,7 +15,14 @@ async function verifierMotDePasse(motDePasseClair, hash) {
 
 function genererToken(employe) {
   return jwt.sign(
-    { id: employe.id, role: employe.role, email: employe.email, nom: employe.nom, prenom: employe.prenom },
+    {
+      id: employe.id,
+      clinic_id: employe.clinic_id,
+      role: employe.role,
+      email: employe.email,
+      nom: employe.nom,
+      prenom: employe.prenom
+    },
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES_IN }
   );

@@ -1,0 +1,14 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+data
+graphify-out
+.cursor
+*.md
+Dockerfile
+docker-compose*.yml
+.dockerignore

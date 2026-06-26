@@ -1,15 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
-const { readAll, withWriteLock } = require('../utils/jsonStore');
+const { Employe, Disponibilite } = require('../models');
 const { hashMotDePasse } = require('../services/authService');
 const { ROLES, JOURS_SEMAINE } = require('../constants');
 const { plageHoraireValide } = require('../utils/dateUtils');
+const { getClinicIdFromRequest } = require('../utils/clinicScope');
+
+function sansMotDePasse(employe) {
+  const obj = employe.toJSON ? employe.toJSON() : { ...employe };
+  delete obj.mot_de_passe_hash;
+  return obj;
+}
 
 // GET /api/employes - liste tous les employés (sans les hash de mot de passe)
-router.get('/', (req, res) => {
-  const employes = readAll('employes').map(({ mot_de_passe_hash, ...e }) => e);
-  res.json(employes);
+router.get('/', async (req, res) => {
+  const clinicId = getClinicIdFromRequest(req);
+  const employes = await Employe.find({ clinic_id: clinicId }).sort({ nom: 1, prenom: 1 });
+  res.json(employes.map(sansMotDePasse));
 });
 
 // GET /api/employes/referentiel-roles - liste des métiers et couleurs (utile pour le front)
@@ -18,15 +26,16 @@ router.get('/referentiel-roles', (req, res) => {
 });
 
 // GET /api/employes/:id
-router.get('/:id', (req, res) => {
-  const employe = readAll('employes').find(e => e.id === req.params.id);
+router.get('/:id', async (req, res) => {
+  const clinicId = getClinicIdFromRequest(req);
+  const employe = await Employe.findOne({ id: req.params.id, clinic_id: clinicId });
   if (!employe) return res.status(404).json({ erreur: 'Employé introuvable.' });
-  const { mot_de_passe_hash, ...sansHash } = employe;
-  res.json(sansHash);
+  res.json(sansMotDePasse(employe));
 });
 
 // POST /api/employes - création d'un employé
 router.post('/', async (req, res) => {
+  const clinicId = getClinicIdFromRequest(req);
   const { nom, prenom, email, mot_de_passe, role } = req.body;
 
   if (!nom || !prenom || !email || !mot_de_passe || !role) {
@@ -37,26 +46,28 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const resultat = await withWriteLock('employes', async (employes) => {
-      if (employes.some(e => e.email.toLowerCase() === email.toLowerCase())) {
-        throw new Error('EMAIL_EXISTANT');
-      }
-      const mot_de_passe_hash = await hashMotDePasse(mot_de_passe);
-      const nouvel_employe = {
-        id: uuidv4(),
-        nom, prenom, email, mot_de_passe_hash, role,
-        actif: true,
-        created_at: new Date().toISOString()
-      };
-      return { data: [...employes, nouvel_employe], returnValue: nouvel_employe };
+    const existant = await Employe.findOne({
+      clinic_id: clinicId,
+      email: email.toLowerCase()
     });
-
-    const { mot_de_passe_hash, ...sansHash } = resultat;
-    res.status(201).json(sansHash);
-  } catch (err) {
-    if (err.message === 'EMAIL_EXISTANT') {
+    if (existant) {
       return res.status(409).json({ erreur: 'Un employé avec cet email existe déjà.' });
     }
+
+    const mot_de_passe_hash = await hashMotDePasse(mot_de_passe);
+    const nouvelEmploye = await Employe.create({
+      id: uuidv4(),
+      clinic_id: clinicId,
+      nom,
+      prenom,
+      email: email.toLowerCase(),
+      mot_de_passe_hash,
+      role,
+      actif: true
+    });
+
+    res.status(201).json(sansMotDePasse(nouvelEmploye));
+  } catch (err) {
     console.error(err);
     res.status(500).json({ erreur: 'Erreur lors de la création de l\'employé.' });
   }
@@ -64,55 +75,53 @@ router.post('/', async (req, res) => {
 
 // PUT /api/employes/:id - mise à jour des infos générales (hors mot de passe)
 router.put('/:id', async (req, res) => {
+  const clinicId = getClinicIdFromRequest(req);
   const { nom, prenom, email, role, actif } = req.body;
 
-  const resultat = await withWriteLock('employes', async (employes) => {
-    const index = employes.findIndex(e => e.id === req.params.id);
-    if (index === -1) return { data: employes, returnValue: null };
-
-    employes[index] = {
-      ...employes[index],
+  const employe = await Employe.findOneAndUpdate(
+    { id: req.params.id, clinic_id: clinicId },
+    {
       ...(nom !== undefined && { nom }),
       ...(prenom !== undefined && { prenom }),
-      ...(email !== undefined && { email }),
+      ...(email !== undefined && { email: email.toLowerCase() }),
       ...(role !== undefined && { role }),
       ...(actif !== undefined && { actif })
-    };
-    return { data: employes, returnValue: employes[index] };
-  });
+    },
+    { new: true }
+  );
 
-  if (!resultat) return res.status(404).json({ erreur: 'Employé introuvable.' });
-  const { mot_de_passe_hash, ...sansHash } = resultat;
-  res.json(sansHash);
+  if (!employe) return res.status(404).json({ erreur: 'Employé introuvable.' });
+  res.json(sansMotDePasse(employe));
 });
 
-// DELETE /api/employes/:id - désactive l'employé (soft delete, ne supprime pas l'historique)
+// DELETE /api/employes/:id - désactive l'employé (soft delete)
 router.delete('/:id', async (req, res) => {
-  const resultat = await withWriteLock('employes', async (employes) => {
-    const index = employes.findIndex(e => e.id === req.params.id);
-    if (index === -1) return { data: employes, returnValue: null };
-    employes[index] = { ...employes[index], actif: false };
-    return { data: employes, returnValue: employes[index] };
-  });
+  const clinicId = getClinicIdFromRequest(req);
+  const employe = await Employe.findOneAndUpdate(
+    { id: req.params.id, clinic_id: clinicId },
+    { actif: false },
+    { new: true }
+  );
 
-  if (!resultat) return res.status(404).json({ erreur: 'Employé introuvable.' });
+  if (!employe) return res.status(404).json({ erreur: 'Employé introuvable.' });
   res.json({ message: 'Employé désactivé.' });
 });
 
-// ===========================================================
-// Disponibilités horaires (plages de travail hebdomadaires)
-// ===========================================================
-
 // GET /api/employes/:id/disponibilites
-router.get('/:id/disponibilites', (req, res) => {
-  const dispos = readAll('disponibilites').filter(d => d.employe_id === req.params.id);
-  res.json(dispos);
+router.get('/:id/disponibilites', async (req, res) => {
+  const clinicId = getClinicIdFromRequest(req);
+  const dispos = await Disponibilite.find({
+    clinic_id: clinicId,
+    employe_id: req.params.id
+  }).sort({ jour_semaine: 1, heure_debut: 1 });
+  res.json(dispos.map(d => d.toJSON()));
 });
 
-// PUT /api/employes/:id/disponibilites - remplace entièrement les disponibilités de l'employé
-// Body attendu : { disponibilites: [{ jour_semaine, heure_debut, heure_fin }, ...] }
+// PUT /api/employes/:id/disponibilites - remplace entièrement les disponibilités
 router.put('/:id/disponibilites', async (req, res) => {
+  const clinicId = getClinicIdFromRequest(req);
   const { disponibilites } = req.body;
+
   if (!Array.isArray(disponibilites)) {
     return res.status(400).json({ erreur: 'Le champ disponibilites doit être un tableau.' });
   }
@@ -128,20 +137,21 @@ router.put('/:id/disponibilites', async (req, res) => {
   }
 
   const employeId = req.params.id;
-  await withWriteLock('disponibilites', async (toutes) => {
-    const autresEmployes = toutes.filter(d => d.employe_id !== employeId);
-    const nouvelles = disponibilites.map(d => ({
+  await Disponibilite.deleteMany({ clinic_id: clinicId, employe_id: employeId });
+
+  if (disponibilites.length > 0) {
+    await Disponibilite.insertMany(disponibilites.map(d => ({
       id: uuidv4(),
+      clinic_id: clinicId,
       employe_id: employeId,
       jour_semaine: d.jour_semaine,
       heure_debut: d.heure_debut,
       heure_fin: d.heure_fin
-    }));
-    return { data: [...autresEmployes, ...nouvelles], returnValue: nouvelles };
-  });
+    })));
+  }
 
-  const dispos = readAll('disponibilites').filter(d => d.employe_id === employeId);
-  res.json(dispos);
+  const dispos = await Disponibilite.find({ clinic_id: clinicId, employe_id: employeId });
+  res.json(dispos.map(d => d.toJSON()));
 });
 
 module.exports = router;

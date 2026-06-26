@@ -65,6 +65,10 @@
           <span class="nav-icone" aria-hidden="true">◐</span>
           <span>Mon espace</span>
         </button>
+        <button class="nav-item" data-vue="direction" id="nav-direction" hidden>
+          <span class="nav-icone" aria-hidden="true">◉</span>
+          <span>Direction</span>
+        </button>
         <button class="nav-item" data-vue="agenda-global">
           <span class="nav-icone" aria-hidden="true">▦</span>
           <span>Agenda global</span>
@@ -159,59 +163,65 @@
 
       <!-- Onglet Absences -->
       <div class="espace-panel" id="espace-panel-absences" data-espace-panel="absences" hidden>
-        <div class="absences-layout">
-          <div class="absences-principal">
-            <div class="absences-toolbar">
-              <div id="absences-selecteur-pro" class="absences-selecteur-pro" hidden>
-                <label class="champ champ-compact" for="select-absence-employe">
-                  <span class="champ-label">Professionnel</span>
-                  <select id="select-absence-employe"></select>
-                </label>
-              </div>
-              <div class="navigation-semaine" id="nav-semaine-absences"></div>
-            </div>
-            <div class="calendrier-absences" id="calendrier-absences"></div>
-            <div class="liste-absences" id="liste-absences"></div>
+        <header class="vue-entete">
+          <div>
+            <p class="vue-eyebrow">Indisponibilités</p>
+            <h2 class="vue-titre">Mes absences</h2>
+            <p class="absences-intro">Déclarez vos congés, arrêts maladie ou formations. Le planning automatique ignorera ces créneaux.</p>
           </div>
-          <aside class="absences-formulaire">
-            <h3 class="absences-formulaire-titre">Déclarer une absence</h3>
-            <form id="form-absence" class="formulaire-absence" novalidate>
-              <label class="champ">
-                <span class="champ-label">Type</span>
-                <select id="absence-type" required></select>
-              </label>
-              <div class="champs-ligne">
-                <label class="champ">
-                  <span class="champ-label">Du</span>
-                  <input type="date" id="absence-date-debut" required>
-                </label>
-                <label class="champ">
-                  <span class="champ-label">Au</span>
-                  <input type="date" id="absence-date-fin" required>
-                </label>
+          <div class="vue-actions">
+            <div class="navigation-semaine" id="nav-semaine-absences"></div>
+          </div>
+        </header>
+
+        <div class="absences-legende" id="absences-legende" aria-label="Légende des types d'absence"></div>
+
+        <div class="absences-semaine" id="calendrier-absences"></div>
+
+        <aside class="absences-formulaire">
+          <h3 class="absences-formulaire-titre">Nouvelle absence</h3>
+          <form id="form-absence" class="formulaire-absence" novalidate>
+            <fieldset class="absence-types-groupe">
+              <legend class="champ-label">Type d'absence</legend>
+              <div class="absence-types" id="absence-types" role="radiogroup"></div>
+              <input type="hidden" id="absence-type" value="CONGE" required>
+            </fieldset>
+            <div class="formulaire-absence-grille">
+              <div class="formulaire-absence-dates">
+                <span class="champ-label">Période d'absence</span>
+                <div class="calendrier-absence-picker" id="calendrier-absence-picker" aria-label="Choisir les dates d'absence"></div>
+                <p class="calendrier-absence-resume" id="calendrier-absence-resume" hidden></p>
+                <input type="hidden" id="absence-date-debut" required>
+                <input type="hidden" id="absence-date-fin" required>
               </div>
-              <label class="champ champ-checkbox">
+              <label class="champ champ-bascule formulaire-absence-bascule">
                 <input type="checkbox" id="absence-journee-entiere" checked>
-                <span>Journée(s) entière(s)</span>
+                <span class="champ-bascule-piste" aria-hidden="true"></span>
+                <span class="champ-bascule-texte">Journée(s) entière(s)</span>
               </label>
-              <div id="absence-horaires-partiels" class="champs-ligne" hidden>
-                <label class="champ">
-                  <span class="champ-label">De</span>
-                  <input type="time" id="absence-heure-debut" step="300">
-                </label>
-                <label class="champ">
-                  <span class="champ-label">À</span>
-                  <input type="time" id="absence-heure-fin" step="300">
-                </label>
+              <div id="absence-horaires-partiels" class="absence-horaires-partiels formulaire-absence-horaires" hidden>
+                <p class="absence-horaires-aide">Pour une demi-journée ou un créneau précis (une seule journée).</p>
+                <div class="champs-ligne">
+                  <label class="champ">
+                    <span class="champ-label">De</span>
+                    <input type="time" id="absence-heure-debut" step="300" value="08:00">
+                  </label>
+                  <label class="champ">
+                    <span class="champ-label">À</span>
+                    <input type="time" id="absence-heure-fin" step="300" value="12:00">
+                  </label>
+                </div>
               </div>
-              <label class="champ">
-                <span class="champ-label">Commentaire (optionnel)</span>
-                <input type="text" id="absence-commentaire" placeholder="Ex. formation kiné…">
+              <label class="champ formulaire-absence-commentaire">
+                <span class="champ-label">Commentaire <span class="champ-label-optionnel">(optionnel)</span></span>
+                <input type="text" id="absence-commentaire" placeholder="Ex. formation continue…">
               </label>
-              <button type="submit" class="bouton bouton-principal bouton-pleine-largeur">Enregistrer l'absence</button>
-            </form>
-          </aside>
-        </div>
+              <div class="formulaire-absence-actions">
+                <button type="submit" class="bouton bouton-principal">Enregistrer l'absence</button>
+              </div>
+            </div>
+          </form>
+        </aside>
       </div>
     </section>
 
@@ -340,6 +350,26 @@
         <button class="bouton bouton-principal" id="btn-nouvel-employe">+ Nouvel employé</button>
       </header>
       <div class="liste-equipe" id="liste-equipe"></div>
+    </section>
+
+    <!-- VUE : Direction (directeur) -->
+    <section class="vue" id="vue-direction" data-vue="direction" hidden>
+      <header class="vue-entete vue-entete--direction">
+        <div>
+          <p class="vue-eyebrow">Pilotage clinique</p>
+          <h2 class="vue-titre">Tableau de bord direction</h2>
+        </div>
+        <div class="vue-actions direction-actions">
+          <div class="navigation-mois" id="nav-mois-direction"></div>
+          <button type="button" class="bouton bouton-principal bouton-rapport-pdf" id="btn-rapport-pdf">
+            Télécharger le rapport mensuel (PDF)
+          </button>
+        </div>
+      </header>
+
+      <div class="direction-grille" id="direction-contenu">
+        <p class="direction-chargement">Chargement du tableau de bord…</p>
+      </div>
     </section>
 
   </main>

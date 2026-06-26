@@ -127,5 +127,24 @@ const API = {
 
   revokeCalendarSync() {
     return this.request('DELETE', '/calendar/sync');
+  },
+
+  getTableauDeBord(mois) {
+    const q = mois ? `?mois=${mois}` : '';
+    return this.request('GET', `/rapports/tableau-de-bord${q}`);
+  },
+
+  async downloadRapportMensuel(mois) {
+    const q = mois ? `?mois=${mois}` : '';
+    const headers = {};
+    const token = this.getToken();
+    if (token) headers.Authorization = `Bearer ${token}`;
+
+    const res = await fetch(`${CONFIG.API_BASE}/rapports/mensuel.pdf${q}`, { headers });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.erreur || `Erreur ${res.status}`);
+    }
+    return res.blob();
   }
 };

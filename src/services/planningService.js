@@ -1,5 +1,12 @@
 const { v4: uuidv4 } = require('uuid');
-const { readAll } = require('../utils/jsonStore');
+const {
+  Employe,
+  Disponibilite,
+  Absence,
+  Patient,
+  Besoin,
+  Creneau
+} = require('../models');
 const {
   seChevauchent,
   lesCinqJoursDeLaSemaine,
@@ -132,12 +139,20 @@ function ordonnerJours(jours, besoin, creneaux) {
   });
 }
 
-function genererPlanningHebdomadaire(lundi, options = {}) {
-  const employes = readAll('employes').filter(e => e.actif !== false);
-  const disponibilites = readAll('disponibilites');
-  const absences = readAll('absences');
-  const patients = readAll('patients').filter(p => p.statut === 'ACTIF');
-  const besoins = readAll('besoins').filter(b => b.actif !== false);
+async function genererPlanningHebdomadaire(lundi, options = {}) {
+  const clinicId = options.clinicId;
+  if (!clinicId) {
+    return { planningGenere: [], conflits: [], erreur: 'Clinique non identifiée.' };
+  }
+
+  const [employes, disponibilites, absences, patients, besoins, creneauxBruts] = await Promise.all([
+    Employe.find({ clinic_id: clinicId, actif: { $ne: false } }).lean(),
+    Disponibilite.find({ clinic_id: clinicId }).lean(),
+    Absence.find({ clinic_id: clinicId }).lean(),
+    Patient.find({ clinic_id: clinicId, statut: 'ACTIF' }).lean(),
+    Besoin.find({ clinic_id: clinicId, actif: { $ne: false } }).lean(),
+    Creneau.find({ clinic_id: clinicId, statut: { $ne: 'ANNULE' } }).lean()
+  ]);
 
   const jours = lesCinqJoursDeLaSemaine(lundi);
   const datesSemaine = new Set(jours.map(j => j.date));
@@ -150,7 +165,7 @@ function genererPlanningHebdomadaire(lundi, options = {}) {
     return { planningGenere: [], conflits: [], erreur: 'Professionnel introuvable ou inactif.' };
   }
 
-  let creneauxExistants = readAll('creneaux').filter(c => c.statut !== 'ANNULE');
+  let creneauxExistants = creneauxBruts;
   if (options.remplacerSemaine && options.employeId) {
     creneauxExistants = creneauxExistants.filter(c =>
       !(datesSemaine.has(c.date) && c.employe_id === options.employeId)

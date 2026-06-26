@@ -852,6 +852,75 @@ button, input, select {
   vertical-align: middle;
 }
 
+.bloc-absence-agenda {
+  border: 1px dashed;
+  border-left-width: 3px;
+  border-radius: 12px;
+  padding: 7px 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+  overflow: hidden;
+  cursor: default;
+  user-select: none;
+}
+
+.bloc-absence-agenda--perso {
+  height: 52px;
+  max-height: 52px;
+  min-height: 52px;
+}
+
+.bloc-absence-agenda--global {
+  height: 76px;
+  max-height: 76px;
+  min-height: 76px;
+  gap: 3px;
+}
+
+.bloc-absence-agenda-icone {
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0.9;
+}
+
+.bloc-absence-agenda--global .bloc-absence-agenda-icone {
+  font-size: 16px;
+}
+
+.bloc-absence-agenda-type {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--type-couleur);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.bloc-absence-agenda--global .bloc-absence-agenda-type {
+  font-size: 11px;
+}
+
+.bloc-absence-agenda-detail {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--encre-discrete);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.bloc-absence-agenda--global .bloc-absence-agenda-detail {
+  font-size: 10px;
+}
+
 /* ============================================================
    AGENDA GLOBAL
    ============================================================ */
@@ -1034,8 +1103,8 @@ button, input, select {
 }
 
 .agenda-table--global td {
-  height: 72px;
-  max-height: 72px;
+  height: 88px;
+  max-height: 88px;
   padding: 6px;
 }
 
@@ -1049,10 +1118,10 @@ button, input, select {
 .creneau-carte--pro-global {
   border-left-width: 4px;
   padding: 8px 10px;
-  gap: 4px;
-  height: 60px;
-  max-height: 60px;
-  min-height: 60px;
+  gap: 3px;
+  height: 76px;
+  max-height: 76px;
+  min-height: 76px;
 }
 
 .creneau-badge-role {
@@ -1087,7 +1156,10 @@ button, input, select {
   flex-shrink: 0;
 }
 
-.creneau-carte--global .creneau-titre {
+.creneau-carte--global .creneau-titre,
+.creneau-carte--pro-global .creneau-titre {
+  flex-shrink: 0;
+  min-width: 0;
   font-size: 12px;
 }
 
@@ -1756,11 +1828,46 @@ button, input, select {
   justify-content: center;
 }
 
+@property --pie-sweep {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.graphique-patient-pie-animate {
+  --pie-sweep: 0deg;
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  -webkit-mask-image: conic-gradient(
+    from -90deg,
+    #000 0deg,
+    #000 var(--pie-sweep),
+    transparent var(--pie-sweep)
+  );
+  mask-image: conic-gradient(
+    from -90deg,
+    #000 0deg,
+    #000 var(--pie-sweep),
+    transparent var(--pie-sweep)
+  );
+}
+
+.graphique-patient-carte--animate .graphique-patient-pie-animate {
+  animation: graphique-pie-sweep 1s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+@keyframes graphique-pie-sweep {
+  to { --pie-sweep: 360deg; }
+}
+
 .graphique-patient-svg {
   width: 100%;
   max-width: 220px;
   aspect-ratio: 1;
   filter: drop-shadow(0 8px 18px rgba(15, 23, 42, 0.08));
+  display: block;
 }
 
 .graphique-patient-part {
@@ -1790,6 +1897,41 @@ button, input, select {
   border-radius: var(--rayon-petit);
   background: var(--fond);
   border: 1px solid var(--bordure);
+}
+
+.graphique-patient-carte--animate .graphique-patient-legende-item {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: graphique-legende-apparait 0.45s ease forwards;
+}
+
+.graphique-patient-carte--animate .graphique-patient-legende-item:nth-child(1) { animation-delay: 0.55s; }
+.graphique-patient-carte--animate .graphique-patient-legende-item:nth-child(2) { animation-delay: 0.65s; }
+.graphique-patient-carte--animate .graphique-patient-legende-item:nth-child(3) { animation-delay: 0.75s; }
+.graphique-patient-carte--animate .graphique-patient-legende-item:nth-child(4) { animation-delay: 0.85s; }
+.graphique-patient-carte--animate .graphique-patient-legende-item:nth-child(5) { animation-delay: 0.95s; }
+.graphique-patient-carte--animate .graphique-patient-legende-item:nth-child(6) { animation-delay: 1.05s; }
+.graphique-patient-carte--animate .graphique-patient-legende-item:nth-child(7) { animation-delay: 1.15s; }
+.graphique-patient-carte--animate .graphique-patient-legende-item:nth-child(8) { animation-delay: 1.25s; }
+
+@keyframes graphique-legende-apparait {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .graphique-patient-carte--animate .graphique-patient-pie-animate {
+    animation: none;
+    --pie-sweep: 360deg;
+  }
+
+  .graphique-patient-carte--animate .graphique-patient-legende-item {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .graphique-patient-pastille {
@@ -2189,174 +2331,656 @@ button, input, select {
    ABSENCES
    ============================================================ */
 
-.absences-layout {
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 24px;
-  align-items: start;
+.absences-intro {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: var(--encre-douce);
+  max-width: 520px;
+  line-height: 1.45;
 }
 
-.absences-toolbar {
+.absences-legende {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.absences-selecteur-pro .champ-compact select {
-  min-width: 260px;
-}
-
-.calendrier-absences-grille {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.calendrier-absences-jour {
-  background: var(--fond-releve);
-  border: 1px solid var(--bordure);
-  border-radius: var(--rayon);
-  overflow: hidden;
-  box-shadow: var(--ombre-carte);
-}
-
-.calendrier-absences-jour-entete {
-  padding: 12px 14px;
-  background: var(--fond-creux);
-  border-bottom: 1px solid var(--bordure);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.calendrier-absences-jour-nom {
-  font-weight: 600;
-  font-size: 13px;
-  text-transform: capitalize;
-}
-
-.calendrier-absences-jour-date {
-  font-size: 12px;
-  color: var(--encre-discrete);
-}
-
-.calendrier-absences-jour-corps {
-  padding: 14px;
-  min-height: 72px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-content: flex-start;
-}
-
-.calendrier-absences-vide {
-  font-size: 12px;
-  color: var(--encre-discrete);
-}
-
-.absence-puce {
-  display: inline-flex;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 600;
-  border: 1px solid;
-}
-
-.liste-absences-titre {
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 0 12px;
-}
-
-.liste-absences-vide {
-  color: var(--encre-discrete);
-  font-size: 14px;
-}
-
-.liste-absences-items {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.absence-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 16px;
+  gap: 10px 18px;
+  margin-bottom: 18px;
+  padding: 12px 16px;
   background: var(--fond-releve);
   border: 1px solid var(--bordure);
   border-radius: var(--rayon-petit);
 }
 
-.absence-item-info {
+.absences-legende-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--encre-douce);
+}
+
+.absences-legende-pastille {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--type-couleur);
+  flex-shrink: 0;
+}
+
+.absences-semaine {
+  margin-bottom: 28px;
+}
+
+.absences-semaine-grille {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.absence-jour-carte {
+  background: var(--fond-releve);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  overflow: hidden;
+  box-shadow: var(--ombre-carte);
+  min-height: 148px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
-.absence-item-type {
-  font-weight: 600;
+.absence-jour-carte--dispo {
+  border-color: rgba(52, 199, 89, 0.2);
+}
+
+.absence-jour-carte--indispo {
+  border-color: rgba(15, 40, 80, 0.1);
+}
+
+.absence-jour-carte-entete {
+  padding: 14px 16px 12px;
+  background: linear-gradient(180deg, #FAFCFF 0%, #F4F8FD 100%);
+  border-bottom: 1px solid var(--bordure);
+}
+
+.absence-jour-carte-nom {
+  display: block;
+  font-weight: 700;
   font-size: 13px;
+  text-transform: capitalize;
+  color: var(--encre);
+  letter-spacing: -0.02em;
 }
 
-.absence-item-dates {
-  font-size: 13px;
-}
-
-.absence-item-commentaire {
+.absence-jour-carte-date {
+  display: block;
+  margin-top: 2px;
   font-size: 12px;
   color: var(--encre-discrete);
+  text-transform: capitalize;
+}
+
+.absence-jour-carte-corps {
+  flex: 1;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+}
+
+.absence-jour-disponible {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  color: #34A853;
+  font-size: 13px;
+  font-weight: 600;
+  min-height: 72px;
+}
+
+.absence-jour-disponible-icone {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(52, 199, 89, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.absence-jour-bloc {
+  padding: 10px 12px;
+  border-radius: var(--rayon-petit);
+  background: color-mix(in srgb, var(--type-couleur) 10%, white);
+  border: 1px solid color-mix(in srgb, var(--type-couleur) 28%, transparent);
+  border-left: 3px solid var(--type-couleur);
+}
+
+.absence-jour-bloc-haut {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.absence-jour-bloc-icone {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.absence-jour-bloc-supprimer {
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--encre-discrete);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+
+.absence-jour-bloc-supprimer:hover {
+  background: var(--danger-clair);
+  color: var(--danger);
+}
+
+.absence-jour-bloc-type {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--type-couleur);
+  letter-spacing: -0.01em;
+}
+
+.absence-jour-bloc-detail {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--encre-douce);
+}
+
+.absence-jour-bloc-commentaire {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--encre-discrete);
+  font-style: italic;
 }
 
 .absences-formulaire {
   background: var(--fond-releve);
   border: 1px solid var(--bordure);
   border-radius: var(--rayon);
-  padding: 20px;
+  padding: 24px 28px;
   box-shadow: var(--ombre-carte);
-  position: sticky;
-  top: 16px;
 }
 
 .absences-formulaire-titre {
-  font-size: 15px;
-  font-weight: 600;
-  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 20px;
+  letter-spacing: -0.02em;
 }
 
 .formulaire-absence {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 20px;
 }
 
-.champ-checkbox {
+.formulaire-absence-grille {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 16px 20px;
+  align-items: end;
+}
+
+.formulaire-absence-dates {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.formulaire-absence-dates > .champ-label {
+  margin-bottom: 2px;
+}
+
+.calendrier-absence-picker {
+  background: linear-gradient(180deg, #FAFCFF 0%, var(--fond-releve) 100%);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: 14px 18px 12px;
+  box-shadow: var(--ombre-carte);
+  width: 100%;
+}
+
+.calendrier-absence-entete {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
   gap: 8px;
-  font-size: 14px;
-  cursor: pointer;
 }
 
-.champ-checkbox input {
-  width: 16px;
-  height: 16px;
+.calendrier-absence-periode {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: capitalize;
+  color: var(--encre);
+  text-align: center;
+  flex: 1;
+  line-height: 1.3;
+}
+
+.calendrier-absence-titre {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: capitalize;
+  color: var(--encre);
+}
+
+.calendrier-absence-duo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  width: 100%;
+}
+
+.calendrier-absence-mois {
+  min-width: 0;
+}
+
+.calendrier-absence-mois-titre {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+  color: var(--encre-douce);
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.calendrier-absence-nav {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--bordure);
+  border-radius: 50%;
+  background: var(--fond-releve);
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--transition), border-color var(--transition), transform 0.15s ease;
+}
+
+.calendrier-absence-nav:hover {
+  background: var(--accent-clair);
+  border-color: rgba(0, 122, 255, 0.2);
+}
+
+.calendrier-absence-nav:active {
+  transform: scale(0.94);
+}
+
+.calendrier-absence-aide {
+  font-size: 11px;
+  color: var(--encre-discrete);
+  text-align: center;
+  margin-bottom: 10px;
+  line-height: 1.35;
+}
+
+.calendrier-absence-grille-jours {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.calendrier-absence-jour-semaine {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--encre-discrete);
+  text-align: center;
+  padding: 2px 0 5px;
+}
+
+.calendrier-absence-jour {
+  position: relative;
+  aspect-ratio: 1;
+  min-height: 34px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 0;
+  width: 100%;
+  transition: background var(--transition), color var(--transition), box-shadow var(--transition);
+}
+
+.calendrier-absence-jour-num {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--encre);
+  line-height: 1;
+}
+
+.calendrier-absence-jour-point {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.calendrier-absence-jour--hors-mois .calendrier-absence-jour-num {
+  color: var(--encre-discrete);
+  opacity: 0.45;
+}
+
+.calendrier-absence-jour--aujourdhui:not(.calendrier-absence-jour--selection) {
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+.calendrier-absence-jour--aujourdhui:not(.calendrier-absence-jour--selection) .calendrier-absence-jour-num {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.calendrier-absence-jour--occupe:not(.calendrier-absence-jour--selection) {
+  background: color-mix(in srgb, var(--absence-couleur, #FF9500) 8%, white);
+}
+
+.calendrier-absence-jour:hover:not(.calendrier-absence-jour--selection) {
+  background: var(--fond-hover);
+}
+
+.calendrier-absence-jour--selection {
+  background: var(--accent-clair);
+}
+
+.calendrier-absence-jour--selection .calendrier-absence-jour-num {
+  color: var(--accent-encre);
+  font-weight: 700;
+}
+
+.calendrier-absence-jour--debut,
+.calendrier-absence-jour--fin {
+  background: var(--accent);
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+.calendrier-absence-jour--debut .calendrier-absence-jour-num,
+.calendrier-absence-jour--fin .calendrier-absence-jour-num {
+  color: #fff;
+}
+
+.calendrier-absence-jour--debut {
+  border-radius: 6px 3px 3px 6px;
+}
+
+.calendrier-absence-jour--fin {
+  border-radius: 3px 6px 6px 3px;
+}
+
+.calendrier-absence-jour--debut.calendrier-absence-jour--fin {
+  border-radius: 6px;
+}
+
+.calendrier-absence-legende {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--bordure);
+}
+
+.calendrier-absence-legende-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--encre-discrete);
+}
+
+.calendrier-absence-legende-echantillon {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.calendrier-absence-legende-echantillon--selection {
+  background: var(--accent-clair);
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+.calendrier-absence-legende-echantillon--occupe {
+  background: rgba(255, 149, 0, 0.12);
+  box-shadow: inset 0 0 0 1.5px rgba(255, 149, 0, 0.45);
+}
+
+.calendrier-absence-resume {
+  margin: 0;
+  padding: 10px 14px;
+  background: var(--accent-surface);
+  border: 1px solid rgba(0, 122, 255, 0.12);
+  border-radius: var(--rayon-petit);
+  font-size: 12px;
+  color: var(--encre-douce);
+  line-height: 1.4;
+  width: 100%;
+}
+
+.calendrier-absence-resume strong {
+  color: var(--encre);
+  font-weight: 700;
+}
+
+.calendrier-absence-resume-icone {
+  margin-right: 4px;
+}
+
+.formulaire-absence-bascule {
+  grid-column: 1 / -1;
+  align-self: center;
+  margin: 0;
+  padding-top: 0;
+}
+
+.formulaire-absence-horaires {
+  grid-column: 1 / -1;
+}
+
+.formulaire-absence-commentaire {
+  grid-column: 1 / 2;
+  margin: 0;
+}
+
+.formulaire-absence-actions {
+  grid-column: 2;
+  display: flex;
+  justify-content: flex-end;
+  align-items: end;
+}
+
+.formulaire-absence-actions .bouton {
+  min-width: 180px;
+  white-space: nowrap;
+}
+
+.absence-types-groupe {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.absence-types-groupe legend {
+  margin-bottom: 10px;
+}
+
+.absence-types {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.absence-type-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-petit);
+  background: var(--fond);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
+}
+
+.absence-type-chip:hover {
+  border-color: color-mix(in srgb, var(--type-couleur) 40%, transparent);
+  background: color-mix(in srgb, var(--type-couleur) 6%, white);
+}
+
+.absence-type-chip.is-active {
+  border-color: var(--type-couleur);
+  background: color-mix(in srgb, var(--type-couleur) 10%, white);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--type-couleur) 18%, transparent);
+}
+
+.absence-type-chip-icone {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--type-couleur) 14%, white);
+  color: var(--type-couleur);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.absence-type-chip-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--encre);
+}
+
+.champ-label-optionnel {
+  font-weight: 500;
+  color: var(--encre-discrete);
+}
+
+.champ-bascule {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  user-select: none;
+}
+
+.champ-bascule input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.champ-bascule-piste {
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--fond-creux);
+  border: 1px solid var(--bordure);
+  position: relative;
+  flex-shrink: 0;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.champ-bascule-piste::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform var(--transition);
+}
+
+.champ-bascule input:checked + .champ-bascule-piste {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.champ-bascule input:checked + .champ-bascule-piste::after {
+  transform: translateX(18px);
+}
+
+.champ-bascule-texte {
+  color: var(--encre);
+  font-weight: 500;
+}
+
+.absence-horaires-partiels {
+  padding: 14px;
+  background: var(--fond);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-petit);
+}
+
+.absence-horaires-aide {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--encre-discrete);
+  line-height: 1.4;
 }
 
 @media (max-width: 960px) {
-  .absences-layout { grid-template-columns: 1fr; }
-  .absences-formulaire { position: static; }
-  .calendrier-absences-grille { grid-template-columns: 1fr; }
+  .absences-semaine-grille { grid-template-columns: 1fr; }
+  .absence-types { grid-template-columns: 1fr; }
+  .formulaire-absence-grille {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  .formulaire-absence-dates,
+  .formulaire-absence-bascule,
+  .formulaire-absence-horaires,
+  .formulaire-absence-commentaire,
+  .formulaire-absence-actions {
+    grid-column: 1;
+  }
+  .formulaire-absence-bascule { padding-top: 0; }
+  .formulaire-absence-actions .bouton { width: 100%; }
+  .calendrier-absence-duo { grid-template-columns: 1fr; gap: 14px; }
+  .calendrier-absence-periode { font-size: 12px; }
 }
 
 /* ============================================================
@@ -2678,6 +3302,301 @@ button, input, select {
   .contenu { padding: 24px 20px 48px; }
   .vue-titre { font-size: 26px; }
   .liste-patients, .liste-equipe { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   DIRECTION — Tableau de bord directeur
+   ============================================================ */
+
+.vue-entete--direction {
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.direction-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.navigation-mois {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--fond-releve);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-pill);
+  padding: 4px 6px;
+}
+
+.bouton-rapport-pdf {
+  white-space: nowrap;
+}
+
+.direction-grille {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.direction-chargement,
+.direction-erreur,
+.direction-message-vide {
+  grid-column: 1 / -1;
+  color: var(--encre-discrete);
+  font-size: 14px;
+  padding: 24px;
+  text-align: center;
+}
+
+.direction-erreur { color: var(--danger); }
+
+.direction-carte {
+  background: var(--fond-releve);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: 22px 24px;
+  box-shadow: var(--ombre-carte);
+}
+
+.direction-carte--conformite,
+.direction-carte--occupation {
+  grid-column: 1 / -1;
+}
+
+.direction-carte-entete {
+  margin-bottom: 18px;
+}
+
+.direction-carte-entete--conformite {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.direction-conformite-semaine {
+  flex-shrink: 0;
+}
+
+.direction-carte-titre {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.direction-carte-sous-titre {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--encre-discrete);
+}
+
+.direction-conformite-corps {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.direction-jauge-svg {
+  width: 160px;
+  height: 160px;
+  display: block;
+}
+
+.direction-jauge-valeur {
+  font-size: 28px;
+  font-weight: 700;
+  fill: #1D1D1F;
+  font-family: var(--police-ui);
+}
+
+.direction-jauge-sous-titre {
+  font-size: 11px;
+  font-weight: 600;
+  fill: #8A93A3;
+  font-family: var(--police-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.direction-conformite-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  flex: 1;
+  min-width: 240px;
+}
+
+.direction-kpi {
+  background: var(--fond);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-petit);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.direction-kpi-valeur {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--encre);
+}
+
+.direction-kpi-valeur--succes { color: #34A853; }
+
+.direction-kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--encre-discrete);
+}
+
+.direction-liste-patients {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--bordure);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.direction-patient-ligne {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--fond);
+  border-radius: var(--rayon-petit);
+  border: 1px solid var(--bordure);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.direction-patient-ligne:hover {
+  background: var(--accent-surface);
+  border-color: rgba(0, 122, 255, 0.2);
+}
+
+.direction-patient-ligne:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.direction-patient-nom { font-size: 13px; font-weight: 600; }
+.direction-patient-score { font-size: 13px; font-weight: 700; }
+.direction-patient-score--succes { color: #34A853; }
+.direction-patient-score--alerte { color: var(--alerte); }
+
+.direction-rh-resume {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--bordure);
+}
+
+.direction-rh-taux {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+}
+
+.direction-rh-taux-label {
+  font-size: 14px;
+  color: var(--encre-douce);
+}
+
+.direction-rh-compteurs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.direction-rh-puce {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: var(--rayon-pill);
+}
+
+.direction-rh-puce--conge { background: rgba(255, 149, 0, 0.12); color: #C93400; }
+.direction-rh-puce--arret { background: rgba(255, 59, 48, 0.1); color: #D70015; }
+.direction-rh-puce--formation { background: rgba(88, 86, 214, 0.12); color: #5856D6; }
+
+.direction-rh-complet { font-size: 13px; font-weight: 600; margin: 0; }
+.direction-rh-complet--ok { color: #34A853; }
+.direction-rh-complet--ko { color: var(--alerte); }
+
+.direction-rh-tableau {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.direction-rh-ligne {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1.4fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: var(--rayon-petit);
+  font-size: 13px;
+}
+
+.direction-rh-ligne--entete {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--encre-discrete);
+  background: var(--fond);
+  position: sticky;
+  top: 0;
+}
+
+.direction-rh-nom { font-weight: 600; }
+.direction-rh-metier { color: var(--encre-douce); font-size: 12px; }
+.direction-rh-statut { display: flex; flex-direction: column; gap: 2px; }
+.direction-rh-detail { font-size: 11px; color: var(--encre-discrete); }
+
+.direction-badge {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: var(--rayon-pill);
+}
+
+.direction-badge--present { background: rgba(52, 199, 89, 0.12); color: #248A3D; }
+.direction-badge--partiel { background: rgba(255, 149, 0, 0.12); color: #C93400; }
+.direction-badge--absent { background: rgba(255, 59, 48, 0.1); color: #D70015; }
+
+.direction-occupation-grille {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 960px) {
+  .direction-grille { grid-template-columns: 1fr; }
+  .direction-conformite-stats { grid-template-columns: repeat(2, 1fr); }
+  .direction-occupation-grille { grid-template-columns: repeat(2, 1fr); }
+  .direction-rh-ligne { grid-template-columns: 1fr; }
+  .direction-rh-ligne--entete { display: none; }
+  .bouton-rapport-pdf { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {

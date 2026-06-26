@@ -1,16 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
-const { readAll, withWriteLock } = require('../utils/jsonStore');
+const { Employe, Patient, Creneau, Absence } = require('../models');
 const { genererPlanningHebdomadaire } = require('../services/planningService');
 const { seChevauchent, lundiDeLaSemaine, lesCinqJoursDeLaSemaine } = require('../utils/dateUtils');
 const { genererFichierIcs } = require('../utils/icsUtils');
 const { TEMPS_PLANNING } = require('../constants');
 const { estProAbsent } = require('../utils/absenceUtils');
+const { getClinicIdFromRequest } = require('../utils/clinicScope');
 
 // GET /api/creneaux/export/ics?date_debut=...&date_fin=...
-// Exporte uniquement l'agenda du professionnel connecté (semaine affichée par défaut).
-router.get('/export/ics', (req, res) => {
+router.get('/export/ics', async (req, res) => {
+  const clinicId = getClinicIdFromRequest(req);
   let { date_debut, date_fin } = req.query;
 
   if (!date_debut || !date_fin) {
@@ -21,25 +22,25 @@ router.get('/export/ics', (req, res) => {
     date_fin = jours[4].date;
   }
 
-  const employes = readAll('employes');
-  const patients = readAll('patients');
-  const employe = employes.find(e => e.id === req.utilisateur.id);
-
+  const employe = await Employe.findOne({ id: req.utilisateur.id, clinic_id: clinicId });
   if (!employe) {
     return res.status(401).json({ erreur: 'Compte introuvable.' });
   }
 
-  const creneaux = readAll('creneaux').filter(c =>
-    c.employe_id === req.utilisateur.id &&
-    c.statut !== 'ANNULE' &&
-    c.date >= date_debut &&
-    c.date <= date_fin
-  );
+  const [creneaux, patients] = await Promise.all([
+    Creneau.find({
+      clinic_id: clinicId,
+      employe_id: req.utilisateur.id,
+      statut: { $ne: 'ANNULE' },
+      date: { $gte: date_debut, $lte: date_fin }
+    }).lean(),
+    Patient.find({ clinic_id: clinicId }).lean()
+  ]);
 
   const ics = genererFichierIcs({
     creneaux,
     patients,
-    employe,
+    employe: employe.toJSON(),
     nomCalendrier: `SMR — ${employe.prenom} ${employe.nom}`
   });
 
@@ -50,21 +51,28 @@ router.get('/export/ics', (req, res) => {
 });
 
 // GET /api/creneaux?employe_id=...&patient_id=...&date_debut=...&date_fin=...
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
+  const clinicId = getClinicIdFromRequest(req);
   const { employe_id, patient_id, date_debut, date_fin } = req.query;
-  let creneaux = readAll('creneaux');
+  const filtre = { clinic_id: clinicId };
 
-  if (employe_id) creneaux = creneaux.filter(c => c.employe_id === employe_id);
-  if (patient_id) creneaux = creneaux.filter(c => c.patient_id === patient_id);
-  if (date_debut) creneaux = creneaux.filter(c => c.date >= date_debut);
-  if (date_fin) creneaux = creneaux.filter(c => c.date <= date_fin);
+  if (employe_id) filtre.employe_id = employe_id;
+  if (patient_id) filtre.patient_id = patient_id;
+  if (date_debut || date_fin) {
+    filtre.date = {};
+    if (date_debut) filtre.date.$gte = date_debut;
+    if (date_fin) filtre.date.$lte = date_fin;
+  }
 
-  res.json(creneaux);
+  const creneaux = await Creneau.find(filtre).sort({ date: 1, heure_debut: 1 });
+  res.json(creneaux.map(c => c.toJSON()));
 });
 
-// Vérifie qu'un créneau manuel ne crée pas de conflit pro ou patient
-function verifierConflit(creneauxExistants, candidat, idAIgnorer = null) {
-  const absences = readAll('absences');
+async function verifierConflit(clinicId, candidat, idAIgnorer = null) {
+  const [creneauxExistants, absences] = await Promise.all([
+    Creneau.find({ clinic_id: clinicId, date: candidat.date }).lean(),
+    Absence.find({ clinic_id: clinicId, employe_id: candidat.employe_id }).lean()
+  ]);
 
   if (estProAbsent(absences, candidat.employe_id, candidat.date, candidat.heure_debut, candidat.heure_fin)) {
     return 'Le professionnel est absent sur ce créneau.';
@@ -73,24 +81,24 @@ function verifierConflit(creneauxExistants, candidat, idAIgnorer = null) {
   const conflitsPro = creneauxExistants.filter(c =>
     c.id !== idAIgnorer &&
     c.employe_id === candidat.employe_id &&
-    c.date === candidat.date &&
     c.statut !== 'ANNULE' &&
     seChevauchent(c.heure_debut, c.heure_fin, candidat.heure_debut, candidat.heure_fin)
   );
   const conflitsPatient = creneauxExistants.filter(c =>
     c.id !== idAIgnorer &&
     c.patient_id === candidat.patient_id &&
-    c.date === candidat.date &&
     c.statut !== 'ANNULE' &&
     seChevauchent(c.heure_debut, c.heure_fin, candidat.heure_debut, candidat.heure_fin)
   );
+
   if (conflitsPro.length > 0) return 'Le professionnel a déjà un rendez-vous sur ce créneau.';
   if (conflitsPatient.length > 0) return 'Le patient a déjà un rendez-vous sur ce créneau.';
   return null;
 }
 
-// POST /api/creneaux - création manuelle d'un créneau (avec vérification stricte des conflits)
+// POST /api/creneaux - création manuelle
 router.post('/', async (req, res) => {
+  const clinicId = getClinicIdFromRequest(req);
   const { patient_id, employe_id, role, date, heure_debut, heure_fin, besoin_soin_id } = req.body;
 
   if (!patient_id || !employe_id || !date || !heure_debut || !heure_fin) {
@@ -104,119 +112,120 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const nouveauCreneau = await withWriteLock('creneaux', async (creneaux) => {
-      const candidat = { patient_id, employe_id, date, heure_debut, heure_fin };
-      const erreurConflit = verifierConflit(creneaux, candidat);
-      if (erreurConflit) throw new Error(erreurConflit);
+    const candidat = { patient_id, employe_id, date, heure_debut, heure_fin };
+    const erreurConflit = await verifierConflit(clinicId, candidat);
+    if (erreurConflit) {
+      return res.status(409).json({ erreur: erreurConflit });
+    }
 
-      const creneau = {
-        id: uuidv4(),
-        patient_id, employe_id,
-        besoin_soin_id: besoin_soin_id || null,
-        role: role || null,
-        date, heure_debut, heure_fin,
-        statut: 'PLANIFIE',
-        genere_auto: false
-      };
-      return { data: [...creneaux, creneau], returnValue: creneau };
+    const creneau = await Creneau.create({
+      id: uuidv4(),
+      clinic_id: clinicId,
+      patient_id,
+      employe_id,
+      besoin_soin_id: besoin_soin_id || null,
+      role: role || null,
+      date,
+      heure_debut,
+      heure_fin,
+      statut: 'PLANIFIE',
+      genere_auto: false
     });
 
-    res.status(201).json(nouveauCreneau);
+    res.status(201).json(creneau.toJSON());
   } catch (err) {
     res.status(409).json({ erreur: err.message });
   }
 });
 
-// PUT /api/creneaux/:id - déplacer/modifier un créneau (re-vérifie les conflits)
+// PUT /api/creneaux/:id
 router.put('/:id', async (req, res) => {
+  const clinicId = getClinicIdFromRequest(req);
   const { date, heure_debut, heure_fin, statut } = req.body;
 
   try {
-    const resultat = await withWriteLock('creneaux', async (creneaux) => {
-      const index = creneaux.findIndex(c => c.id === req.params.id);
-      if (index === -1) throw new Error('NOT_FOUND');
+    const existant = await Creneau.findOne({ id: req.params.id, clinic_id: clinicId });
+    if (!existant) return res.status(404).json({ erreur: 'Créneau introuvable.' });
 
-      const existant = creneaux[index];
-      const candidat = {
-        patient_id: existant.patient_id,
-        employe_id: existant.employe_id,
-        date: date || existant.date,
-        heure_debut: heure_debut || existant.heure_debut,
-        heure_fin: heure_fin || existant.heure_fin
-      };
+    const candidat = {
+      patient_id: existant.patient_id,
+      employe_id: existant.employe_id,
+      date: date || existant.date,
+      heure_debut: heure_debut || existant.heure_debut,
+      heure_fin: heure_fin || existant.heure_fin
+    };
 
-      if (date || heure_debut || heure_fin) {
-        const erreurConflit = verifierConflit(creneaux, candidat, existant.id);
-        if (erreurConflit) throw new Error(erreurConflit);
-      }
+    if (date || heure_debut || heure_fin) {
+      const erreurConflit = await verifierConflit(clinicId, candidat, existant.id);
+      if (erreurConflit) return res.status(409).json({ erreur: erreurConflit });
+    }
 
-      creneaux[index] = {
-        ...existant,
-        ...candidat,
-        ...(statut !== undefined && { statut })
-      };
-      return { data: creneaux, returnValue: creneaux[index] };
-    });
+    if (date !== undefined) existant.date = date;
+    if (heure_debut !== undefined) existant.heure_debut = heure_debut;
+    if (heure_fin !== undefined) existant.heure_fin = heure_fin;
+    if (statut !== undefined) existant.statut = statut;
 
-    res.json(resultat);
+    await existant.save();
+    res.json(existant.toJSON());
   } catch (err) {
-    if (err.message === 'NOT_FOUND') return res.status(404).json({ erreur: 'Créneau introuvable.' });
     res.status(409).json({ erreur: err.message });
   }
 });
 
-// DELETE /api/creneaux/:id - annule le créneau (conserve l'historique, ne supprime pas la ligne)
+// DELETE /api/creneaux/:id - annule le créneau
 router.delete('/:id', async (req, res) => {
-  const resultat = await withWriteLock('creneaux', async (creneaux) => {
-    const index = creneaux.findIndex(c => c.id === req.params.id);
-    if (index === -1) return { data: creneaux, returnValue: null };
-    creneaux[index] = { ...creneaux[index], statut: 'ANNULE' };
-    return { data: creneaux, returnValue: creneaux[index] };
-  });
-  if (!resultat) return res.status(404).json({ erreur: 'Créneau introuvable.' });
+  const clinicId = getClinicIdFromRequest(req);
+  const creneau = await Creneau.findOneAndUpdate(
+    { id: req.params.id, clinic_id: clinicId },
+    { statut: 'ANNULE' },
+    { new: true }
+  );
+
+  if (!creneau) return res.status(404).json({ erreur: 'Créneau introuvable.' });
   res.json({ message: 'Créneau annulé.' });
 });
 
-// ===========================================================
-// Génération automatique du planning hebdomadaire
-// ===========================================================
-
-// POST /api/creneaux/generer - génère l'agenda du professionnel connecté pour la semaine
-// Body : { date: "2026-06-22" } (n'importe quel jour de la semaine cible)
+// POST /api/creneaux/generer - génère l'agenda du professionnel connecté
 router.post('/generer', async (req, res) => {
+  const clinicId = getClinicIdFromRequest(req);
   const { date } = req.body;
+
   if (!date) {
     return res.status(400).json({ erreur: 'Le champ date est requis (un jour quelconque de la semaine à planifier).' });
   }
 
   const lundi = lundiDeLaSemaine(date);
   const jours = lesCinqJoursDeLaSemaine(lundi);
-  const datesSemaine = new Set(jours.map(j => j.date));
+  const datesSemaine = jours.map(j => j.date);
   const employeId = req.utilisateur.id;
 
-  const { planningGenere, conflits, erreur, employe } = genererPlanningHebdomadaire(lundi, {
+  const { planningGenere, conflits, erreur, employe } = await genererPlanningHebdomadaire(lundi, {
     remplacerSemaine: true,
-    employeId
+    employeId,
+    clinicId
   });
 
   if (erreur) {
     return res.status(404).json({ erreur });
   }
 
-  const creneauxSauvegardes = await withWriteLock('creneaux', async (creneauxActuels) => {
-    const conserves = creneauxActuels.filter(c =>
-      !(datesSemaine.has(c.date) && c.employe_id === employeId)
-    );
-    return { data: [...conserves, ...planningGenere], returnValue: planningGenere };
+  await Creneau.deleteMany({
+    clinic_id: clinicId,
+    employe_id: employeId,
+    date: { $in: datesSemaine }
   });
+
+  if (planningGenere.length > 0) {
+    await Creneau.insertMany(planningGenere.map(c => ({ ...c, clinic_id: clinicId })));
+  }
 
   const nomPro = employe ? `${employe.prenom} ${employe.nom}` : 'Votre agenda';
   res.json({
-    message: `${nomPro} : ${creneauxSauvegardes.length} rendez-vous planifié(s) pour la semaine du ${lundi}.`,
+    message: `${nomPro} : ${planningGenere.length} rendez-vous planifié(s) pour la semaine du ${lundi}.`,
     lundi,
     employe_id: employeId,
-    creneaux_crees: creneauxSauvegardes.length,
-    creneaux: creneauxSauvegardes,
+    creneaux_crees: planningGenere.length,
+    creneaux: planningGenere,
     conflits
   });
 });

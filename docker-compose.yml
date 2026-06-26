@@ -1,0 +1,34 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: smr-mongo
+    restart: unless-stopped
+    volumes:
+      - smr-mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  app:
+    build: .
+    container_name: smr-app
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    ports:
+      - "${PORT:-4000}:4000"
+    environment:
+      MONGO_URI: mongodb://mongo:27017/smr-planner
+      JWT_SECRET: ${JWT_SECRET:-changez_moi_en_production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-8h}
+      PORT: 4000
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:4000}
+
+volumes:
+  smr-mongo-data:

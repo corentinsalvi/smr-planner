@@ -7,7 +7,12 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "seed": "node src/utils/seed.js"
+    "seed": "node src/utils/seed.js",
+    "migrate:json": "node src/scripts/migrateJsonToMongo.js",
+    "docker:up": "docker compose up -d --build",
+    "docker:down": "docker compose down",
+    "docker:seed": "docker compose run --rm app npm run seed",
+    "docker:logs": "docker compose logs -f app"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -16,6 +21,8 @@
     "express": "^4.19.2",
     "graphify": "^1.0.0",
     "jsonwebtoken": "^9.0.2",
+    "mongoose": "^9.7.2",
+    "pdfkit": "^0.19.1",
     "uuid": "^9.0.1"
   }
 }

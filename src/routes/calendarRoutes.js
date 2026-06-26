@@ -7,6 +7,7 @@ const {
   revoquerJeton,
   validerEtServirFlux
 } = require('../services/calendarSyncService');
+const { getClinicIdFromRequest } = require('../utils/clinicScope');
 
 /**
  * GET /v1/calendar/sync-[UUID]-[TOKEN].ics
@@ -42,7 +43,8 @@ function creerRoutesGestion() {
 
   // GET /api/calendar/sync — statut sans exposer le secret
   gestion.get('/', async (req, res) => {
-    const statut = await obtenirStatutSync(req.utilisateur.id);
+    const clinicId = getClinicIdFromRequest(req);
+    const statut = await obtenirStatutSync(req.utilisateur.id, clinicId);
     if (!statut.actif) {
       return res.json({ actif: false });
     }
@@ -58,13 +60,15 @@ function creerRoutesGestion() {
 
   // POST /api/calendar/sync — génère ou régénère le lien (révoque l'ancien)
   gestion.post('/', async (req, res) => {
-    const resultat = await creerOuRegenererJeton(req.utilisateur.id, req);
+    const clinicId = getClinicIdFromRequest(req);
+    const resultat = await creerOuRegenererJeton(req.utilisateur.id, clinicId, req);
     res.status(201).json(resultat);
   });
 
   // DELETE /api/calendar/sync — révoque immédiatement le lien actif
   gestion.delete('/', async (req, res) => {
-    const revoque = await revoquerJeton(req.utilisateur.id);
+    const clinicId = getClinicIdFromRequest(req);
+    const revoque = await revoquerJeton(req.utilisateur.id, clinicId);
     if (!revoque) {
       return res.status(404).json({ erreur: 'Aucun lien de synchronisation actif.' });
     }

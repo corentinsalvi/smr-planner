@@ -1,10 +1,9 @@
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
-const { readAll, withWriteLock } = require('../utils/jsonStore');
+const { CalendarSyncToken, Creneau, Employe, Patient } = require('../models');
 const { formaterDateLocale } = require('../utils/dateUtils');
 const { genererFluxIcsAbonnement } = require('../utils/icsUtils');
 
-const COLLECTION = 'calendar_sync_tokens';
 const FENETRE_PASSEE_JOURS = 7;
 const FENETRE_FUTURE_JOURS = 180;
 
@@ -29,22 +28,25 @@ function ajouterJours(dateStr, jours) {
   return formaterDateLocale(d);
 }
 
-function recupererCreneauxAbonnement(employeId) {
+async function recupererCreneauxAbonnement(employeId, clinicId) {
   const aujourdhui = formaterDateLocale(new Date());
   const dateDebut = ajouterJours(aujourdhui, -FENETRE_PASSEE_JOURS);
   const dateFin = ajouterJours(aujourdhui, FENETRE_FUTURE_JOURS);
 
-  return readAll('creneaux').filter(c =>
-    c.employe_id === employeId &&
-    c.statut !== 'ANNULE' &&
-    c.date >= dateDebut &&
-    c.date <= dateFin
-  );
+  return Creneau.find({
+    clinic_id: clinicId,
+    employe_id: employeId,
+    statut: { $ne: 'ANNULE' },
+    date: { $gte: dateDebut, $lte: dateFin }
+  }).lean();
 }
 
-async function obtenirStatutSync(employeId) {
-  const jetons = readAll(COLLECTION);
-  const actif = jetons.find(t => t.employe_id === employeId && t.actif);
+async function obtenirStatutSync(employeId, clinicId) {
+  const actif = await CalendarSyncToken.findOne({
+    clinic_id: clinicId,
+    employe_id: employeId,
+    actif: true
+  }).lean();
 
   if (!actif) {
     return { actif: false, created_at: null, last_accessed_at: null };
@@ -58,30 +60,27 @@ async function obtenirStatutSync(employeId) {
   };
 }
 
-async function creerOuRegenererJeton(employeId, req) {
+async function creerOuRegenererJeton(employeId, clinicId, req) {
   const tokenSecret = crypto.randomBytes(32).toString('hex');
   const syncUuid = uuidv4();
   const tokenHash = hasherToken(tokenSecret);
   const now = new Date().toISOString();
 
-  await withWriteLock(COLLECTION, async (jetons) => {
-    const misAJour = jetons.map(t => {
-      if (t.employe_id !== employeId || !t.actif) return t;
-      return { ...t, actif: false, revoked_at: now };
-    });
+  await CalendarSyncToken.updateMany(
+    { clinic_id: clinicId, employe_id: employeId, actif: true },
+    { actif: false, revoked_at: now }
+  );
 
-    const nouveau = {
-      id: uuidv4(),
-      employe_id: employeId,
-      sync_uuid: syncUuid,
-      token_hash: tokenHash,
-      actif: true,
-      revoked_at: null,
-      created_at: now,
-      last_accessed_at: null
-    };
-
-    return { data: [...misAJour, nouveau], returnValue: nouveau };
+  await CalendarSyncToken.create({
+    id: uuidv4(),
+    clinic_id: clinicId,
+    employe_id: employeId,
+    sync_uuid: syncUuid,
+    token_hash: tokenHash,
+    actif: true,
+    revoked_at: null,
+    created_at: now,
+    last_accessed_at: null
   });
 
   const url = construireUrlPublique(req, syncUuid, tokenSecret);
@@ -94,52 +93,42 @@ async function creerOuRegenererJeton(employeId, req) {
   };
 }
 
-async function revoquerJeton(employeId) {
+async function revoquerJeton(employeId, clinicId) {
   const now = new Date().toISOString();
-  let revoque = false;
-
-  await withWriteLock(COLLECTION, async (jetons) => {
-    const misAJour = jetons.map(t => {
-      if (t.employe_id !== employeId || !t.actif) return t;
-      revoque = true;
-      return { ...t, actif: false, revoked_at: now };
-    });
-    return { data: misAJour, returnValue: revoque };
-  });
-
-  return revoque;
+  const result = await CalendarSyncToken.updateMany(
+    { clinic_id: clinicId, employe_id: employeId, actif: true },
+    { actif: false, revoked_at: now }
+  );
+  return result.modifiedCount > 0;
 }
 
 async function validerEtServirFlux(syncUuid, tokenSecret) {
-  const jetons = readAll(COLLECTION);
-  const jeton = jetons.find(t => t.sync_uuid === syncUuid && t.actif);
+  const jeton = await CalendarSyncToken.findOne({ sync_uuid: syncUuid, actif: true }).lean();
 
   if (!jeton || !comparerHashes(jeton.token_hash, hasherToken(tokenSecret))) {
     return null;
   }
 
-  const employes = readAll('employes');
-  const employe = employes.find(e => e.id === jeton.employe_id && e.actif !== false);
+  const employe = await Employe.findOne({
+    id: jeton.employe_id,
+    clinic_id: jeton.clinic_id,
+    actif: { $ne: false }
+  }).lean();
   if (!employe) return null;
 
-  const creneaux = recupererCreneauxAbonnement(employe.id);
-  const patients = readAll('patients');
+  const [creneaux, patients] = await Promise.all([
+    recupererCreneauxAbonnement(employe.id, jeton.clinic_id),
+    Patient.find({ clinic_id: jeton.clinic_id }).lean()
+  ]);
 
   const now = new Date().toISOString();
-  await withWriteLock(COLLECTION, async (all) => {
-    const data = all.map(t =>
-      t.id === jeton.id ? { ...t, last_accessed_at: now } : t
-    );
-    return { data, returnValue: true };
-  });
+  await CalendarSyncToken.updateOne({ id: jeton.id }, { last_accessed_at: now });
 
-  const ics = genererFluxIcsAbonnement({
+  return genererFluxIcsAbonnement({
     creneaux,
     patients,
     nomCalendrier: `SMR — ${employe.prenom} ${employe.nom}`
   });
-
-  return ics;
 }
 
 module.exports = {

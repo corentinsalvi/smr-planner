@@ -11,5 +11,6 @@ const CONFIG = {
     ARRET_MALADIE: { label: 'Arrêt maladie', couleur: '#FF3B30' },
     FORMATION: { label: 'Formation', couleur: '#5856D6' }
   },
-  GESTIONNAIRE_ROLES: ['IDE_COORDINATRICE']
+  GESTIONNAIRE_ROLES: ['IDE_COORDINATRICE'],
+  DIRECTEUR_ROLES: ['DIRECTEUR']
 };

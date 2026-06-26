@@ -21,7 +21,8 @@ const ROLES = {
   DIETETICIEN: { label: 'Diététicien', couleur: '#FF9500' },
   ASSISTANTE_SOCIALE: { label: 'Assistante sociale', couleur: '#FF2D55' },
   IDE_COORDINATRICE: { label: 'IDE coordinatrice', couleur: '#004999' },
-  AIDE_SOIGNANT: { label: 'Aide-soignant', couleur: '#64D2FF' }
+  AIDE_SOIGNANT: { label: 'Aide-soignant', couleur: '#64D2FF' },
+  DIRECTEUR: { label: 'Directeur', couleur: '#1C1C1E' }
 };
 
 const JOURS_SEMAINE = [
@@ -33,6 +34,8 @@ const JOURS_SEMAINE = [
 ];
 
 const GESTIONNAIRE_ROLES = ['IDE_COORDINATRICE'];
+const DIRECTEUR_ROLES = ['DIRECTEUR'];
+const ROLES_VUE_GLOBALE = [...GESTIONNAIRE_ROLES, ...DIRECTEUR_ROLES];
 
 const TYPES_ABSENCE = {
   CONGE: { label: 'Congé', couleur: '#FF9500' },
@@ -40,4 +43,13 @@ const TYPES_ABSENCE = {
   FORMATION: { label: 'Formation', couleur: '#5856D6' }
 };
 
-module.exports = { ROLES, JOURS_SEMAINE, REGLES_PLANNING, TEMPS_PLANNING, GESTIONNAIRE_ROLES, TYPES_ABSENCE };
+module.exports = {
+  ROLES,
+  JOURS_SEMAINE,
+  REGLES_PLANNING,
+  TEMPS_PLANNING,
+  GESTIONNAIRE_ROLES,
+  DIRECTEUR_ROLES,
+  ROLES_VUE_GLOBALE,
+  TYPES_ABSENCE
+};

@@ -12,7 +12,15 @@
     patientAgendaMode: 'agenda',
     espaceOnglet: 'agenda',
     absencesCourantes: [],
-    espaceEmployeId: null
+    calendrierAbsence: {
+      mois: null,
+      debut: null,
+      fin: null,
+      survol: null,
+      absences: []
+    },
+    moisDirection: null,
+    directionRefreshInterval: null
   };
 
   const $ = id => document.getElementById(id);
@@ -146,14 +154,255 @@
     return state.roles[role]?.label || role;
   }
 
-  function estGestionnaire() {
-    return CONFIG.GESTIONNAIRE_ROLES.includes(state.utilisateur?.role);
+  function estDirecteur() {
+    return CONFIG.DIRECTEUR_ROLES.includes(state.utilisateur?.role);
   }
 
-  function employeAbsenceId() {
-    return estGestionnaire() && state.espaceEmployeId
-      ? state.espaceEmployeId
-      : state.utilisateur.id;
+  function moisDirectionCourant() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  function libelleMoisDirection(moisStr) {
+    const [y, m] = moisStr.split('-').map(Number);
+    return new Date(y, m - 1, 1).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  }
+
+  function decalageMoisDirection(moisStr, delta) {
+    const [y, m] = moisStr.split('-').map(Number);
+    const d = new Date(y, m - 1 + delta, 1);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  function badgeStatutRh(statut) {
+    const classes = {
+      PRESENT: 'direction-badge--present',
+      PARTIEL: 'direction-badge--partiel',
+      ABSENT: 'direction-badge--absent'
+    };
+    return classes[statut] || 'direction-badge--partiel';
+  }
+
+  function renderJaugeConformite(score) {
+    const r = 54;
+    const c = 2 * Math.PI * r;
+    const dash = (score / 100) * c;
+    const couleur = score >= 100 ? '#34A853' : score >= 70 ? '#007AFF' : '#FF9500';
+    return `
+      <div class="direction-jauge" role="img" aria-label="Score de conformité moyen ${score} pour cent">
+        <svg viewBox="0 0 140 140" class="direction-jauge-svg" aria-hidden="true">
+          <circle cx="70" cy="70" r="${r}" fill="none" stroke="#E8EEF8" stroke-width="12"/>
+          <circle cx="70" cy="70" r="${r}" fill="none" stroke="${couleur}" stroke-width="12"
+            stroke-linecap="round"
+            stroke-dasharray="${dash} ${c - dash}"
+            transform="rotate(-90 70 70)"/>
+          <text x="70" y="68" text-anchor="middle" class="direction-jauge-valeur">${score}%</text>
+          <text x="70" y="88" text-anchor="middle" class="direction-jauge-sous-titre">conformité</text>
+        </svg>
+      </div>`;
+  }
+
+  async function renderTableauDeBord() {
+    if (!state.moisDirection) state.moisDirection = moisDirectionCourant();
+
+    const nav = $('nav-mois-direction');
+    if (nav) {
+      nav.innerHTML = `
+        <button type="button" class="nav-semaine-bouton" data-mois-dir="-1" aria-label="Mois précédent">‹</button>
+        <span class="nav-semaine-label">${libelleMoisDirection(state.moisDirection)}</span>
+        <button type="button" class="nav-semaine-bouton" data-mois-dir="1" aria-label="Mois suivant">›</button>
+      `;
+      nav.querySelectorAll('[data-mois-dir]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.moisDirection = decalageMoisDirection(state.moisDirection, Number(btn.dataset.moisDir));
+          renderTableauDeBord();
+        });
+      });
+    }
+
+    const cont = $('direction-contenu');
+    if (!cont) return;
+    cont.innerHTML = '<p class="direction-chargement">Chargement du tableau de bord…</p>';
+
+    try {
+      await rafraichirPatients();
+      const jours = joursDeLaSemaine(state.semaineLundi);
+      const creneauxSemaine = await API.getCreneaux({
+        date_debut: jours[0],
+        date_fin: jours[4]
+      });
+      const conformite = calculerConformiteGlobaleSemaine(state.patients, creneauxSemaine);
+      const data = await API.getTableauDeBord(state.moisDirection);
+      const { occupation, rh } = data;
+
+      cont.innerHTML = `
+        <section class="direction-carte direction-carte--conformite">
+          <header class="direction-carte-entete direction-carte-entete--conformite">
+            <div>
+              <h3 class="direction-carte-titre">Conformité globale de la clinique</h3>
+              <p class="direction-carte-sous-titre">Même calcul que l'agenda patient — semaine affichée ci-dessous</p>
+            </div>
+            <div class="navigation-semaine direction-conformite-semaine" id="nav-semaine-direction"></div>
+          </header>
+          <div class="direction-conformite-corps">
+            ${renderJaugeConformite(conformite.scoreMoyen)}
+            <div class="direction-conformite-stats">
+              <div class="direction-kpi">
+                <span class="direction-kpi-valeur">${conformite.patientsEvalues}</span>
+                <span class="direction-kpi-label">Patients évalués</span>
+              </div>
+              <div class="direction-kpi">
+                <span class="direction-kpi-valeur direction-kpi-valeur--succes">${conformite.patientsConformes}</span>
+                <span class="direction-kpi-label">100% conformes</span>
+              </div>
+              <div class="direction-kpi">
+                <span class="direction-kpi-valeur">${formaterHeuresForfait(conformite.heuresPlanifiees)}</span>
+                <span class="direction-kpi-label">Heures planifiées</span>
+              </div>
+              <div class="direction-kpi">
+                <span class="direction-kpi-valeur">${formaterHeuresForfait(conformite.heuresForfait)}</span>
+                <span class="direction-kpi-label">Heures forfait / sem.</span>
+              </div>
+            </div>
+          </div>
+          ${conformite.patients.length ? `
+            <ul class="direction-liste-patients">
+              ${conformite.patients.map(p => `
+                <li class="direction-patient-ligne" data-patient-direction="${p.patient_id}" role="button" tabindex="0"
+                    title="Voir l'agenda de ${p.nom}">
+                  <span class="direction-patient-nom">${p.nom}</span>
+                  <span class="direction-patient-score${p.conforme ? ' direction-patient-score--succes' : ' direction-patient-score--alerte'}">${p.score}%</span>
+                </li>
+              `).join('')}
+            </ul>
+          ` : '<p class="direction-message-vide">Aucun patient avec forfait défini.</p>'}
+        </section>
+
+        <section class="direction-carte direction-carte--rh">
+          <header class="direction-carte-entete">
+            <h3 class="direction-carte-titre">Bilan RH</h3>
+            <p class="direction-carte-sous-titre">Semaine prochaine (${rh.semaineLabel})</p>
+          </header>
+          <div class="direction-rh-resume">
+            <div class="direction-rh-jauge-texte">
+              <span class="direction-rh-taux">${rh.tauxPresence}%</span>
+              <span class="direction-rh-taux-label">taux de présence prévu</span>
+            </div>
+            <div class="direction-rh-compteurs">
+              <span class="direction-rh-puce direction-rh-puce--conge">${rh.enConge} en congé</span>
+              <span class="direction-rh-puce direction-rh-puce--arret">${rh.enArret} en arrêt</span>
+              <span class="direction-rh-puce direction-rh-puce--formation">${rh.enFormation} en formation</span>
+            </div>
+            <p class="direction-rh-complet${rh.equipeAuComplet ? ' direction-rh-complet--ok' : ' direction-rh-complet--ko'}">
+              ${rh.equipeAuComplet
+                ? '✓ Équipe au complet pour la semaine prochaine'
+                : `⚠ ${rh.absents} professionnel(s) indisponible(s) sur ${rh.effectif}`}
+            </p>
+          </div>
+          <div class="direction-rh-tableau">
+            <div class="direction-rh-ligne direction-rh-ligne--entete">
+              <span>Professionnel</span>
+              <span>Métier</span>
+              <span>Statut</span>
+            </div>
+            ${rh.details.map(d => `
+              <div class="direction-rh-ligne">
+                <span class="direction-rh-nom">${d.prenom} ${d.nom}</span>
+                <span class="direction-rh-metier">${d.roleLabel}</span>
+                <span class="direction-rh-statut">
+                  <span class="direction-badge ${badgeStatutRh(d.statut)}">${d.label}</span>
+                  <span class="direction-rh-detail">${d.detail}</span>
+                </span>
+              </div>
+            `).join('')}
+          </div>
+        </section>
+
+        <section class="direction-carte direction-carte--occupation">
+          <header class="direction-carte-entete">
+            <h3 class="direction-carte-titre">Activité du mois</h3>
+            <p class="direction-carte-sous-titre">${data.periode.label}</p>
+          </header>
+          <div class="direction-occupation-grille">
+            <article class="stat-carte stat-carte--direction">
+              <span class="stat-carte-valeur">${occupation.tauxOccupation}%</span>
+              <span class="stat-carte-label">Taux d'occupation</span>
+            </article>
+            <article class="stat-carte stat-carte--direction">
+              <span class="stat-carte-valeur">${formaterHeuresForfait(occupation.heuresSoins)}</span>
+              <span class="stat-carte-label">Heures de soins</span>
+            </article>
+            <article class="stat-carte stat-carte--direction">
+              <span class="stat-carte-valeur">${occupation.seancesPlanifiees}</span>
+              <span class="stat-carte-label">Séances planifiées</span>
+            </article>
+            <article class="stat-carte stat-carte--direction">
+              <span class="stat-carte-valeur">${formaterHeuresForfait(occupation.capaciteHeures)}</span>
+              <span class="stat-carte-label">Capacité disponible</span>
+            </article>
+          </div>
+        </section>
+      `;
+
+      renderNavigationSemaine('nav-semaine-direction', renderTableauDeBord);
+
+      cont.querySelectorAll('[data-patient-direction]').forEach(el => {
+        const ouvrir = () => {
+          state.patientAgendaId = el.dataset.patientDirection;
+          state.patientAgendaMode = 'agenda';
+          activerVue('agenda-patient');
+        };
+        el.addEventListener('click', ouvrir);
+        el.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            ouvrir();
+          }
+        });
+      });
+    } catch (err) {
+      cont.innerHTML = `<p class="direction-erreur">${err.message}</p>`;
+    }
+  }
+
+  function vueCourante() {
+    return document.querySelector('.nav-item.is-active')?.dataset.vue || null;
+  }
+
+  function demarrerAutoRefreshDirection() {
+    arreterAutoRefreshDirection();
+    if (!estDirecteur()) return;
+    state.directionRefreshInterval = setInterval(() => {
+      if (vueCourante() === 'direction' && !$('vue-direction')?.hidden) {
+        renderTableauDeBord();
+      }
+    }, 15000);
+  }
+
+  function arreterAutoRefreshDirection() {
+    if (state.directionRefreshInterval) {
+      clearInterval(state.directionRefreshInterval);
+      state.directionRefreshInterval = null;
+    }
+  }
+
+  async function rafraichirVueActive() {
+    const vue = vueCourante();
+    const actions = {
+      'mon-espace': renderMonEspace,
+      'direction': renderTableauDeBord,
+      'agenda-global': renderAgendaGlobal,
+      'agenda-patient': renderAgendaPatient,
+      'patients': renderListePatients,
+      'equipe': renderListeEquipe
+    };
+    await actions[vue]?.();
+  }
+
+  async function rafraichirScoresConformite() {
+    const vue = vueCourante();
+    if (vue === 'direction') await renderTableauDeBord();
+    if (vue === 'agenda-patient') await renderAgendaPatient();
   }
 
   function labelTypeAbsence(type) {
@@ -186,6 +435,39 @@
     ) || null;
   }
 
+  function detailAbsenceCreneau(absence) {
+    if (absence.journee_entiere !== false) return 'Journée entière';
+    if (absence.heure_debut && absence.heure_fin) {
+      return `${absence.heure_debut} – ${absence.heure_fin}`;
+    }
+    return 'Indisponible';
+  }
+
+  function htmlBlocAbsenceAgenda(absence, options = {}) {
+    const couleur = couleurTypeAbsence(absence.type);
+    const label = labelTypeAbsence(absence.type);
+    const detail = detailAbsenceCreneau(absence);
+    const variante = options.modeGlobal || options.modePro ? ' bloc-absence-agenda--global'
+      : ' bloc-absence-agenda--perso';
+    return `
+      <div class="bloc-absence-agenda${variante}"
+           style="--type-couleur:${couleur};background:${couleur}14;border-color:${couleur}44;border-left-color:${couleur}"
+           title="${label}${detail !== 'Journée entière' ? ` · ${detail}` : ''}">
+        <span class="bloc-absence-agenda-icone" aria-hidden="true">${iconeTypeAbsence(absence.type)}</span>
+        <span class="bloc-absence-agenda-type">${label}</span>
+        <span class="bloc-absence-agenda-detail">${detail}</span>
+      </div>`;
+  }
+
+  async function chargerAbsencesAgenda(employeId) {
+    const jours = joursDeLaSemaine(state.semaineLundi);
+    return API.getAbsences({
+      employe_id: employeId,
+      date_debut: jours[0],
+      date_fin: jours[4]
+    });
+  }
+
   function renderGrilleAgenda(containerId, creneaux, options = {}) {
     const cont = $(containerId);
     const jours = joursDeLaSemaine(state.semaineLundi);
@@ -210,10 +492,17 @@
       }
 
       const cellules = jours.map(date => {
+        const heureFin = finHeureSlot(heure);
         const creneau = creneaux.find(c =>
           c.date === date && c.heure_debut === heure && c.statut !== 'ANNULE'
         );
         if (!creneau) {
+          const absence = options.absences && options.employeId
+            ? absencePourCreneau(options.absences, options.employeId, date, heure, heureFin)
+            : null;
+          if (absence) {
+            return `<td>${htmlBlocAbsenceAgenda(absence, options)}</td>`;
+          }
           return (options.modeGlobal || options.modePatient || options.modePro)
             ? '<td class="cellule-vide"><span class="cellule-vide-point"></span></td>'
             : '<td></td>';
@@ -649,8 +938,14 @@
 
   async function renderMonAgenda() {
     renderNavigationSemaine('nav-semaine-mon-agenda', renderMonAgenda);
-    const creneaux = await chargerCreneaux({ employe_id: state.utilisateur.id });
-    renderGrilleAgenda('grille-mon-agenda', creneaux);
+    const [creneaux, absences] = await Promise.all([
+      chargerCreneaux({ employe_id: state.utilisateur.id }),
+      chargerAbsencesAgenda(state.utilisateur.id)
+    ]);
+    renderGrilleAgenda('grille-mon-agenda', creneaux, {
+      absences,
+      employeId: state.utilisateur.id
+    });
   }
 
   function activerEspaceOnglet(onglet) {
@@ -676,132 +971,440 @@
   }
 
   async function renderMonEspace() {
-    if (!state.espaceEmployeId) state.espaceEmployeId = state.utilisateur.id;
-    preparerSelecteurAbsenceEmploye();
     activerEspaceOnglet(state.espaceOnglet || 'agenda');
   }
 
-  function preparerSelecteurAbsenceEmploye() {
-    const zone = $('absences-selecteur-pro');
-    const select = $('select-absence-employe');
-    if (!zone || !select) return;
+  function iconeTypeAbsence(type) {
+    const icones = { CONGE: '☀', ARRET_MALADIE: '✚', FORMATION: '◈' };
+    return icones[type] || '•';
+  }
 
-    if (!estGestionnaire()) {
-      zone.hidden = true;
-      state.espaceEmployeId = state.utilisateur.id;
-      return;
-    }
+  function initTypesAbsenceFormulaire() {
+    const cont = $('absence-types');
+    const input = $('absence-type');
+    if (!cont || cont.dataset.initialise) return;
 
-    zone.hidden = false;
-    const actifs = state.employes.filter(e => e.actif !== false);
-    select.innerHTML = actifs.map(e =>
-      `<option value="${e.id}" ${e.id === state.espaceEmployeId ? 'selected' : ''}>${nomComplet(e)} — ${labelRole(e.role)}</option>`
-    ).join('');
+    cont.innerHTML = Object.entries(CONFIG.TYPES_ABSENCE).map(([code, info]) => `
+      <button type="button"
+              class="absence-type-chip${code === 'CONGE' ? ' is-active' : ''}"
+              data-type="${code}"
+              role="radio"
+              aria-checked="${code === 'CONGE' ? 'true' : 'false'}"
+              style="--type-couleur: ${info.couleur}">
+        <span class="absence-type-chip-icone" aria-hidden="true">${iconeTypeAbsence(code)}</span>
+        <span class="absence-type-chip-label">${info.label}</span>
+      </button>
+    `).join('');
+
+    cont.querySelectorAll('.absence-type-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        cont.querySelectorAll('.absence-type-chip').forEach(b => {
+          b.classList.remove('is-active');
+          b.setAttribute('aria-checked', 'false');
+        });
+        btn.classList.add('is-active');
+        btn.setAttribute('aria-checked', 'true');
+        if (input) input.value = btn.dataset.type;
+      });
+    });
+
+    cont.dataset.initialise = '1';
+  }
+
+  function renderLegendeAbsences() {
+    const cont = $('absences-legende');
+    if (!cont) return;
+    cont.innerHTML = Object.entries(CONFIG.TYPES_ABSENCE).map(([code, info]) => `
+      <span class="absences-legende-item" style="--type-couleur: ${info.couleur}">
+        <span class="absences-legende-pastille"></span>
+        ${info.label}
+      </span>
+    `).join('');
   }
 
   function absencesPourJour(date) {
     return state.absencesCourantes.filter(a => dateDansPlage(date, a.date_debut, a.date_fin));
   }
 
-  function formatPeriodeAbsence(absence) {
-    const debut = formatDateCourte(absence.date_debut);
-    const fin = formatDateCourte(absence.date_fin);
-    const dates = absence.date_debut === absence.date_fin ? debut : `${debut} → ${fin}`;
-    if (absence.journee_entiere === false && absence.heure_debut) {
-      return `${dates}, ${absence.heure_debut} – ${absence.heure_fin}`;
+  function absencesFormulairePourJour(date) {
+    return state.calendrierAbsence.absences.filter(a => dateDansPlage(date, a.date_debut, a.date_fin));
+  }
+
+  function premierJourMois(moisStr) {
+    const [y, m] = moisStr.split('-').map(Number);
+    return formaterDateLocale(new Date(y, m - 1, 1));
+  }
+
+  function dernierJourMois(moisStr) {
+    const [y, m] = moisStr.split('-').map(Number);
+    return formaterDateLocale(new Date(y, m, 0));
+  }
+
+  function moisCourantStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
+  }
+
+  function decalageMois(moisStr, delta) {
+    const [y, m] = moisStr.split('-').map(Number);
+    const d = new Date(y, m - 1 + delta, 1);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
+  }
+
+  function libelleMoisAnnee(moisStr) {
+    const [y, m] = moisStr.split('-').map(Number);
+    return new Date(y, m - 1, 1).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  }
+
+  function joursGrilleCalendrier(moisStr) {
+    const [y, m] = moisStr.split('-').map(Number);
+    const premier = new Date(y, m - 1, 1);
+    const offset = (premier.getDay() + 6) % 7;
+    const nbJours = new Date(y, m, 0).getDate();
+    const total = Math.ceil((offset + nbJours) / 7) * 7;
+    const cellules = [];
+
+    for (let i = 0; i < total; i++) {
+      const d = new Date(y, m - 1, 1 - offset + i);
+      cellules.push({
+        date: formaterDateLocale(d),
+        horsMois: d.getMonth() !== m - 1
+      });
     }
-    return dates;
+    return cellules;
+  }
+
+  function estDansSelectionAbsence(date) {
+    const { debut, fin, survol } = state.calendrierAbsence;
+    if (!debut) return false;
+    const finEffective = fin || survol;
+    if (!finEffective) return date === debut;
+    const d = date;
+    const a = debut <= finEffective ? debut : finEffective;
+    const b = debut <= finEffective ? finEffective : debut;
+    return d >= a && d <= b;
+  }
+
+  function extremiteSelectionAbsence(date) {
+    const { debut, fin, survol } = state.calendrierAbsence;
+    const finEffective = fin || survol;
+    if (!debut || !finEffective) {
+      return date === debut ? 'debut' : null;
+    }
+    const a = debut <= finEffective ? debut : finEffective;
+    const b = debut <= finEffective ? finEffective : debut;
+    if (date === a) return 'debut';
+    if (date === b) return 'fin';
+    return null;
+  }
+
+  function mettreAJourInputsAbsence() {
+    const { debut, fin } = state.calendrierAbsence;
+    const inputDebut = $('absence-date-debut');
+    const inputFin = $('absence-date-fin');
+    const resume = $('calendrier-absence-resume');
+    const journeeEntiere = $('absence-journee-entiere')?.checked !== false;
+
+    if (inputDebut) inputDebut.value = debut || '';
+    if (inputFin) inputFin.value = fin || debut || '';
+
+    if (!resume) return;
+
+    if (!debut) {
+      resume.hidden = true;
+      resume.textContent = '';
+      return;
+    }
+
+    resume.hidden = false;
+    const fmt = d => parseDateLocale(d).toLocaleDateString('fr-FR', {
+      weekday: 'long', day: 'numeric', month: 'long'
+    });
+
+    if (!fin || fin === debut || !journeeEntiere) {
+      resume.innerHTML = `<span class="calendrier-absence-resume-icone" aria-hidden="true">📅</span> ${fmt(debut)}`;
+      return;
+    }
+
+    resume.innerHTML = `
+      <span class="calendrier-absence-resume-icone" aria-hidden="true">📅</span>
+      Du <strong>${fmt(debut)}</strong> au <strong>${fmt(fin)}</strong>`;
+  }
+
+  function reinitialiserSelectionAbsence() {
+    state.calendrierAbsence.debut = null;
+    state.calendrierAbsence.fin = null;
+    state.calendrierAbsence.survol = null;
+    mettreAJourInputsAbsence();
+    appliquerStylesSelectionCalendrier();
+  }
+
+  function selectionnerDateAbsence(date) {
+    const journeeEntiere = $('absence-journee-entiere')?.checked !== false;
+    const { debut, fin } = state.calendrierAbsence;
+
+    if (!journeeEntiere) {
+      state.calendrierAbsence.debut = date;
+      state.calendrierAbsence.fin = date;
+      state.calendrierAbsence.survol = null;
+      mettreAJourInputsAbsence();
+      appliquerStylesSelectionCalendrier();
+      return;
+    }
+
+    if (!debut || (debut && fin)) {
+      state.calendrierAbsence.debut = date;
+      state.calendrierAbsence.fin = null;
+      state.calendrierAbsence.survol = null;
+    } else {
+      state.calendrierAbsence.fin = date;
+      if (state.calendrierAbsence.fin < state.calendrierAbsence.debut) {
+        const tmp = state.calendrierAbsence.debut;
+        state.calendrierAbsence.debut = state.calendrierAbsence.fin;
+        state.calendrierAbsence.fin = tmp;
+      }
+      state.calendrierAbsence.survol = null;
+    }
+
+    mettreAJourInputsAbsence();
+    appliquerStylesSelectionCalendrier();
+  }
+
+  function appliquerStylesSelectionCalendrier() {
+    const cont = $('calendrier-absence-picker');
+    if (!cont) return;
+
+    cont.querySelectorAll('[data-date]').forEach(btn => {
+      const date = btn.dataset.date;
+      const dansSelection = estDansSelectionAbsence(date);
+      const extremite = extremiteSelectionAbsence(date);
+      btn.classList.toggle('calendrier-absence-jour--selection', dansSelection);
+      btn.classList.toggle('calendrier-absence-jour--debut', extremite === 'debut');
+      btn.classList.toggle('calendrier-absence-jour--fin', extremite === 'fin');
+      btn.setAttribute('aria-pressed', dansSelection ? 'true' : 'false');
+    });
+
+    const aide = cont.querySelector('.calendrier-absence-aide');
+    const journeeEntiere = $('absence-journee-entiere')?.checked !== false;
+    const enAttenteFin = state.calendrierAbsence.debut && !state.calendrierAbsence.fin;
+    if (aide) {
+      aide.textContent = !journeeEntiere
+        ? 'Sélectionnez le jour concerné'
+        : enAttenteFin
+          ? 'Choisissez la date de fin'
+          : 'Cliquez sur le premier jour, puis sur le dernier jour';
+    }
+
+    mettreAJourInputsAbsence();
+  }
+
+  async function chargerAbsencesPeriodeFormulaire(dateDebut, dateFin) {
+    state.calendrierAbsence.absences = await API.getAbsences({
+      employe_id: state.utilisateur.id,
+      date_debut: dateDebut,
+      date_fin: dateFin
+    });
+  }
+
+  function htmlGrilleMoisCalendrier(moisStr, aujourdhui) {
+    const joursSemaine = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+    const cellules = joursGrilleCalendrier(moisStr);
+    const titreMois = libelleMoisAnnee(moisStr);
+
+    return `
+      <div class="calendrier-absence-mois">
+        <div class="calendrier-absence-mois-titre">${titreMois}</div>
+        <div class="calendrier-absence-grille-jours" role="grid" aria-label="Calendrier ${titreMois}">
+          ${joursSemaine.map(j => `<span class="calendrier-absence-jour-semaine" role="columnheader">${j}</span>`).join('')}
+          ${cellules.map(({ date, horsMois }) => {
+            const absencesJour = absencesFormulairePourJour(date);
+            const absence = absencesJour[0];
+            const couleur = absence ? couleurTypeAbsence(absence.type) : null;
+            const dansSelection = estDansSelectionAbsence(date);
+            const extremite = extremiteSelectionAbsence(date);
+            const classes = [
+              'calendrier-absence-jour',
+              horsMois ? 'calendrier-absence-jour--hors-mois' : '',
+              date === aujourdhui ? 'calendrier-absence-jour--aujourdhui' : '',
+              absence ? 'calendrier-absence-jour--occupe' : '',
+              dansSelection ? 'calendrier-absence-jour--selection' : '',
+              extremite === 'debut' ? 'calendrier-absence-jour--debut' : '',
+              extremite === 'fin' ? 'calendrier-absence-jour--fin' : ''
+            ].filter(Boolean).join(' ');
+            const num = parseDateLocale(date).getDate();
+            return `
+              <button type="button"
+                      class="${classes}"
+                      data-date="${date}"
+                      role="gridcell"
+                      aria-pressed="${dansSelection ? 'true' : 'false'}"
+                      aria-label="${parseDateLocale(date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}${absence ? ` · ${labelTypeAbsence(absence.type)}` : ''}"
+                      style="${absence && !dansSelection ? `--absence-couleur:${couleur}` : ''}">
+                <span class="calendrier-absence-jour-num">${num}</span>
+                ${absence ? `<span class="calendrier-absence-jour-point" style="background:${couleur}"></span>` : ''}
+              </button>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }
+
+  async function renderCalendrierAbsenceFormulaire() {
+    const cont = $('calendrier-absence-picker');
+    if (!cont) return;
+
+    if (!state.calendrierAbsence.mois) {
+      state.calendrierAbsence.mois = moisCourantStr();
+    }
+
+    const moisGauche = state.calendrierAbsence.mois;
+    const moisDroit = decalageMois(moisGauche, 1);
+    await chargerAbsencesPeriodeFormulaire(
+      premierJourMois(moisGauche),
+      dernierJourMois(moisDroit)
+    );
+
+    const aujourdhui = formaterDateLocale(new Date());
+    const journeeEntiere = $('absence-journee-entiere')?.checked !== false;
+    const enAttenteFin = state.calendrierAbsence.debut && !state.calendrierAbsence.fin;
+
+    cont.innerHTML = `
+      <div class="calendrier-absence-entete">
+        <button type="button" class="calendrier-absence-nav" data-mois-delta="-1" aria-label="Mois précédents">‹</button>
+        <span class="calendrier-absence-periode">${libelleMoisAnnee(moisGauche)} – ${libelleMoisAnnee(moisDroit)}</span>
+        <button type="button" class="calendrier-absence-nav" data-mois-delta="1" aria-label="Mois suivants">›</button>
+      </div>
+      <div class="calendrier-absence-aide">${!journeeEntiere
+        ? 'Sélectionnez le jour concerné'
+        : enAttenteFin
+          ? 'Choisissez la date de fin'
+          : 'Cliquez sur le premier jour, puis sur le dernier jour'}</div>
+      <div class="calendrier-absence-duo">
+        ${htmlGrilleMoisCalendrier(moisGauche, aujourdhui)}
+        ${htmlGrilleMoisCalendrier(moisDroit, aujourdhui)}
+      </div>
+      <div class="calendrier-absence-legende">
+        <span class="calendrier-absence-legende-item">
+          <span class="calendrier-absence-legende-echantillon calendrier-absence-legende-echantillon--selection"></span>
+          Période choisie
+        </span>
+        <span class="calendrier-absence-legende-item">
+          <span class="calendrier-absence-legende-echantillon calendrier-absence-legende-echantillon--occupe"></span>
+          Absence existante
+        </span>
+      </div>`;
+
+    cont.querySelectorAll('[data-mois-delta]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        state.calendrierAbsence.mois = decalageMois(state.calendrierAbsence.mois, Number(btn.dataset.moisDelta));
+        await renderCalendrierAbsenceFormulaire();
+      });
+    });
+
+    cont.querySelectorAll('[data-date]').forEach(btn => {
+      btn.addEventListener('click', () => selectionnerDateAbsence(btn.dataset.date));
+      btn.addEventListener('mouseenter', () => {
+        if (!state.calendrierAbsence.debut || state.calendrierAbsence.fin) return;
+        state.calendrierAbsence.survol = btn.dataset.date;
+        appliquerStylesSelectionCalendrier();
+      });
+    });
+
+    cont.querySelector('.calendrier-absence-duo')?.addEventListener('mouseleave', () => {
+      if (!state.calendrierAbsence.survol) return;
+      state.calendrierAbsence.survol = null;
+      appliquerStylesSelectionCalendrier();
+    });
+  }
+
+  function initCalendrierAbsenceFormulaire() {
+    if ($('calendrier-absence-picker')?.dataset.initialise) return;
+    $('calendrier-absence-picker').dataset.initialise = '1';
+    $('absence-journee-entiere')?.addEventListener('change', () => {
+      reinitialiserSelectionAbsence();
+      renderCalendrierAbsenceFormulaire();
+    });
   }
 
   async function chargerAbsencesSemaine() {
     const jours = joursDeLaSemaine(state.semaineLundi);
     state.absencesCourantes = await API.getAbsences({
-      employe_id: employeAbsenceId(),
+      employe_id: state.utilisateur.id,
       date_debut: jours[0],
       date_fin: jours[4]
     });
   }
 
   async function renderAbsences() {
-    preparerSelecteurAbsenceEmploye();
+    initTypesAbsenceFormulaire();
+    initCalendrierAbsenceFormulaire();
+    renderLegendeAbsences();
     renderNavigationSemaine('nav-semaine-absences', renderAbsences);
     await chargerAbsencesSemaine();
+    await renderCalendrierAbsenceFormulaire();
 
     const jours = joursDeLaSemaine(state.semaineLundi);
     const calendrier = $('calendrier-absences');
     if (calendrier) {
       calendrier.innerHTML = `
-        <div class="calendrier-absences-grille">
+        <div class="absences-semaine-grille">
           ${jours.map(date => {
             const absencesJour = absencesPourJour(date);
             const dateObj = parseDateLocale(date);
             const jourNom = dateObj.toLocaleDateString('fr-FR', { weekday: 'long' });
             const jourNum = dateObj.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-            const puces = absencesJour.length
+            const estAbsent = absencesJour.length > 0;
+            const corps = estAbsent
               ? absencesJour.map(a => {
                   const couleur = couleurTypeAbsence(a.type);
-                  return `<span class="absence-puce" style="background:${couleur}22;color:${couleur};border-color:${couleur}55">${labelTypeAbsence(a.type)}</span>`;
+                  const detail = a.journee_entiere === false && a.heure_debut
+                    ? `${a.heure_debut} – ${a.heure_fin}`
+                    : 'Journée entière';
+                  return `
+                    <div class="absence-jour-bloc" style="--type-couleur: ${couleur}">
+                      <div class="absence-jour-bloc-haut">
+                        <span class="absence-jour-bloc-icone" aria-hidden="true">${iconeTypeAbsence(a.type)}</span>
+                        <button type="button"
+                                class="absence-jour-bloc-supprimer"
+                                data-supprimer-absence="${a.id}"
+                                title="Supprimer"
+                                aria-label="Supprimer cette absence">×</button>
+                      </div>
+                      <span class="absence-jour-bloc-type">${labelTypeAbsence(a.type)}</span>
+                      <span class="absence-jour-bloc-detail">${detail}</span>
+                      ${a.commentaire ? `<span class="absence-jour-bloc-commentaire">${a.commentaire.replace(/</g, '&lt;')}</span>` : ''}
+                    </div>
+                  `;
                 }).join('')
-              : '<span class="calendrier-absences-vide">Disponible</span>';
+              : `
+                <div class="absence-jour-disponible">
+                  <span class="absence-jour-disponible-icone" aria-hidden="true">✓</span>
+                  <span>Disponible</span>
+                </div>
+              `;
             return `
-              <article class="calendrier-absences-jour">
-                <header class="calendrier-absences-jour-entete">
-                  <span class="calendrier-absences-jour-nom">${jourNom}</span>
-                  <span class="calendrier-absences-jour-date">${jourNum}</span>
+              <article class="absence-jour-carte${estAbsent ? ' absence-jour-carte--indispo' : ' absence-jour-carte--dispo'}">
+                <header class="absence-jour-carte-entete">
+                  <span class="absence-jour-carte-nom">${jourNom}</span>
+                  <span class="absence-jour-carte-date">${jourNum}</span>
                 </header>
-                <div class="calendrier-absences-jour-corps">${puces}</div>
+                <div class="absence-jour-carte-corps">${corps}</div>
               </article>
             `;
           }).join('')}
         </div>
       `;
-    }
-
-    const liste = $('liste-absences');
-    if (liste) {
-      const triees = [...state.absencesCourantes].sort((a, b) => a.date_debut.localeCompare(b.date_debut));
-      if (!triees.length) {
-        liste.innerHTML = '<p class="liste-absences-vide">Aucune absence sur cette semaine.</p>';
-      } else {
-        liste.innerHTML = `
-          <h3 class="liste-absences-titre">Absences de la semaine</h3>
-          <ul class="liste-absences-items">
-            ${triees.map(a => {
-              const couleur = couleurTypeAbsence(a.type);
-              return `
-                <li class="absence-item">
-                  <div class="absence-item-info">
-                    <span class="absence-item-type" style="color:${couleur}">${labelTypeAbsence(a.type)}</span>
-                    <span class="absence-item-dates">${formatPeriodeAbsence(a)}</span>
-                    ${a.commentaire ? `<span class="absence-item-commentaire">${a.commentaire.replace(/</g, '&lt;')}</span>` : ''}
-                  </div>
-                  <button type="button" class="bouton bouton-mini bouton-danger" data-supprimer-absence="${a.id}">Supprimer</button>
-                </li>
-              `;
-            }).join('')}
-          </ul>
-        `;
-        liste.querySelectorAll('[data-supprimer-absence]').forEach(btn => {
-          btn.addEventListener('click', async () => {
-            if (!confirm('Supprimer cette absence ?')) return;
-            try {
-              await API.deleteAbsence(btn.dataset.supprimerAbsence);
-              toast('Absence supprimée.');
-              await renderAbsences();
-              if (state.espaceOnglet === 'agenda') await renderMonAgenda();
-            } catch (err) {
-              toast(err.message, 'erreur');
-            }
-          });
+      calendrier.querySelectorAll('[data-supprimer-absence]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Supprimer cette absence ?')) return;
+          try {
+            await API.deleteAbsence(btn.dataset.supprimerAbsence);
+            toast('Absence supprimée.');
+            await renderAbsences();
+          } catch (err) {
+            toast(err.message, 'erreur');
+          }
         });
-      }
-    }
-
-    const selectType = $('absence-type');
-    if (selectType && !selectType.options.length) {
-      selectType.innerHTML = Object.entries(CONFIG.TYPES_ABSENCE).map(([code, info]) =>
-        `<option value="${code}">${info.label}</option>`
-      ).join('');
+      });
     }
   }
 
@@ -852,7 +1455,12 @@
 
     renderStatsAgendaGlobal(creneaux);
 
-    if (creneaux.length === 0) {
+    let absences = [];
+    if (modePro && state.agendaGlobalEmployeId) {
+      absences = await chargerAbsencesAgenda(state.agendaGlobalEmployeId);
+    }
+
+    if (creneaux.length === 0 && absences.length === 0) {
       renderAgendaGlobalVide(true, modePro ? { sansRdvPro: true } : {});
       return;
     }
@@ -861,7 +1469,9 @@
     renderGrilleAgenda(
       'grille-globale',
       creneaux,
-      modePro ? { modePro: true } : { modeGlobal: true }
+      modePro
+        ? { modePro: true, absences, employeId: state.agendaGlobalEmployeId }
+        : { modeGlobal: true }
     );
   }
 
@@ -1026,6 +1636,43 @@
       seancesPlanifiees,
       seancesPrevues,
       forfaitDefini: heuresForfait > 0
+    };
+  }
+
+  function calculerConformiteGlobaleSemaine(patients, creneauxSemaine) {
+    const scores = [];
+    let heuresPlanifieesTotal = 0;
+    let heuresForfaitTotal = 0;
+
+    patients.filter(p => p.statut === 'ACTIF').forEach(patient => {
+      const besoins = patient.besoins || [];
+      const creneauxPatient = creneauxSemaine.filter(c => c.patient_id === patient.id);
+      const conformite = calculerScoreConformiteForfait(besoins, creneauxPatient);
+      if (!conformite.forfaitDefini) return;
+
+      scores.push({
+        patient_id: patient.id,
+        nom: nomComplet(patient),
+        score: conformite.score,
+        conforme: conformite.conforme,
+        heuresPlanifiees: conformite.heuresPlanifiees,
+        heuresForfait: conformite.heuresForfait
+      });
+      heuresPlanifieesTotal += conformite.heuresPlanifiees;
+      heuresForfaitTotal += conformite.heuresForfait;
+    });
+
+    const scoreMoyen = scores.length
+      ? Math.round(scores.reduce((s, p) => s + p.score, 0) / scores.length)
+      : 0;
+
+    return {
+      scoreMoyen,
+      patientsEvalues: scores.length,
+      patientsConformes: scores.filter(p => p.conforme).length,
+      heuresPlanifiees: heuresPlanifieesTotal,
+      heuresForfait: heuresForfaitTotal,
+      patients: scores.sort((a, b) => a.score - b.score)
     };
   }
 
@@ -1302,10 +1949,12 @@
           </div>
           <div class="graphique-patient-corps">
             <div class="graphique-patient-visuel">
-              <svg class="graphique-patient-svg" viewBox="0 0 200 200" role="img" aria-label="Camembert de répartition par métier">
-                ${partsSvg}
-                <circle cx="${cx}" cy="${cy}" r="46" fill="var(--fond-releve)"/>
-              </svg>
+              <div class="graphique-patient-pie-animate">
+                <svg class="graphique-patient-svg" viewBox="0 0 200 200" role="img" aria-label="Camembert de répartition par métier">
+                  ${partsSvg}
+                  <circle cx="${cx}" cy="${cy}" r="46" fill="var(--fond-releve)"/>
+                </svg>
+              </div>
             </div>
             <ul class="graphique-patient-legende">
               ${segments.map(seg => `
@@ -1329,6 +1978,12 @@
         ${sectionConformite}
       </div>
     `;
+
+    if (total) {
+      requestAnimationFrame(() => {
+        cont.querySelector('.graphique-patient-carte')?.classList.add('graphique-patient-carte--animate');
+      });
+    }
   }
 
   function formaterJourCourtImpression(dateStr) {
@@ -1917,6 +2572,8 @@
     $('profil-nom').textContent = nomComplet(state.utilisateur);
     $('profil-role').textContent = labelRole(state.utilisateur.role);
     $('profil-avatar').textContent = initiales(state.utilisateur);
+    const navDirection = $('nav-direction');
+    if (navDirection) navDirection.hidden = !estDirecteur();
   }
 
   function afficherLogin() {
@@ -1949,7 +2606,9 @@
     const valeurRole = filtreRole?.value || '';
     if (filtreRole) {
       filtreRole.innerHTML = '<option value="">Tous les métiers</option>' +
-        Object.entries(state.roles).map(([code, info]) =>
+        Object.entries(state.roles)
+          .filter(([code]) => !CONFIG.DIRECTEUR_ROLES.includes(code))
+          .map(([code, info]) =>
           `<option value="${code}">${info.label}</option>`
         ).join('');
       filtreRole.value = valeurRole;
@@ -1962,8 +2621,15 @@
       n.classList.toggle('is-active', n.dataset.vue === nomVue);
     });
 
+    if (nomVue === 'direction') {
+      demarrerAutoRefreshDirection();
+    } else {
+      arreterAutoRefreshDirection();
+    }
+
     const actions = {
       'mon-espace': renderMonEspace,
+      'direction': renderTableauDeBord,
       'agenda-global': renderAgendaGlobal,
       'agenda-patient': preparerAgendaPatient,
       'patients': renderListePatients,
@@ -1977,7 +2643,7 @@
     await chargerDonnees();
     await rafraichirPatients();
     afficherApp();
-    activerVue('mon-espace');
+    activerVue(estDirecteur() ? 'direction' : 'mon-espace');
   }
 
   async function handleLogin(e) {
@@ -2004,13 +2670,42 @@
     $('form-login').addEventListener('submit', handleLogin);
 
     $('btn-logout').addEventListener('click', () => {
+      arreterAutoRefreshDirection();
       API.setToken(null);
       state.utilisateur = null;
       afficherLogin();
     });
 
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && vueCourante() === 'direction') {
+        renderTableauDeBord();
+      }
+    });
+
     document.querySelectorAll('.nav-item').forEach(btn => {
       btn.addEventListener('click', () => activerVue(btn.dataset.vue));
+    });
+
+    $('btn-rapport-pdf')?.addEventListener('click', async () => {
+      const btn = $('btn-rapport-pdf');
+      const mois = state.moisDirection || moisDirectionCourant();
+      btn.disabled = true;
+      try {
+        const blob = await API.downloadRapportMensuel(mois);
+        const url = URL.createObjectURL(blob);
+        const lien = document.createElement('a');
+        lien.href = url;
+        lien.download = `rapport-smr-${mois}.pdf`;
+        document.body.appendChild(lien);
+        lien.click();
+        lien.remove();
+        URL.revokeObjectURL(url);
+        toast('Rapport mensuel téléchargé.');
+      } catch (err) {
+        toast(err.message, 'erreur');
+      } finally {
+        btn.disabled = false;
+      }
     });
 
     $('btn-export-ics')?.addEventListener('click', ouvrirModaleSync);
@@ -2073,6 +2768,7 @@
         await rafraichirPatients();
         fermerModale('modale-patient-fond');
         renderListePatients();
+        await rafraichirScoresConformite();
         toast('Patient enregistré.');
       } catch (err) {
         afficherErreur('patient-erreur', err.message);
@@ -2133,6 +2829,7 @@
           toast(`${resultat.conflits.length} séance(s) non planifiée(s)`, 'erreur');
         }
         await renderMonAgenda();
+        await rafraichirScoresConformite();
       } catch (err) {
         toast(err.message, 'erreur');
       } finally {
@@ -2146,20 +2843,18 @@
       btn.addEventListener('click', () => activerEspaceOnglet(btn.dataset.espaceOnglet));
     });
 
-    $('select-absence-employe')?.addEventListener('change', e => {
-      state.espaceEmployeId = e.target.value;
-      if (state.espaceOnglet === 'absences') renderAbsences();
-    });
-
     $('absence-journee-entiere')?.addEventListener('change', e => {
       $('absence-horaires-partiels').hidden = e.target.checked;
     });
 
     $('form-absence')?.addEventListener('submit', async e => {
       e.preventDefault();
+      if (!$('absence-date-debut').value) {
+        toast('Sélectionnez une période dans le calendrier.', 'erreur');
+        return;
+      }
       const journeeEntiere = $('absence-journee-entiere').checked;
       const data = {
-        employe_id: employeAbsenceId(),
         type: $('absence-type').value,
         date_debut: $('absence-date-debut').value,
         date_fin: $('absence-date-fin').value,
@@ -2174,11 +2869,20 @@
       try {
         await API.createAbsence(data);
         $('form-absence').reset();
+        $('absence-type').value = 'CONGE';
+        $('absence-types')?.querySelectorAll('.absence-type-chip').forEach(b => {
+          b.classList.toggle('is-active', b.dataset.type === 'CONGE');
+          b.setAttribute('aria-checked', b.dataset.type === 'CONGE' ? 'true' : 'false');
+        });
         $('absence-journee-entiere').checked = true;
         $('absence-horaires-partiels').hidden = true;
+        reinitialiserSelectionAbsence();
+        state.calendrierAbsence.mois = moisCourantStr();
+        await renderCalendrierAbsenceFormulaire();
         toast('Absence enregistrée.');
         await renderAbsences();
         if (state.espaceOnglet === 'agenda') await renderMonAgenda();
+        await rafraichirScoresConformite();
       } catch (err) {
         toast(err.message, 'erreur');
       }
@@ -2189,7 +2893,7 @@
       await API.annulerCreneau(state.creneauSelectionne.id);
       fermerModale('modale-creneau-fond');
       toast('Rendez-vous annulé.');
-      activerVue(document.querySelector('.nav-item.is-active')?.dataset.vue || 'mon-espace');
+      await rafraichirVueActive();
     });
 
     document.querySelectorAll('[data-fermer-modale]').forEach(btn => {
