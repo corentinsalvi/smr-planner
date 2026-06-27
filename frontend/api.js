@@ -99,6 +99,10 @@ const API = {
     return this.request('DELETE', `/creneaux/${id}`);
   },
 
+  createCreneau(data) {
+    return this.request('POST', '/creneaux', data);
+  },
+
   genererPlanning(date) {
     return this.request('POST', '/creneaux/generer', { date });
   },

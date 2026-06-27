@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { Employe } = require('../models');
 const { verifierMotDePasse, genererToken } = require('../services/authService');
+const { limiteurAuth } = require('../middleware/rateLimit');
 
 function sansMotDePasse(employe) {
   const obj = employe.toJSON ? employe.toJSON() : { ...employe };
@@ -10,7 +11,7 @@ function sansMotDePasse(employe) {
 }
 
 // POST /api/auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', limiteurAuth, async (req, res) => {
   const { email, mot_de_passe } = req.body;
 
   if (!email || !mot_de_passe) {

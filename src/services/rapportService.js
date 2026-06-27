@@ -11,7 +11,8 @@ const {
   formaterDateLocale,
   parseDateLocale,
   lundiDeLaSemaine,
-  dureePlageMinutes
+  dureePlageMinutes,
+  memeJourSemaine
 } = require('../utils/dateUtils');
 const { absenceCouvreCreneau } = require('../utils/absenceUtils');
 const { ROLES, TYPES_ABSENCE, TEMPS_PLANNING, DIRECTEUR_ROLES } = require('../constants');
@@ -64,7 +65,7 @@ function capaciteHeuresEmploye(disponibilites, employeId, joursOuvres) {
   let minutes = 0;
   joursOuvres.forEach(date => {
     const jourSemaine = parseDateLocale(date).getDay() || 7;
-    dispos.filter(d => d.jour_semaine === jourSemaine).forEach(d => {
+    dispos.filter(d => memeJourSemaine(d.jour_semaine, jourSemaine)).forEach(d => {
       minutes += dureePlageMinutes(d.heure_debut, d.heure_fin);
     });
   });
@@ -158,7 +159,7 @@ function calculerOccupation(employes, disponibilites, absences, creneaux, joursO
       if (absentJournee) {
         const dispos = disponibilites.filter(d => d.employe_id === employe.id);
         const jourSemaine = parseDateLocale(date).getDay() || 7;
-        dispos.filter(d => d.jour_semaine === jourSemaine).forEach(d => {
+        dispos.filter(d => memeJourSemaine(d.jour_semaine, jourSemaine)).forEach(d => {
           heures -= dureePlageMinutes(d.heure_debut, d.heure_fin) / 60;
         });
       }

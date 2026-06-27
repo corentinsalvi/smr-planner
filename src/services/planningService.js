@@ -11,7 +11,8 @@ const {
   seChevauchent,
   lesCinqJoursDeLaSemaine,
   genererCreneauxSeances,
-  minutesDepuisMinuit
+  minutesDepuisMinuit,
+  memeJourSemaine
 } = require('../utils/dateUtils');
 const { REGLES_PLANNING } = require('../constants');
 const { estProAbsent } = require('../utils/absenceUtils');
@@ -226,7 +227,7 @@ async function genererPlanningHebdomadaire(lundi, options = {}) {
       for (const pro of pros) {
         if (place) break;
         const dispos = disponibilites.filter(
-          d => d.employe_id === pro.id && d.jour_semaine === jour.jour_semaine
+          d => d.employe_id === pro.id && memeJourSemaine(d.jour_semaine, jour.jour_semaine)
         );
         for (const dispo of dispos) {
           const slots = genererCreneauxSeances(dispo.heure_debut, dispo.heure_fin);

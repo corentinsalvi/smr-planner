@@ -8,6 +8,7 @@ const { genererFichierIcs } = require('../utils/icsUtils');
 const { TEMPS_PLANNING } = require('../constants');
 const { estProAbsent } = require('../utils/absenceUtils');
 const { getClinicIdFromRequest } = require('../utils/clinicScope');
+const { limiteurPlanning } = require('../middleware/rateLimit');
 
 // GET /api/creneaux/export/ics?date_debut=...&date_fin=...
 router.get('/export/ics', async (req, res) => {
@@ -84,25 +85,43 @@ async function verifierConflit(clinicId, candidat, idAIgnorer = null) {
     c.statut !== 'ANNULE' &&
     seChevauchent(c.heure_debut, c.heure_fin, candidat.heure_debut, candidat.heure_fin)
   );
-  const conflitsPatient = creneauxExistants.filter(c =>
-    c.id !== idAIgnorer &&
-    c.patient_id === candidat.patient_id &&
-    c.statut !== 'ANNULE' &&
-    seChevauchent(c.heure_debut, c.heure_fin, candidat.heure_debut, candidat.heure_fin)
-  );
 
   if (conflitsPro.length > 0) return 'Le professionnel a déjà un rendez-vous sur ce créneau.';
-  if (conflitsPatient.length > 0) return 'Le patient a déjà un rendez-vous sur ce créneau.';
+
+  if (candidat.patient_id) {
+    const conflitsPatient = creneauxExistants.filter(c =>
+      c.id !== idAIgnorer &&
+      c.patient_id === candidat.patient_id &&
+      c.statut !== 'ANNULE' &&
+      seChevauchent(c.heure_debut, c.heure_fin, candidat.heure_debut, candidat.heure_fin)
+    );
+    if (conflitsPatient.length > 0) return 'Le patient a déjà un rendez-vous sur ce créneau.';
+  }
+
   return null;
 }
 
 // POST /api/creneaux - création manuelle
 router.post('/', async (req, res) => {
   const clinicId = getClinicIdFromRequest(req);
-  const { patient_id, employe_id, role, date, heure_debut, heure_fin, besoin_soin_id } = req.body;
+  const { patient_id, employe_id, role, date, heure_debut, heure_fin, besoin_soin_id, notes } = req.body;
 
-  if (!patient_id || !employe_id || !date || !heure_debut || !heure_fin) {
-    return res.status(400).json({ erreur: 'patient_id, employe_id, date, heure_debut et heure_fin sont requis.' });
+  if (!employe_id || !date || !heure_debut || !heure_fin) {
+    return res.status(400).json({ erreur: 'employe_id, date, heure_debut et heure_fin sont requis.' });
+  }
+
+  const employe = await Employe.findOne({ id: employe_id, clinic_id: clinicId });
+  if (!employe) {
+    return res.status(404).json({ erreur: 'Professionnel introuvable.' });
+  }
+
+  const creneauPersoDirecteur = employe.role === 'DIRECTEUR' && !patient_id;
+  if (creneauPersoDirecteur) {
+    if (!notes?.trim()) {
+      return res.status(400).json({ erreur: 'Une description est requise pour ce créneau.' });
+    }
+  } else if (!patient_id) {
+    return res.status(400).json({ erreur: 'patient_id est requis.' });
   }
 
   const dureeMin = (parseInt(heure_fin.split(':')[0]) * 60 + parseInt(heure_fin.split(':')[1])) -
@@ -112,7 +131,7 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const candidat = { patient_id, employe_id, date, heure_debut, heure_fin };
+    const candidat = { patient_id: patient_id || null, employe_id, date, heure_debut, heure_fin };
     const erreurConflit = await verifierConflit(clinicId, candidat);
     if (erreurConflit) {
       return res.status(409).json({ erreur: erreurConflit });
@@ -121,15 +140,16 @@ router.post('/', async (req, res) => {
     const creneau = await Creneau.create({
       id: uuidv4(),
       clinic_id: clinicId,
-      patient_id,
+      patient_id: patient_id || null,
       employe_id,
       besoin_soin_id: besoin_soin_id || null,
-      role: role || null,
+      role: role || employe.role || null,
       date,
       heure_debut,
       heure_fin,
       statut: 'PLANIFIE',
-      genere_auto: false
+      genere_auto: false,
+      notes: notes?.trim() || ''
     });
 
     res.status(201).json(creneau.toJSON());
@@ -186,7 +206,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // POST /api/creneaux/generer - génère l'agenda du professionnel connecté
-router.post('/generer', async (req, res) => {
+router.post('/generer', limiteurPlanning, async (req, res) => {
   const clinicId = getClinicIdFromRequest(req);
   const { date } = req.body;
 

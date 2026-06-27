@@ -5,7 +5,7 @@ const apiJsonPlugin = require('./plugins/apiJson');
 const creneauSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true, default: uuidv4 },
   clinic_id: { type: String, required: true, index: true },
-  patient_id: { type: String, required: true, index: true },
+  patient_id: { type: String, default: null, index: true },
   employe_id: { type: String, required: true, index: true },
   role: { type: String, default: null },
   besoin_soin_id: { type: String, default: null },

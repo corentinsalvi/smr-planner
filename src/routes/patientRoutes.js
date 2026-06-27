@@ -4,6 +4,10 @@ const { v4: uuidv4 } = require('uuid');
 const { Patient, Besoin } = require('../models');
 const { ROLES } = require('../constants');
 const { getClinicIdFromRequest } = require('../utils/clinicScope');
+const requireRole = require('../middleware/requireRole');
+const { GESTIONNAIRE_ROLES, DIRECTEUR_ROLES } = require('../constants');
+
+const ROLES_GESTION = [...GESTIONNAIRE_ROLES, ...DIRECTEUR_ROLES];
 
 async function enrichirPatient(patient) {
   const besoins = await Besoin.find({
@@ -34,8 +38,8 @@ router.get('/:id', async (req, res) => {
   res.json(await enrichirPatient(patient));
 });
 
-// POST /api/patients
-router.post('/', async (req, res) => {
+// POST /api/patients (gestionnaires et directeur uniquement)
+router.post('/', requireRole(...ROLES_GESTION), async (req, res) => {
   const clinicId = getClinicIdFromRequest(req);
   const { nom, prenom, date_naissance, besoins } = req.body;
 
@@ -78,7 +82,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/patients/:id
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireRole(...ROLES_GESTION), async (req, res) => {
   const clinicId = getClinicIdFromRequest(req);
   const { nom, prenom, date_naissance, statut } = req.body;
 
@@ -98,7 +102,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/patients/:id — archive le patient
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireRole(...ROLES_GESTION), async (req, res) => {
   const clinicId = getClinicIdFromRequest(req);
   const patient = await Patient.findOneAndUpdate(
     { id: req.params.id, clinic_id: clinicId },
@@ -111,7 +115,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // PUT /api/patients/:id/besoins — remplace les besoins actifs du patient
-router.put('/:id/besoins', async (req, res) => {
+router.put('/:id/besoins', requireRole(...ROLES_GESTION), async (req, res) => {
   const clinicId = getClinicIdFromRequest(req);
   const { besoins } = req.body;
 

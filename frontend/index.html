@@ -136,11 +136,30 @@
             <span>Planifiez vos séances selon vos disponibilités et les besoins de vos patients.</span>
           </div>
           <div class="bandeau-generation-actions">
+            <button type="button" class="bouton bouton-secondaire" id="btn-ajout-rdv-manuel" aria-pressed="false">
+              Ajouter un rendez-vous
+            </button>
             <button class="bouton bouton-principal" id="btn-lancer-generation">
               <span class="btn-texte-generation">Générer mon agenda</span>
               <span class="btn-spinner" id="spinner-generation" hidden></span>
             </button>
           </div>
+        </div>
+
+        <div class="bandeau-directeur-agenda" id="bandeau-directeur-agenda" hidden>
+          <div class="bandeau-directeur-agenda-texte">
+            <strong>Agenda personnel</strong>
+            <span>Ajoutez vos réunions et créneaux avec une description libre.</span>
+          </div>
+          <button type="button" class="bouton bouton-principal" id="btn-ajout-creneau-directeur" aria-pressed="false">
+            Ajouter un créneau
+          </button>
+        </div>
+
+        <div class="bandeau-ajout-rdv" id="bandeau-ajout-rdv" hidden>
+          <span class="bandeau-ajout-rdv-pastille" aria-hidden="true"></span>
+          <p id="bandeau-ajout-rdv-texte">Mode ajout actif — cliquez sur un <strong>créneau vert</strong> pour planifier un rendez-vous.</p>
+          <button type="button" class="bouton bouton-discret bouton-discret--compact" id="btn-quitter-ajout-rdv">Terminer</button>
         </div>
 
         <div class="grille-agenda" id="grille-mon-agenda"></div>
@@ -454,6 +473,34 @@
       <button class="bouton bouton-discret" data-fermer-modale="modale-employe-fond">Annuler</button>
       <button class="bouton bouton-principal" id="btn-enregistrer-employe">Créer le compte</button>
     </div>
+  </div>
+</div>
+
+<!-- Modale : ajout manuel d'un rendez-vous -->
+<div class="modale-fond" id="modale-ajout-rdv-fond" hidden>
+  <div class="modale modale--petite" role="dialog" aria-modal="true" aria-labelledby="modale-ajout-rdv-titre">
+    <div class="modale-entete">
+      <h3 id="modale-ajout-rdv-titre">Ajouter un rendez-vous</h3>
+      <button class="modale-fermer" data-fermer-modale="modale-ajout-rdv-fond" aria-label="Fermer">×</button>
+    </div>
+    <form id="form-ajout-rdv" class="modale-corps">
+      <p class="ajout-rdv-info" id="ajout-rdv-creneau-info"></p>
+      <div class="champ" id="ajout-rdv-patient-champ">
+        <label class="champ-label" for="ajout-rdv-patient">Patient</label>
+        <select id="ajout-rdv-patient">
+          <option value="">Choisir un patient…</option>
+        </select>
+      </div>
+      <div class="champ" id="ajout-rdv-description-champ" hidden>
+        <label class="champ-label" for="ajout-rdv-description">Description</label>
+        <textarea id="ajout-rdv-description" rows="3" maxlength="200" placeholder="Ex. Réunion direction, visite partenaire…"></textarea>
+      </div>
+      <p class="champ-erreur" id="ajout-rdv-erreur" hidden></p>
+      <div class="modale-pied">
+        <button type="button" class="bouton bouton-discret" data-fermer-modale="modale-ajout-rdv-fond">Annuler</button>
+        <button type="submit" class="bouton bouton-principal">Confirmer</button>
+      </div>
+    </form>
   </div>
 </div>
 

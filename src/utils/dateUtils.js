@@ -57,6 +57,10 @@ function lundiDeLaSemaine(dateStr) {
   return formaterDateLocale(d);
 }
 
+function memeJourSemaine(a, b) {
+  return Number(a) === Number(b);
+}
+
 function lesCinqJoursDeLaSemaine(lundiStr) {
   const dates = [];
   const base = parseDateLocale(lundiStr);
@@ -114,6 +118,7 @@ module.exports = {
   parseDateLocale,
   lundiDeLaSemaine,
   lesCinqJoursDeLaSemaine,
+  memeJourSemaine,
   genererCreneauxSeances,
   genererHeuresAgenda
 };

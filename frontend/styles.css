@@ -1266,6 +1266,162 @@ button, input, select {
 
 .bandeau-generation-actions { display: flex; gap: 10px; flex-shrink: 0; }
 
+.bandeau-generation .bouton-secondaire {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.bandeau-generation .bouton-secondaire:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: #fff;
+}
+
+.bandeau-generation .bouton-secondaire.is-active {
+  background: #fff;
+  color: #1B7D3A;
+  border-color: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.bandeau-directeur-agenda {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, #1C1C1E 0%, #3A3A3C 100%);
+  border-radius: var(--rayon);
+  padding: 22px 26px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 32px rgba(28, 28, 30, 0.22);
+}
+
+.bandeau-directeur-agenda-texte {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.bandeau-directeur-agenda-texte strong {
+  font-size: 16px;
+  color: #fff;
+}
+
+.bandeau-directeur-agenda-texte span {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.bandeau-directeur-agenda .bouton-principal {
+  background: #fff;
+  color: #1C1C1E;
+  flex-shrink: 0;
+}
+
+.bandeau-directeur-agenda .bouton-principal.is-active {
+  background: #34A853;
+  color: #fff;
+}
+
+.bandeau-directeur-agenda .bouton-principal:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.champ textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--bordure);
+  border-radius: 10px;
+  font: inherit;
+  resize: vertical;
+  min-height: 72px;
+  box-sizing: border-box;
+}
+
+.champ textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+}
+
+.bandeau-ajout-rdv {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: #E8F5E9;
+  border: 1px solid #A5D6A7;
+  border-radius: var(--rayon);
+  padding: 12px 16px;
+  margin: -8px 0 20px;
+  color: #1B5E20;
+  font-size: 14px;
+}
+
+.bandeau-ajout-rdv-pastille {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #34A853;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 4px rgba(52, 168, 83, 0.2);
+}
+
+.bandeau-ajout-rdv p {
+  flex: 1;
+  margin: 0;
+  min-width: 200px;
+}
+
+.bouton-discret--compact {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.grille-agenda--mode-ajout .cellule-libre {
+  width: 100%;
+  min-height: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #34A853;
+  background: #34A85320;
+  border-radius: 12px;
+  color: #1B7D3A;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.grille-agenda--mode-ajout .cellule-libre:hover {
+  background: #34A85338;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(52, 168, 83, 0.2);
+}
+
+.grille-agenda--mode-ajout .cellule-libre:focus-visible {
+  outline: 2px solid #34A853;
+  outline-offset: 2px;
+}
+
+.ajout-rdv-info {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  border-radius: 10px;
+  color: #166534;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 .bandeau-generation .bouton-principal {
   background: #fff;
   color: var(--accent-encre);

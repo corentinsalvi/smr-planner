@@ -20,7 +20,10 @@
       absences: []
     },
     moisDirection: null,
-    directionRefreshInterval: null
+    directionRefreshInterval: null,
+    modeAjoutRdv: false,
+    slotAjoutRdv: null,
+    disponibilitesCourantes: null
   };
 
   const $ = id => document.getElementById(id);
@@ -459,6 +462,166 @@
       </div>`;
   }
 
+  function jourSemaineNumero(dateStr) {
+    return parseDateLocale(dateStr).getDay();
+  }
+
+  function plageContientCreneau(dispos, jourSemaine, heureDebut, heureFin) {
+    return dispos.some(d =>
+      Number(d.jour_semaine) === jourSemaine &&
+      minutesDepuis(d.heure_debut) <= minutesDepuis(heureDebut) &&
+      minutesDepuis(d.heure_fin) >= minutesDepuis(heureFin)
+    );
+  }
+
+  function estCreneauLibre(date, heure, creneaux, dispos, absences, employeId, options = {}) {
+    const heureFin = finHeureSlot(heure);
+    const occupe = creneaux.some(c =>
+      c.date === date && c.heure_debut === heure && c.statut !== 'ANNULE'
+    );
+    if (occupe) return false;
+
+    if (absencePourCreneau(absences, employeId, date, heure, heureFin)) return false;
+
+    const jourSemaine = jourSemaineNumero(date);
+    if (jourSemaine === 0 || jourSemaine === 6) return false;
+
+    if (!options.modeDirecteur && !plageContientCreneau(dispos, jourSemaine, heure, heureFin)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  function calculerCreneauxLibres(creneaux, dispos, absences, employeId) {
+    const libres = new Set();
+    const jours = joursDeLaSemaine(state.semaineLundi);
+    const modeDirecteur = estDirecteur();
+
+    lignesAgenda(creneaux).forEach(ligne => {
+      if (ligne.type !== 'seance') return;
+      jours.forEach(date => {
+        if (estCreneauLibre(date, ligne.heure, creneaux, dispos, absences, employeId, { modeDirecteur })) {
+          libres.add(`${date}|${ligne.heure}`);
+        }
+      });
+    });
+
+    return libres;
+  }
+
+  function basculerModeAjoutRdv(actif) {
+    state.modeAjoutRdv = actif ?? !state.modeAjoutRdv;
+    const btnPro = $('btn-ajout-rdv-manuel');
+    const btnDir = $('btn-ajout-creneau-directeur');
+    const bandeau = $('bandeau-ajout-rdv');
+    const bandeauTexte = $('bandeau-ajout-rdv-texte');
+    const grille = $('grille-mon-agenda');
+
+    if (btnPro && !estDirecteur()) {
+      btnPro.classList.toggle('is-active', state.modeAjoutRdv);
+      btnPro.setAttribute('aria-pressed', state.modeAjoutRdv ? 'true' : 'false');
+      btnPro.textContent = state.modeAjoutRdv ? 'Mode ajout actif' : 'Ajouter un rendez-vous';
+    }
+    if (btnDir && estDirecteur()) {
+      btnDir.classList.toggle('is-active', state.modeAjoutRdv);
+      btnDir.setAttribute('aria-pressed', state.modeAjoutRdv ? 'true' : 'false');
+      btnDir.textContent = state.modeAjoutRdv ? 'Mode ajout actif' : 'Ajouter un créneau';
+    }
+    if (bandeau) bandeau.hidden = !state.modeAjoutRdv;
+    if (bandeauTexte) {
+      bandeauTexte.innerHTML = estDirecteur()
+        ? 'Mode ajout actif — cliquez sur un <strong>créneau vert</strong> pour saisir une description.'
+        : 'Mode ajout actif — cliquez sur un <strong>créneau vert</strong> pour planifier un rendez-vous.';
+    }
+    if (grille) grille.classList.toggle('grille-agenda--mode-ajout', state.modeAjoutRdv);
+
+    if (!state.modeAjoutRdv) state.slotAjoutRdv = null;
+    renderMonAgenda();
+  }
+
+  function ouvrirModaleAjoutRdv(date, heure) {
+    state.slotAjoutRdv = { date, heure, heure_fin: finHeureSlot(heure) };
+    afficherErreur('ajout-rdv-erreur', null);
+
+    const directeur = estDirecteur();
+    $('modale-ajout-rdv-titre').textContent = directeur ? 'Ajouter un créneau' : 'Ajouter un rendez-vous';
+    $('ajout-rdv-patient-champ').hidden = directeur;
+    $('ajout-rdv-description-champ').hidden = !directeur;
+
+    if (directeur) {
+      $('ajout-rdv-description').value = '';
+    } else {
+      const patientsActifs = state.patients.filter(p => p.statut === 'ACTIF');
+      const select = $('ajout-rdv-patient');
+      select.innerHTML = '<option value="">Choisir un patient…</option>' +
+        patientsActifs.map(p => `<option value="${p.id}">${nomComplet(p)}</option>`).join('');
+    }
+
+    $('ajout-rdv-creneau-info').textContent =
+      `${formatDateCourte(date)} · ${heure} – ${state.slotAjoutRdv.heure_fin}`;
+
+    ouvrirModale('modale-ajout-rdv-fond');
+  }
+
+  async function enregistrerRdvManuel(e) {
+    e.preventDefault();
+    if (!state.slotAjoutRdv || !state.utilisateur) return;
+
+    const payload = {
+      employe_id: state.utilisateur.id,
+      role: state.utilisateur.role,
+      date: state.slotAjoutRdv.date,
+      heure_debut: state.slotAjoutRdv.heure,
+      heure_fin: state.slotAjoutRdv.heure_fin
+    };
+
+    if (estDirecteur()) {
+      const description = $('ajout-rdv-description').value.trim();
+      if (!description) {
+        afficherErreur('ajout-rdv-erreur', 'Veuillez saisir une description.');
+        return;
+      }
+      payload.notes = description;
+    } else {
+      const patientId = $('ajout-rdv-patient').value;
+      if (!patientId) {
+        afficherErreur('ajout-rdv-erreur', 'Veuillez sélectionner un patient.');
+        return;
+      }
+      payload.patient_id = patientId;
+    }
+
+    try {
+      await API.createCreneau(payload);
+      fermerModale('modale-ajout-rdv-fond');
+      toast(estDirecteur() ? 'Créneau ajouté.' : 'Rendez-vous ajouté.');
+      await renderMonAgenda();
+      if (!estDirecteur()) await rafraichirScoresConformite();
+    } catch (err) {
+      afficherErreur('ajout-rdv-erreur', err.message);
+    }
+  }
+
+  function mettreAJourBandeauAgenda() {
+    const directeur = estDirecteur();
+    const bandeauGen = $('bandeau-generation');
+    const bandeauDir = $('bandeau-directeur-agenda');
+    const btnGen = $('btn-lancer-generation');
+    const btnPro = $('btn-ajout-rdv-manuel');
+    const ongletHoraires = document.querySelector('[data-espace-onglet="horaires"]');
+
+    if (bandeauGen) bandeauGen.hidden = directeur;
+    if (bandeauDir) bandeauDir.hidden = !directeur;
+    if (btnGen) btnGen.hidden = directeur;
+    if (btnPro) btnPro.hidden = directeur;
+    if (ongletHoraires) ongletHoraires.hidden = directeur;
+
+    if (directeur && state.espaceOnglet === 'horaires') {
+      activerEspaceOnglet('agenda');
+    }
+  }
+
   async function chargerAbsencesAgenda(employeId) {
     const jours = joursDeLaSemaine(state.semaineLundi);
     return API.getAbsences({
@@ -503,6 +666,9 @@
           if (absence) {
             return `<td>${htmlBlocAbsenceAgenda(absence, options)}</td>`;
           }
+          if (options.modeAjoutRdv && options.creneauxLibres?.has(`${date}|${heure}`)) {
+            return `<td><button type="button" class="cellule-libre" data-date="${date}" data-heure="${heure}" aria-label="Créneau libre le ${formatDateCourte(date)} à ${heure}">Libre</button></td>`;
+          }
           return (options.modeGlobal || options.modePatient || options.modePro)
             ? '<td class="cellule-vide"><span class="cellule-vide-point"></span></td>'
             : '<td></td>';
@@ -521,8 +687,13 @@
           titre = patient ? nomComplet(patient) : '—';
           sousTitre = employe ? nomComplet(employe) : labelRole(creneau.role);
         } else {
-          titre = patient ? nomComplet(patient) : '—';
-          sousTitre = labelRole(creneau.role);
+          if (creneau.notes && !patient) {
+            titre = creneau.notes;
+            sousTitre = `${creneau.heure_debut} – ${creneau.heure_fin}`;
+          } else {
+            titre = patient ? nomComplet(patient) : '—';
+            sousTitre = labelRole(creneau.role);
+          }
         }
         const couleur = couleurRole(creneau.role);
         const classeVariante = options.modeGlobal ? ' creneau-carte--global'
@@ -585,6 +756,12 @@
       el.addEventListener('click', () => {
         const creneau = creneaux.find(c => c.id === el.dataset.creneauId);
         if (creneau) ouvrirModaleCreneau(creneau);
+      });
+    });
+
+    cont.querySelectorAll('.cellule-libre').forEach(el => {
+      el.addEventListener('click', () => {
+        ouvrirModaleAjoutRdv(el.dataset.date, el.dataset.heure);
       });
     });
   }
@@ -938,13 +1115,33 @@
 
   async function renderMonAgenda() {
     renderNavigationSemaine('nav-semaine-mon-agenda', renderMonAgenda);
-    const [creneaux, absences] = await Promise.all([
-      chargerCreneaux({ employe_id: state.utilisateur.id }),
-      chargerAbsencesAgenda(state.utilisateur.id)
+    const employeId = state.utilisateur.id;
+    const directeur = estDirecteur();
+
+    const [creneaux, absences, dispos] = await Promise.all([
+      chargerCreneaux({ employe_id: employeId }),
+      chargerAbsencesAgenda(employeId),
+      directeur
+        ? Promise.resolve([])
+        : (state.disponibilitesCourantes
+          ? Promise.resolve(state.disponibilitesCourantes)
+          : API.getDisponibilites(employeId))
     ]);
+
+    if (!directeur) state.disponibilitesCourantes = dispos;
+
+    const creneauxLibres = state.modeAjoutRdv
+      ? calculerCreneauxLibres(creneaux, dispos, absences, employeId)
+      : null;
+
+    const grille = $('grille-mon-agenda');
+    if (grille) grille.classList.toggle('grille-agenda--mode-ajout', state.modeAjoutRdv);
+
     renderGrilleAgenda('grille-mon-agenda', creneaux, {
       absences,
-      employeId: state.utilisateur.id
+      employeId,
+      modeAjoutRdv: state.modeAjoutRdv,
+      creneauxLibres
     });
   }
 
@@ -964,6 +1161,7 @@
       horaires: async () => {
         state.disponibilitesCourantes = await API.getDisponibilites(state.utilisateur.id);
         renderEditeurHoraires();
+        if (state.espaceOnglet === 'agenda' && state.modeAjoutRdv) renderMonAgenda();
       },
       absences: renderAbsences
     };
@@ -2426,7 +2624,7 @@
     const disposParJour = state.disponibilitesCourantes || [];
 
     cont.innerHTML = state.jours.map(jour => {
-      const dispos = disposParJour.filter(d => d.jour_semaine === jour.numero);
+      const dispos = disposParJour.filter(d => Number(d.jour_semaine) === jour.numero);
       const lignes = dispos.length
         ? dispos.map((d, i) => ligneDispo(jour.numero, d, i)).join('')
         : ligneDispo(jour.numero, null, 0);
@@ -2499,7 +2697,8 @@
     const employe = state.employes.find(e => e.id === creneau.employe_id);
 
     $('modale-creneau-corps').innerHTML = `
-      <div class="detail-creneau-ligne"><span>Patient</span><span>${patient ? nomComplet(patient) : '—'}</span></div>
+      ${creneau.notes ? `<div class="detail-creneau-ligne"><span>Description</span><span>${creneau.notes}</span></div>` : ''}
+      ${patient ? `<div class="detail-creneau-ligne"><span>Patient</span><span>${nomComplet(patient)}</span></div>` : ''}
       <div class="detail-creneau-ligne"><span>Professionnel</span><span>${employe ? nomComplet(employe) : '—'}</span></div>
       <div class="detail-creneau-ligne"><span>Métier</span><span>${labelRole(creneau.role)}</span></div>
       <div class="detail-creneau-ligne"><span>Date</span><span>${formatDateCourte(creneau.date)}</span></div>
@@ -2640,8 +2839,11 @@
 
   async function initSession() {
     state.semaineLundi = lundiDe();
+    state.modeAjoutRdv = false;
+    state.disponibilitesCourantes = null;
     await chargerDonnees();
     await rafraichirPatients();
+    mettreAJourBandeauAgenda();
     afficherApp();
     activerVue(estDirecteur() ? 'direction' : 'mon-espace');
   }
@@ -2673,6 +2875,8 @@
       arreterAutoRefreshDirection();
       API.setToken(null);
       state.utilisateur = null;
+      state.modeAjoutRdv = false;
+      state.disponibilitesCourantes = null;
       afficherLogin();
     });
 
@@ -2805,14 +3009,21 @@
       }
       try {
         await API.saveDisponibilites(state.utilisateur.id, dispos);
+        state.disponibilitesCourantes = await API.getDisponibilites(state.utilisateur.id);
         const conf = $('confirmation-horaires');
         conf.hidden = false;
         setTimeout(() => { conf.hidden = true; }, 2500);
         toast('Horaires enregistrés.');
+        if (state.espaceOnglet === 'agenda' && state.modeAjoutRdv) await renderMonAgenda();
       } catch (err) {
         toast(err.message, 'erreur');
       }
     });
+
+    $('btn-ajout-rdv-manuel')?.addEventListener('click', () => basculerModeAjoutRdv());
+    $('btn-ajout-creneau-directeur')?.addEventListener('click', () => basculerModeAjoutRdv());
+    $('btn-quitter-ajout-rdv')?.addEventListener('click', () => basculerModeAjoutRdv(false));
+    $('form-ajout-rdv')?.addEventListener('submit', enregistrerRdvManuel);
 
     $('btn-lancer-generation').addEventListener('click', async () => {
       const btn = $('btn-lancer-generation');

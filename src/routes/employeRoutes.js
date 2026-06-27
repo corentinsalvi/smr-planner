@@ -6,6 +6,11 @@ const { hashMotDePasse } = require('../services/authService');
 const { ROLES, JOURS_SEMAINE } = require('../constants');
 const { plageHoraireValide } = require('../utils/dateUtils');
 const { getClinicIdFromRequest } = require('../utils/clinicScope');
+const requireRole = require('../middleware/requireRole');
+const { limiteurPlanning } = require('../middleware/rateLimit');
+const { GESTIONNAIRE_ROLES, DIRECTEUR_ROLES } = require('../constants');
+
+const ROLES_GESTION = [...GESTIONNAIRE_ROLES, ...DIRECTEUR_ROLES];
 
 function sansMotDePasse(employe) {
   const obj = employe.toJSON ? employe.toJSON() : { ...employe };
@@ -33,8 +38,8 @@ router.get('/:id', async (req, res) => {
   res.json(sansMotDePasse(employe));
 });
 
-// POST /api/employes - création d'un employé
-router.post('/', async (req, res) => {
+// POST /api/employes - création d'un employé (gestionnaires et directeur uniquement)
+router.post('/', requireRole(...ROLES_GESTION), async (req, res) => {
   const clinicId = getClinicIdFromRequest(req);
   const { nom, prenom, email, mot_de_passe, role } = req.body;
 
@@ -74,7 +79,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/employes/:id - mise à jour des infos générales (hors mot de passe)
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireRole(...ROLES_GESTION), async (req, res) => {
   const clinicId = getClinicIdFromRequest(req);
   const { nom, prenom, email, role, actif } = req.body;
 
@@ -95,7 +100,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/employes/:id - désactive l'employé (soft delete)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireRole(...ROLES_GESTION), async (req, res) => {
   const clinicId = getClinicIdFromRequest(req);
   const employe = await Employe.findOneAndUpdate(
     { id: req.params.id, clinic_id: clinicId },
@@ -117,8 +122,16 @@ router.get('/:id/disponibilites', async (req, res) => {
   res.json(dispos.map(d => d.toJSON()));
 });
 
+function peutModifierDisponibilites(req, res, next) {
+  const rolesGestion = new Set(ROLES_GESTION);
+  if (rolesGestion.has(req.utilisateur.role) || req.params.id === req.utilisateur.id) {
+    return next();
+  }
+  return res.status(403).json({ erreur: 'Vous ne pouvez modifier que vos propres disponibilités.' });
+}
+
 // PUT /api/employes/:id/disponibilites - remplace entièrement les disponibilités
-router.put('/:id/disponibilites', async (req, res) => {
+router.put('/:id/disponibilites', peutModifierDisponibilites, async (req, res) => {
   const clinicId = getClinicIdFromRequest(req);
   const { disponibilites } = req.body;
 
@@ -144,7 +157,7 @@ router.put('/:id/disponibilites', async (req, res) => {
       id: uuidv4(),
       clinic_id: clinicId,
       employe_id: employeId,
-      jour_semaine: d.jour_semaine,
+      jour_semaine: Number(d.jour_semaine),
       heure_debut: d.heure_debut,
       heure_fin: d.heure_fin
     })));
