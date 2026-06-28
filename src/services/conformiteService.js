@@ -1,5 +1,6 @@
 const { TEMPS_PLANNING } = require('../constants');
 const { Besoin, Creneau } = require('../models');
+const { creneauConcernePatient } = require('../utils/creneauUtils');
 
 function calculerScoreConformite(besoins, creneaux) {
   const dureeSeanceMin = TEMPS_PLANNING.DUREE_SEANCE_MIN;
@@ -34,10 +35,12 @@ function calculerScoreConformite(besoins, creneaux) {
 }
 
 async function calculerScoreConformitePatient(clinicId, patientId, filtreCreneaux = {}) {
-  const [besoins, creneaux] = await Promise.all([
+  const [besoins, creneauxIndividuels, creneauxAteliers] = await Promise.all([
     Besoin.find({ clinic_id: clinicId, patient_id: patientId }).lean(),
-    Creneau.find({ clinic_id: clinicId, patient_id: patientId, ...filtreCreneaux }).lean()
+    Creneau.find({ clinic_id: clinicId, patient_id: patientId, ...filtreCreneaux }).lean(),
+    Creneau.find({ clinic_id: clinicId, type: 'ATELIER', patient_ids: patientId, ...filtreCreneaux }).lean()
   ]);
+  const creneaux = [...creneauxIndividuels, ...creneauxAteliers];
   return calculerScoreConformite(besoins, creneaux);
 }
 
@@ -59,7 +62,7 @@ function calculerConformiteGlobale(patients, besoins, creneaux, semainesDansPeri
 
   patientsActifs.forEach(patient => {
     const besoinsPatient = besoins.filter(b => b.patient_id === patient.id);
-    const creneauxPatient = creneaux.filter(c => c.patient_id === patient.id);
+    const creneauxPatient = creneaux.filter(c => creneauConcernePatient(c, patient.id));
     const conformite = calculerScoreConformite(besoinsPatient, creneauxPatient);
 
     if (!conformite.forfaitDefini) return;

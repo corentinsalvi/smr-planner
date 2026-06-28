@@ -9,6 +9,7 @@ const { TEMPS_PLANNING } = require('../constants');
 const { estProAbsent } = require('../utils/absenceUtils');
 const { getClinicIdFromRequest } = require('../utils/clinicScope');
 const { limiteurPlanning } = require('../middleware/rateLimit');
+const { creneauConcernePatient, patientsIdsCreneau } = require('../utils/creneauUtils');
 
 // GET /api/creneaux/export/ics?date_debut=...&date_fin=...
 router.get('/export/ics', async (req, res) => {
@@ -58,7 +59,12 @@ router.get('/', async (req, res) => {
   const filtre = { clinic_id: clinicId };
 
   if (employe_id) filtre.employe_id = employe_id;
-  if (patient_id) filtre.patient_id = patient_id;
+  if (patient_id) {
+    filtre.$or = [
+      { patient_id },
+      { type: 'ATELIER', patient_ids: patient_id }
+    ];
+  }
   if (date_debut || date_fin) {
     filtre.date = {};
     if (date_debut) filtre.date.$gte = date_debut;
@@ -88,23 +94,42 @@ async function verifierConflit(clinicId, candidat, idAIgnorer = null) {
 
   if (conflitsPro.length > 0) return 'Le professionnel a déjà un rendez-vous sur ce créneau.';
 
-  if (candidat.patient_id) {
+  const patientsAVerifier = candidat.patient_ids?.length
+    ? candidat.patient_ids
+    : (candidat.patient_id ? [candidat.patient_id] : []);
+
+  for (const pid of patientsAVerifier) {
     const conflitsPatient = creneauxExistants.filter(c =>
       c.id !== idAIgnorer &&
-      c.patient_id === candidat.patient_id &&
       c.statut !== 'ANNULE' &&
+      creneauConcernePatient(c, pid) &&
       seChevauchent(c.heure_debut, c.heure_fin, candidat.heure_debut, candidat.heure_fin)
     );
-    if (conflitsPatient.length > 0) return 'Le patient a déjà un rendez-vous sur ce créneau.';
+    if (conflitsPatient.length > 0) {
+      const patient = await Patient.findOne({ id: pid, clinic_id: clinicId }).lean();
+      const nom = patient ? `${patient.prenom} ${patient.nom}` : 'Un patient';
+      return `${nom} a déjà un rendez-vous sur ce créneau.`;
+    }
   }
 
   return null;
 }
 
-// POST /api/creneaux - création manuelle
+// POST /api/creneaux - création manuelle (séance ou atelier de groupe)
 router.post('/', async (req, res) => {
   const clinicId = getClinicIdFromRequest(req);
-  const { patient_id, employe_id, role, date, heure_debut, heure_fin, besoin_soin_id, notes } = req.body;
+  const {
+    patient_id,
+    patient_ids,
+    type,
+    employe_id,
+    role,
+    date,
+    heure_debut,
+    heure_fin,
+    besoin_soin_id,
+    notes
+  } = req.body;
 
   if (!employe_id || !date || !heure_debut || !heure_fin) {
     return res.status(400).json({ erreur: 'employe_id, date, heure_debut et heure_fin sont requis.' });
@@ -115,8 +140,23 @@ router.post('/', async (req, res) => {
     return res.status(404).json({ erreur: 'Professionnel introuvable.' });
   }
 
-  const creneauPersoDirecteur = employe.role === 'DIRECTEUR' && !patient_id;
-  if (creneauPersoDirecteur) {
+  const estAtelier = type === 'ATELIER';
+  const creneauPersoDirecteur = employe.role === 'DIRECTEUR' && !patient_id && !estAtelier;
+
+  if (estAtelier) {
+    if (!Array.isArray(patient_ids) || patient_ids.length < 2) {
+      return res.status(400).json({ erreur: 'Sélectionnez au moins 2 patients pour un atelier de groupe.' });
+    }
+    const idsUniques = [...new Set(patient_ids)];
+    const patients = await Patient.find({
+      clinic_id: clinicId,
+      id: { $in: idsUniques },
+      statut: 'ACTIF'
+    }).lean();
+    if (patients.length !== idsUniques.length) {
+      return res.status(400).json({ erreur: 'Un ou plusieurs patients sont introuvables ou inactifs.' });
+    }
+  } else if (creneauPersoDirecteur) {
     if (!notes?.trim()) {
       return res.status(400).json({ erreur: 'Une description est requise pour ce créneau.' });
     }
@@ -131,7 +171,15 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const candidat = { patient_id: patient_id || null, employe_id, date, heure_debut, heure_fin };
+    const idsAtelier = estAtelier ? [...new Set(patient_ids)] : [];
+    const candidat = {
+      patient_id: estAtelier ? null : (patient_id || null),
+      patient_ids: idsAtelier,
+      employe_id,
+      date,
+      heure_debut,
+      heure_fin
+    };
     const erreurConflit = await verifierConflit(clinicId, candidat);
     if (erreurConflit) {
       return res.status(409).json({ erreur: erreurConflit });
@@ -140,7 +188,9 @@ router.post('/', async (req, res) => {
     const creneau = await Creneau.create({
       id: uuidv4(),
       clinic_id: clinicId,
-      patient_id: patient_id || null,
+      patient_id: estAtelier ? null : (patient_id || null),
+      patient_ids: idsAtelier,
+      type: estAtelier ? 'ATELIER' : 'SEANCE',
       employe_id,
       besoin_soin_id: besoin_soin_id || null,
       role: role || employe.role || null,
@@ -169,6 +219,7 @@ router.put('/:id', async (req, res) => {
 
     const candidat = {
       patient_id: existant.patient_id,
+      patient_ids: patientsIdsCreneau(existant),
       employe_id: existant.employe_id,
       date: date || existant.date,
       heure_debut: heure_debut || existant.heure_debut,

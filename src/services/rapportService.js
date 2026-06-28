@@ -4,18 +4,15 @@ const {
   Besoin,
   Creneau,
   Employe,
-  Absence,
-  Disponibilite
+  Absence
 } = require('../models');
 const {
   formaterDateLocale,
   parseDateLocale,
-  lundiDeLaSemaine,
-  dureePlageMinutes,
-  memeJourSemaine
+  lundiDeLaSemaine
 } = require('../utils/dateUtils');
 const { absenceCouvreCreneau } = require('../utils/absenceUtils');
-const { ROLES, TYPES_ABSENCE, TEMPS_PLANNING, DIRECTEUR_ROLES } = require('../constants');
+const { ROLES, TYPES_ABSENCE, DIRECTEUR_ROLES } = require('../constants');
 const { calculerConformiteGlobale } = require('./conformiteService');
 
 function premierJourMois(moisStr) {
@@ -58,18 +55,6 @@ function decalageJours(dateStr, nb) {
 
 function employesCliniques(employes) {
   return employes.filter(e => e.actif !== false && !DIRECTEUR_ROLES.includes(e.role));
-}
-
-function capaciteHeuresEmploye(disponibilites, employeId, joursOuvres) {
-  const dispos = disponibilites.filter(d => d.employe_id === employeId);
-  let minutes = 0;
-  joursOuvres.forEach(date => {
-    const jourSemaine = parseDateLocale(date).getDay() || 7;
-    dispos.filter(d => memeJourSemaine(d.jour_semaine, jourSemaine)).forEach(d => {
-      minutes += dureePlageMinutes(d.heure_debut, d.heure_fin);
-    });
-  });
-  return minutes / 60;
 }
 
 function statutRhEmploye(employe, absences, joursSemaine) {
@@ -142,72 +127,29 @@ function calculerBilanRh(employes, absences, dateDebut, dateFin) {
   };
 }
 
-function calculerOccupation(employes, disponibilites, absences, creneaux, joursOuvres) {
-  const equipe = employesCliniques(employes);
-  const creneauxActifs = creneaux.filter(c => c.statut !== 'ANNULE');
-  const heuresSoins = (creneauxActifs.length * TEMPS_PLANNING.DUREE_SEANCE_MIN) / 60;
-
-  let capaciteHeures = 0;
-  equipe.forEach(employe => {
-    let heures = capaciteHeuresEmploye(disponibilites, employe.id, joursOuvres);
-    joursOuvres.forEach(date => {
-      const absentJournee = absences.some(a =>
-        a.employe_id === employe.id &&
-        absenceCouvreCreneau(a, date, '08:00', '17:30') &&
-        a.journee_entiere !== false
-      );
-      if (absentJournee) {
-        const dispos = disponibilites.filter(d => d.employe_id === employe.id);
-        const jourSemaine = parseDateLocale(date).getDay() || 7;
-        dispos.filter(d => memeJourSemaine(d.jour_semaine, jourSemaine)).forEach(d => {
-          heures -= dureePlageMinutes(d.heure_debut, d.heure_fin) / 60;
-        });
-      }
-    });
-    capaciteHeures += Math.max(0, heures);
-  });
-
-  const tauxOccupation = capaciteHeures > 0
-    ? Math.min(100, Math.round((heuresSoins / capaciteHeures) * 100))
-    : 0;
-
-  return {
-    tauxOccupation,
-    heuresSoins: Math.round(heuresSoins * 10) / 10,
-    seancesPlanifiees: creneauxActifs.length,
-    capaciteHeures: Math.round(capaciteHeures * 10) / 10
-  };
-}
-
 function moisCourant() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
 async function getTableauDeBord(clinicId, moisStr = moisCourant()) {
-  const [patients, besoins, creneaux, employes, absences, disponibilites] = await Promise.all([
+  const [patients, besoins, creneaux, employes, absences] = await Promise.all([
     Patient.find({ clinic_id: clinicId }).lean(),
     Besoin.find({ clinic_id: clinicId }).lean(),
     Creneau.find({ clinic_id: clinicId }).lean(),
     Employe.find({ clinic_id: clinicId }).lean(),
-    Absence.find({ clinic_id: clinicId }).lean(),
-    Disponibilite.find({ clinic_id: clinicId }).lean()
+    Absence.find({ clinic_id: clinicId }).lean()
   ]);
 
   const dateDebut = premierJourMois(moisStr);
   const dateFin = dernierJourMois(moisStr);
-  const joursMois = joursOuvresEntre(dateDebut, dateFin);
   const semaines = compterSemainesOuvrees(dateDebut, dateFin);
 
   const creneauxMois = creneaux.filter(c =>
     c.date >= dateDebut && c.date <= dateFin
   );
-  const absencesMois = absences.filter(a =>
-    a.date_fin >= dateDebut && a.date_debut <= dateFin
-  );
 
   const conformite = calculerConformiteGlobale(patients, besoins, creneauxMois, semaines);
-  const occupation = calculerOccupation(employes, disponibilites, absencesMois, creneauxMois, joursMois);
 
   const lundiProchain = decalageJours(lundiDeLaSemaine(formaterDateLocale(new Date())), 7);
   const vendrediProchain = decalageJours(lundiProchain, 4);
@@ -225,7 +167,6 @@ async function getTableauDeBord(clinicId, moisStr = moisCourant()) {
       semaines
     },
     conformite,
-    occupation,
     rh: {
       ...rh,
       semaineLabel: `${parseDateLocale(lundiProchain).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} – ${parseDateLocale(vendrediProchain).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}`
@@ -254,8 +195,6 @@ async function genererPdfMensuel(clinicId, moisStr) {
     doc.text(`Score de conformité moyen : ${data.conformite.scoreMoyen}%`);
     doc.text(`Patients évalués : ${data.conformite.patientsEvalues} (${data.conformite.patientsConformes} conformes)`);
     doc.text(`Heures de soins planifiées : ${data.conformite.heuresPlanifiees} h`);
-    doc.text(`Taux d'occupation : ${data.occupation.tauxOccupation}%`);
-    doc.text(`Séances planifiées : ${data.occupation.seancesPlanifiees}`);
     doc.moveDown(1);
 
     doc.fontSize(16).fillColor('#007AFF').text('Conformité par patient');

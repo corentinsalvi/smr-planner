@@ -1,4 +1,5 @@
 const { ROLES } = require('../constants');
+const { creneauConcernePatient, estAtelier } = require('../utils/creneauUtils');
 
 function echapperTexteIcs(texte) {
   return String(texte || '')
@@ -45,11 +46,20 @@ function genererFluxIcsAbonnement({ creneaux, patients, nomCalendrier = 'SMR Pla
   });
 
   for (const creneau of creneauxTries) {
-    const patient = patientsParId.get(creneau.patient_id);
-    const nomPatient = patient ? `${patient.prenom} ${patient.nom}` : 'Patient';
     const metier = labelRole(creneau.role);
     const dtStart = formaterDateHeureIcs(creneau.date, creneau.heure_debut);
     const dtEnd = formaterDateHeureIcs(creneau.date, creneau.heure_fin);
+
+    let summary;
+    if (estAtelier(creneau)) {
+      const n = (creneau.patient_ids || []).length;
+      const libelle = creneau.notes?.trim() || 'Atelier de groupe';
+      summary = `${creneau.heure_debut} - ${libelle} (${n} patients, ${metier})`;
+    } else {
+      const patient = patientsParId.get(creneau.patient_id);
+      const nomPatient = patient ? `${patient.prenom} ${patient.nom}` : 'Patient';
+      summary = `${creneau.heure_debut} - Consultation ${nomPatient} (${metier})`;
+    }
 
     lignes.push(
       'BEGIN:VEVENT',
@@ -57,7 +67,7 @@ function genererFluxIcsAbonnement({ creneaux, patients, nomCalendrier = 'SMR Pla
       `DTSTAMP:${formaterDtStamp()}`,
       `DTSTART:${dtStart}`,
       `DTEND:${dtEnd}`,
-      `SUMMARY:${echapperTexteIcs(`${creneau.heure_debut} - Consultation ${nomPatient} (${metier})`)}`,
+      `SUMMARY:${echapperTexteIcs(summary)}`,
       'END:VEVENT'
     );
   }

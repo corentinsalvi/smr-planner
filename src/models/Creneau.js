@@ -6,6 +6,8 @@ const creneauSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true, default: uuidv4 },
   clinic_id: { type: String, required: true, index: true },
   patient_id: { type: String, default: null, index: true },
+  patient_ids: { type: [String], default: [] },
+  type: { type: String, default: 'SEANCE', enum: ['SEANCE', 'ATELIER'] },
   employe_id: { type: String, required: true, index: true },
   role: { type: String, default: null },
   besoin_soin_id: { type: String, default: null },

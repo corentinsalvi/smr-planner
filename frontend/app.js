@@ -22,6 +22,7 @@
     moisDirection: null,
     directionRefreshInterval: null,
     modeAjoutRdv: false,
+    modeAjoutAtelier: false,
     slotAjoutRdv: null,
     disponibilitesCourantes: null
   };
@@ -157,6 +158,51 @@
     return state.roles[role]?.label || role;
   }
 
+  function estAtelier(creneau) {
+    return creneau?.type === 'ATELIER';
+  }
+
+  function patientsCreneau(creneau) {
+    if (estAtelier(creneau)) {
+      return (creneau.patient_ids || [])
+        .map(id => state.patients.find(p => p.id === id))
+        .filter(Boolean);
+    }
+    const patient = state.patients.find(p => p.id === creneau.patient_id);
+    return patient ? [patient] : [];
+  }
+
+  function libelleCreneauAgenda(creneau, mode) {
+    if (estAtelier(creneau)) {
+      const patients = patientsCreneau(creneau);
+      if (creneau.notes?.trim()) return creneau.notes.trim();
+      if (mode === 'patient') return 'Atelier de groupe';
+      return `Atelier (${patients.length} patient${patients.length > 1 ? 's' : ''})`;
+    }
+    if (creneau.notes && !creneau.patient_id) return creneau.notes;
+    const patient = patientsCreneau(creneau)[0];
+    return patient ? nomComplet(patient) : '—';
+  }
+
+  function sousTitreCreneauAgenda(creneau, mode, employe) {
+    const horaire = `${creneau.heure_debut} – ${creneau.heure_fin}`;
+    if (estAtelier(creneau)) {
+      if (mode === 'patient') {
+        return employe ? `${nomComplet(employe)} · ${horaire}` : horaire;
+      }
+      const noms = patientsCreneau(creneau).map(p => p.prenom).join(', ');
+      return noms || horaire;
+    }
+    if (mode === 'patient' || mode === 'pro') return horaire;
+    if (mode === 'global') return employe ? nomComplet(employe) : labelRole(creneau.role);
+    return labelRole(creneau.role);
+  }
+
+  function creneauConcernePatient(creneau, patientId) {
+    if (estAtelier(creneau)) return (creneau.patient_ids || []).includes(patientId);
+    return creneau.patient_id === patientId;
+  }
+
   function estDirecteur() {
     return CONFIG.DIRECTEUR_ROLES.includes(state.utilisateur?.role);
   }
@@ -236,7 +282,7 @@
       });
       const conformite = calculerConformiteGlobaleSemaine(state.patients, creneauxSemaine);
       const data = await API.getTableauDeBord(state.moisDirection);
-      const { occupation, rh } = data;
+      const { rh } = data;
 
       cont.innerHTML = `
         <section class="direction-carte direction-carte--conformite">
@@ -318,31 +364,6 @@
                 </span>
               </div>
             `).join('')}
-          </div>
-        </section>
-
-        <section class="direction-carte direction-carte--occupation">
-          <header class="direction-carte-entete">
-            <h3 class="direction-carte-titre">Activité du mois</h3>
-            <p class="direction-carte-sous-titre">${data.periode.label}</p>
-          </header>
-          <div class="direction-occupation-grille">
-            <article class="stat-carte stat-carte--direction">
-              <span class="stat-carte-valeur">${occupation.tauxOccupation}%</span>
-              <span class="stat-carte-label">Taux d'occupation</span>
-            </article>
-            <article class="stat-carte stat-carte--direction">
-              <span class="stat-carte-valeur">${formaterHeuresForfait(occupation.heuresSoins)}</span>
-              <span class="stat-carte-label">Heures de soins</span>
-            </article>
-            <article class="stat-carte stat-carte--direction">
-              <span class="stat-carte-valeur">${occupation.seancesPlanifiees}</span>
-              <span class="stat-carte-label">Séances planifiées</span>
-            </article>
-            <article class="stat-carte stat-carte--direction">
-              <span class="stat-carte-valeur">${formaterHeuresForfait(occupation.capaciteHeures)}</span>
-              <span class="stat-carte-label">Capacité disponible</span>
-            </article>
           </div>
         </section>
       `;
@@ -474,7 +495,7 @@
     );
   }
 
-  function estCreneauLibre(date, heure, creneaux, dispos, absences, employeId, options = {}) {
+  function estCreneauLibre(date, heure, creneaux, dispos, absences, employeId) {
     const heureFin = finHeureSlot(heure);
     const occupe = creneaux.some(c =>
       c.date === date && c.heure_debut === heure && c.statut !== 'ANNULE'
@@ -486,22 +507,17 @@
     const jourSemaine = jourSemaineNumero(date);
     if (jourSemaine === 0 || jourSemaine === 6) return false;
 
-    if (!options.modeDirecteur && !plageContientCreneau(dispos, jourSemaine, heure, heureFin)) {
-      return false;
-    }
-
-    return true;
+    return plageContientCreneau(dispos, jourSemaine, heure, heureFin);
   }
 
   function calculerCreneauxLibres(creneaux, dispos, absences, employeId) {
     const libres = new Set();
     const jours = joursDeLaSemaine(state.semaineLundi);
-    const modeDirecteur = estDirecteur();
 
     lignesAgenda(creneaux).forEach(ligne => {
       if (ligne.type !== 'seance') return;
       jours.forEach(date => {
-        if (estCreneauLibre(date, ligne.heure, creneaux, dispos, absences, employeId, { modeDirecteur })) {
+        if (estCreneauLibre(date, ligne.heure, creneaux, dispos, absences, employeId)) {
           libres.add(`${date}|${ligne.heure}`);
         }
       });
@@ -510,9 +526,35 @@
     return libres;
   }
 
+  function modeAjoutAgendaActif() {
+    return state.modeAjoutRdv || state.modeAjoutAtelier;
+  }
+
   function basculerModeAjoutRdv(actif) {
-    state.modeAjoutRdv = actif ?? !state.modeAjoutRdv;
+    if (actif === false) {
+      state.modeAjoutRdv = false;
+      state.modeAjoutAtelier = false;
+    } else {
+      state.modeAjoutAtelier = false;
+      state.modeAjoutRdv = actif ?? !state.modeAjoutRdv;
+    }
+    mettreAJourUiModeAjout();
+  }
+
+  function basculerModeAjoutAtelier(actif) {
+    if (actif === false) {
+      state.modeAjoutAtelier = false;
+    } else {
+      state.modeAjoutRdv = false;
+      state.modeAjoutAtelier = actif ?? !state.modeAjoutAtelier;
+    }
+    mettreAJourUiModeAjout();
+  }
+
+  function mettreAJourUiModeAjout() {
+    const actif = modeAjoutAgendaActif();
     const btnPro = $('btn-ajout-rdv-manuel');
+    const btnAtelier = $('btn-ajout-atelier');
     const btnDir = $('btn-ajout-creneau-directeur');
     const bandeau = $('bandeau-ajout-rdv');
     const bandeauTexte = $('bandeau-ajout-rdv-texte');
@@ -523,20 +565,29 @@
       btnPro.setAttribute('aria-pressed', state.modeAjoutRdv ? 'true' : 'false');
       btnPro.textContent = state.modeAjoutRdv ? 'Mode ajout actif' : 'Ajouter un rendez-vous';
     }
+    if (btnAtelier && !estDirecteur()) {
+      btnAtelier.classList.toggle('is-active', state.modeAjoutAtelier);
+      btnAtelier.setAttribute('aria-pressed', state.modeAjoutAtelier ? 'true' : 'false');
+      btnAtelier.textContent = state.modeAjoutAtelier ? 'Mode atelier actif' : 'Atelier de groupe';
+    }
     if (btnDir && estDirecteur()) {
       btnDir.classList.toggle('is-active', state.modeAjoutRdv);
       btnDir.setAttribute('aria-pressed', state.modeAjoutRdv ? 'true' : 'false');
       btnDir.textContent = state.modeAjoutRdv ? 'Mode ajout actif' : 'Ajouter un créneau';
     }
-    if (bandeau) bandeau.hidden = !state.modeAjoutRdv;
+    if (bandeau) bandeau.hidden = !actif;
     if (bandeauTexte) {
-      bandeauTexte.innerHTML = estDirecteur()
-        ? 'Mode ajout actif — cliquez sur un <strong>créneau vert</strong> pour saisir une description.'
-        : 'Mode ajout actif — cliquez sur un <strong>créneau vert</strong> pour planifier un rendez-vous.';
+      if (state.modeAjoutAtelier) {
+        bandeauTexte.innerHTML = 'Mode atelier actif — cliquez sur un <strong>créneau vert</strong> pour créer un atelier de groupe.';
+      } else {
+        bandeauTexte.innerHTML = estDirecteur()
+          ? 'Mode ajout actif — cliquez sur un <strong>créneau vert</strong> pour saisir une description.'
+          : 'Mode ajout actif — cliquez sur un <strong>créneau vert</strong> pour planifier un rendez-vous.';
+      }
     }
-    if (grille) grille.classList.toggle('grille-agenda--mode-ajout', state.modeAjoutRdv);
+    if (grille) grille.classList.toggle('grille-agenda--mode-ajout', actif);
 
-    if (!state.modeAjoutRdv) state.slotAjoutRdv = null;
+    if (!actif) state.slotAjoutRdv = null;
     renderMonAgenda();
   }
 
@@ -562,6 +613,63 @@
       `${formatDateCourte(date)} · ${heure} – ${state.slotAjoutRdv.heure_fin}`;
 
     ouvrirModale('modale-ajout-rdv-fond');
+  }
+
+  function ouvrirModaleAjoutAtelier(date, heure) {
+    state.slotAjoutRdv = { date, heure, heure_fin: finHeureSlot(heure) };
+    afficherErreur('ajout-atelier-erreur', null);
+
+    const patientsActifs = state.patients.filter(p => p.statut === 'ACTIF');
+    const liste = $('ajout-atelier-patients');
+    liste.innerHTML = patientsActifs.length
+      ? patientsActifs.map(p => `
+          <label class="atelier-patient-option">
+            <input type="checkbox" name="atelier-patient" value="${p.id}">
+            <span>${nomComplet(p)}</span>
+          </label>
+        `).join('')
+      : '<p class="atelier-patients-vide">Aucun patient actif disponible.</p>';
+
+    $('ajout-atelier-libelle').value = '';
+    $('ajout-atelier-creneau-info').textContent =
+      `${formatDateCourte(date)} · ${heure} – ${state.slotAjoutRdv.heure_fin}`;
+
+    ouvrirModale('modale-ajout-atelier-fond');
+  }
+
+  async function enregistrerAtelier(e) {
+    e.preventDefault();
+    if (!state.slotAjoutRdv || !state.utilisateur) return;
+
+    const patientIds = [...document.querySelectorAll('input[name="atelier-patient"]:checked')]
+      .map(el => el.value);
+
+    if (patientIds.length < 2) {
+      afficherErreur('ajout-atelier-erreur', 'Sélectionnez au moins 2 patients.');
+      return;
+    }
+
+    const payload = {
+      type: 'ATELIER',
+      patient_ids: patientIds,
+      employe_id: state.utilisateur.id,
+      role: state.utilisateur.role,
+      date: state.slotAjoutRdv.date,
+      heure_debut: state.slotAjoutRdv.heure,
+      heure_fin: state.slotAjoutRdv.heure_fin,
+      notes: $('ajout-atelier-libelle').value.trim()
+    };
+
+    try {
+      await API.createCreneau(payload);
+      fermerModale('modale-ajout-atelier-fond');
+      toast('Atelier de groupe créé.');
+      basculerModeAjoutAtelier(false);
+      await renderMonAgenda();
+      await rafraichirScoresConformite();
+    } catch (err) {
+      afficherErreur('ajout-atelier-erreur', err.message);
+    }
   }
 
   async function enregistrerRdvManuel(e) {
@@ -609,17 +717,13 @@
     const bandeauDir = $('bandeau-directeur-agenda');
     const btnGen = $('btn-lancer-generation');
     const btnPro = $('btn-ajout-rdv-manuel');
-    const ongletHoraires = document.querySelector('[data-espace-onglet="horaires"]');
+    const btnAtelier = $('btn-ajout-atelier');
 
     if (bandeauGen) bandeauGen.hidden = directeur;
     if (bandeauDir) bandeauDir.hidden = !directeur;
     if (btnGen) btnGen.hidden = directeur;
     if (btnPro) btnPro.hidden = directeur;
-    if (ongletHoraires) ongletHoraires.hidden = directeur;
-
-    if (directeur && state.espaceOnglet === 'horaires') {
-      activerEspaceOnglet('agenda');
-    }
+    if (btnAtelier) btnAtelier.hidden = directeur;
   }
 
   async function chargerAbsencesAgenda(employeId) {
@@ -677,33 +781,36 @@
         const patient = state.patients.find(p => p.id === creneau.patient_id);
         const employe = state.employes.find(e => e.id === creneau.employe_id);
         let titre, sousTitre;
-        if (options.modePatient) {
-          titre = employe ? nomComplet(employe) : labelRole(creneau.role);
-          sousTitre = `${creneau.heure_debut} – ${creneau.heure_fin}`;
-        } else if (options.modePro) {
-          titre = patient ? nomComplet(patient) : '—';
-          sousTitre = `${creneau.heure_debut} – ${creneau.heure_fin}`;
-        } else if (options.modeGlobal) {
-          titre = patient ? nomComplet(patient) : '—';
-          sousTitre = employe ? nomComplet(employe) : labelRole(creneau.role);
-        } else {
-          if (creneau.notes && !patient) {
-            titre = creneau.notes;
-            sousTitre = `${creneau.heure_debut} – ${creneau.heure_fin}`;
-          } else {
-            titre = patient ? nomComplet(patient) : '—';
-            sousTitre = labelRole(creneau.role);
-          }
+        const modeAffichage = options.modePatient ? 'patient'
+          : options.modePro ? 'pro'
+          : options.modeGlobal ? 'global'
+          : 'perso';
+
+        titre = libelleCreneauAgenda(creneau, modeAffichage);
+        sousTitre = sousTitreCreneauAgenda(creneau, modeAffichage, employe);
+
+        if (!estAtelier(creneau) && options.modePro && patient) {
+          titre = nomComplet(patient);
+        } else if (!estAtelier(creneau) && options.modeGlobal && patient) {
+          titre = nomComplet(patient);
+        } else if (!estAtelier(creneau) && options.modePatient && employe) {
+          titre = nomComplet(employe);
         }
         const couleur = couleurRole(creneau.role);
+        const classeAtelier = estAtelier(creneau) ? ' creneau-carte--atelier' : '';
         const classeVariante = options.modeGlobal ? ' creneau-carte--global'
           : options.modePatient ? ' creneau-carte--patient'
           : options.modePro ? ' creneau-carte--pro-global'
           : ' creneau-carte--perso';
 
         let corpsCarte;
+        const badgeAtelier = estAtelier(creneau)
+          ? '<span class="creneau-badge-atelier">Atelier</span>'
+          : '';
+
         if (options.modePro) {
           corpsCarte = `
+            ${badgeAtelier}
             <span class="creneau-badge-role" style="background:${couleur}18;color:${couleur}">${labelRole(creneau.role)}</span>
             <span class="creneau-titre">${titre}</span>
             <span class="creneau-sous-titre creneau-horaire">${sousTitre}</span>`;
@@ -726,6 +833,7 @@
         } else {
           const titreEchappe = titre.replace(/"/g, '&quot;');
           corpsCarte = `
+            ${badgeAtelier}
             <div class="creneau-ligne-titre">
               <span class="creneau-pastille" style="background:${couleur}"></span>
               <span class="creneau-titre" title="${titreEchappe}">${titre}</span>
@@ -734,7 +842,7 @@
         }
 
         return `<td>
-          <div class="creneau-carte${classeVariante} ${creneau.statut === 'ANNULE' ? 'statut-annule' : ''}"
+          <div class="creneau-carte${classeVariante}${classeAtelier} ${creneau.statut === 'ANNULE' ? 'statut-annule' : ''}"
                data-creneau-id="${creneau.id}"
                style="background:${couleur}14;border-color:${couleur}33;border-left-color:${couleur}">
             ${corpsCarte}
@@ -761,7 +869,11 @@
 
     cont.querySelectorAll('.cellule-libre').forEach(el => {
       el.addEventListener('click', () => {
-        ouvrirModaleAjoutRdv(el.dataset.date, el.dataset.heure);
+        if (options.modeAjoutAtelier) {
+          ouvrirModaleAjoutAtelier(el.dataset.date, el.dataset.heure);
+        } else {
+          ouvrirModaleAjoutRdv(el.dataset.date, el.dataset.heure);
+        }
       });
     });
   }
@@ -770,7 +882,11 @@
     const cont = $('agenda-global-stats');
     if (!cont) return;
 
-    const patients = new Set(creneaux.map(c => c.patient_id));
+    const patients = new Set();
+    creneaux.forEach(c => {
+      if (estAtelier(c)) (c.patient_ids || []).forEach(id => patients.add(id));
+      else if (c.patient_id) patients.add(c.patient_id);
+    });
     const pros = new Set(creneaux.map(c => c.employe_id));
     const roles = new Set(creneaux.map(c => c.role));
 
@@ -1116,31 +1232,28 @@
   async function renderMonAgenda() {
     renderNavigationSemaine('nav-semaine-mon-agenda', renderMonAgenda);
     const employeId = state.utilisateur.id;
-    const directeur = estDirecteur();
 
     const [creneaux, absences, dispos] = await Promise.all([
       chargerCreneaux({ employe_id: employeId }),
       chargerAbsencesAgenda(employeId),
-      directeur
-        ? Promise.resolve([])
-        : (state.disponibilitesCourantes
-          ? Promise.resolve(state.disponibilitesCourantes)
-          : API.getDisponibilites(employeId))
+      state.disponibilitesCourantes
+        ? Promise.resolve(state.disponibilitesCourantes)
+        : API.getDisponibilites(employeId)
     ]);
+    state.disponibilitesCourantes = dispos;
 
-    if (!directeur) state.disponibilitesCourantes = dispos;
-
-    const creneauxLibres = state.modeAjoutRdv
+    const creneauxLibres = modeAjoutAgendaActif()
       ? calculerCreneauxLibres(creneaux, dispos, absences, employeId)
       : null;
 
     const grille = $('grille-mon-agenda');
-    if (grille) grille.classList.toggle('grille-agenda--mode-ajout', state.modeAjoutRdv);
+    if (grille) grille.classList.toggle('grille-agenda--mode-ajout', modeAjoutAgendaActif());
 
     renderGrilleAgenda('grille-mon-agenda', creneaux, {
       absences,
       employeId,
-      modeAjoutRdv: state.modeAjoutRdv,
+      modeAjoutRdv: modeAjoutAgendaActif(),
+      modeAjoutAtelier: state.modeAjoutAtelier,
       creneauxLibres
     });
   }
@@ -1161,7 +1274,7 @@
       horaires: async () => {
         state.disponibilitesCourantes = await API.getDisponibilites(state.utilisateur.id);
         renderEditeurHoraires();
-        if (state.espaceOnglet === 'agenda' && state.modeAjoutRdv) renderMonAgenda();
+        if (state.espaceOnglet === 'agenda' && modeAjoutAgendaActif()) renderMonAgenda();
       },
       absences: renderAbsences
     };
@@ -1844,7 +1957,7 @@
 
     patients.filter(p => p.statut === 'ACTIF').forEach(patient => {
       const besoins = patient.besoins || [];
-      const creneauxPatient = creneauxSemaine.filter(c => c.patient_id === patient.id);
+      const creneauxPatient = creneauxSemaine.filter(c => creneauConcernePatient(c, patient.id));
       const conformite = calculerScoreConformiteForfait(besoins, creneauxPatient);
       if (!conformite.forfaitDefini) return;
 
@@ -2693,12 +2806,23 @@
 
   function ouvrirModaleCreneau(creneau) {
     state.creneauSelectionne = creneau;
-    const patient = state.patients.find(p => p.id === creneau.patient_id);
     const employe = state.employes.find(e => e.id === creneau.employe_id);
+    const patients = patientsCreneau(creneau);
+    const titreModale = estAtelier(creneau) ? 'Atelier de groupe' : 'Détail du rendez-vous';
+    $('modale-creneau-titre').textContent = titreModale;
+
+    const blocPatients = estAtelier(creneau)
+      ? `<div class="detail-creneau-ligne detail-creneau-ligne--patients">
+           <span>Participants</span>
+           <span>${patients.map(p => nomComplet(p)).join(', ') || '—'}</span>
+         </div>`
+      : (patients[0]
+        ? `<div class="detail-creneau-ligne"><span>Patient</span><span>${nomComplet(patients[0])}</span></div>`
+        : '');
 
     $('modale-creneau-corps').innerHTML = `
-      ${creneau.notes ? `<div class="detail-creneau-ligne"><span>Description</span><span>${creneau.notes}</span></div>` : ''}
-      ${patient ? `<div class="detail-creneau-ligne"><span>Patient</span><span>${nomComplet(patient)}</span></div>` : ''}
+      ${creneau.notes ? `<div class="detail-creneau-ligne"><span>${estAtelier(creneau) ? 'Nom de l\'atelier' : 'Description'}</span><span>${creneau.notes}</span></div>` : ''}
+      ${blocPatients}
       <div class="detail-creneau-ligne"><span>Professionnel</span><span>${employe ? nomComplet(employe) : '—'}</span></div>
       <div class="detail-creneau-ligne"><span>Métier</span><span>${labelRole(creneau.role)}</span></div>
       <div class="detail-creneau-ligne"><span>Date</span><span>${formatDateCourte(creneau.date)}</span></div>
@@ -2840,6 +2964,7 @@
   async function initSession() {
     state.semaineLundi = lundiDe();
     state.modeAjoutRdv = false;
+    state.modeAjoutAtelier = false;
     state.disponibilitesCourantes = null;
     await chargerDonnees();
     await rafraichirPatients();
@@ -2876,6 +3001,7 @@
       API.setToken(null);
       state.utilisateur = null;
       state.modeAjoutRdv = false;
+      state.modeAjoutAtelier = false;
       state.disponibilitesCourantes = null;
       afficherLogin();
     });
@@ -3014,16 +3140,18 @@
         conf.hidden = false;
         setTimeout(() => { conf.hidden = true; }, 2500);
         toast('Horaires enregistrés.');
-        if (state.espaceOnglet === 'agenda' && state.modeAjoutRdv) await renderMonAgenda();
+        if (state.espaceOnglet === 'agenda' && modeAjoutAgendaActif()) await renderMonAgenda();
       } catch (err) {
         toast(err.message, 'erreur');
       }
     });
 
     $('btn-ajout-rdv-manuel')?.addEventListener('click', () => basculerModeAjoutRdv());
+    $('btn-ajout-atelier')?.addEventListener('click', () => basculerModeAjoutAtelier());
     $('btn-ajout-creneau-directeur')?.addEventListener('click', () => basculerModeAjoutRdv());
     $('btn-quitter-ajout-rdv')?.addEventListener('click', () => basculerModeAjoutRdv(false));
     $('form-ajout-rdv')?.addEventListener('submit', enregistrerRdvManuel);
+    $('form-ajout-atelier')?.addEventListener('submit', enregistrerAtelier);
 
     $('btn-lancer-generation').addEventListener('click', async () => {
       const btn = $('btn-lancer-generation');

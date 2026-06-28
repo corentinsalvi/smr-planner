@@ -139,6 +139,9 @@
             <button type="button" class="bouton bouton-secondaire" id="btn-ajout-rdv-manuel" aria-pressed="false">
               Ajouter un rendez-vous
             </button>
+            <button type="button" class="bouton bouton-secondaire" id="btn-ajout-atelier" aria-pressed="false">
+              Atelier de groupe
+            </button>
             <button class="bouton bouton-principal" id="btn-lancer-generation">
               <span class="btn-texte-generation">Générer mon agenda</span>
               <span class="btn-spinner" id="spinner-generation" hidden></span>
@@ -499,6 +502,32 @@
       <div class="modale-pied">
         <button type="button" class="bouton bouton-discret" data-fermer-modale="modale-ajout-rdv-fond">Annuler</button>
         <button type="submit" class="bouton bouton-principal">Confirmer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modale : atelier de groupe -->
+<div class="modale-fond" id="modale-ajout-atelier-fond" hidden>
+  <div class="modale modale--petite" role="dialog" aria-modal="true" aria-labelledby="modale-ajout-atelier-titre">
+    <div class="modale-entete">
+      <h3 id="modale-ajout-atelier-titre">Créer un atelier de groupe</h3>
+      <button class="modale-fermer" data-fermer-modale="modale-ajout-atelier-fond" aria-label="Fermer">×</button>
+    </div>
+    <form id="form-ajout-atelier" class="modale-corps">
+      <p class="ajout-rdv-info" id="ajout-atelier-creneau-info"></p>
+      <div class="champ">
+        <label class="champ-label" for="ajout-atelier-libelle">Nom de l'atelier (optionnel)</label>
+        <input type="text" id="ajout-atelier-libelle" maxlength="100" placeholder="Ex. Atelier motricité fine">
+      </div>
+      <fieldset class="atelier-patients-groupe">
+        <legend class="champ-label">Patients participants (minimum 2)</legend>
+        <div id="ajout-atelier-patients" class="liste-patients-atelier"></div>
+      </fieldset>
+      <p class="champ-erreur" id="ajout-atelier-erreur" hidden></p>
+      <div class="modale-pied">
+        <button type="button" class="bouton bouton-discret" data-fermer-modale="modale-ajout-atelier-fond">Annuler</button>
+        <button type="submit" class="bouton bouton-principal">Créer l'atelier</button>
       </div>
     </form>
   </div>

@@ -68,7 +68,6 @@ async function seed() {
 
   const disponibilites = [];
   for (const employe of employes) {
-    if (employe.role === 'DIRECTEUR') continue;
     for (let jour = 1; jour <= 5; jour++) {
       disponibilites.push({
         id: uuidv4(),

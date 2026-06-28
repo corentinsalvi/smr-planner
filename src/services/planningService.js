@@ -16,12 +16,13 @@ const {
 } = require('../utils/dateUtils');
 const { REGLES_PLANNING } = require('../constants');
 const { estProAbsent } = require('../utils/absenceUtils');
+const { creneauConcernePatient } = require('../utils/creneauUtils');
 
 const INTENSIFS = new Set(REGLES_PLANNING.ROLES_INTENSIFS);
 
 function rdvPatientJour(creneaux, patientId, date) {
   return creneaux.filter(
-    c => c.patient_id === patientId && c.date === date && c.statut !== 'ANNULE'
+    c => creneauConcernePatient(c, patientId) && c.date === date && c.statut !== 'ANNULE'
   );
 }
 
@@ -41,7 +42,7 @@ function jourAdjacentSpecialite(creneaux, patientId, role, date, jours) {
   const idx = jours.findIndex(j => j.date === date);
   if (idx < 0) return false;
   return creneaux.some(c => {
-    if (c.patient_id !== patientId || c.role !== role || c.statut === 'ANNULE') return false;
+    if (!creneauConcernePatient(c, patientId) || c.role !== role || c.statut === 'ANNULE') return false;
     const i = jours.findIndex(j => j.date === c.date);
     return i >= 0 && Math.abs(i - idx) === 1;
   });
@@ -56,7 +57,7 @@ function distanceJours(dateA, dateB, jours) {
 
 function distanceMinSpecialite(creneaux, patientId, role, date, jours) {
   const autres = creneaux.filter(
-    c => c.patient_id === patientId && c.role === role && c.date !== date && c.statut !== 'ANNULE'
+    c => creneauConcernePatient(c, patientId) && c.role === role && c.date !== date && c.statut !== 'ANNULE'
   );
   if (!autres.length) return jours.length;
   return Math.min(...autres.map(c => distanceJours(date, c.date, jours)));
@@ -190,7 +191,7 @@ async function genererPlanningHebdomadaire(lundi, options = {}) {
       }
 
       const dejaPlacees = creneauxExistants.filter(c =>
-        c.patient_id === patient.id &&
+        creneauConcernePatient(c, patient.id) &&
         c.role === besoin.role &&
         datesSemaine.has(c.date)
       ).length;
@@ -247,7 +248,7 @@ async function genererPlanningHebdomadaire(lundi, options = {}) {
               seChevauchent(c.heure_debut, c.heure_fin, candidat.heure_debut, candidat.heure_fin)
             );
             const conflitPatient = tousLesCreneaux.some(c =>
-              c.patient_id === candidat.patient_id &&
+              creneauConcernePatient(c, candidat.patient_id) &&
               c.date === candidat.date &&
               c.statut !== 'ANNULE' &&
               seChevauchent(c.heure_debut, c.heure_fin, candidat.heure_debut, candidat.heure_fin)

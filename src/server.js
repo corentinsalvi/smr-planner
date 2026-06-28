@@ -55,6 +55,11 @@ app.use(cors());
 app.use(express.json({ limit: '100kb' }));
 app.use(mongoSanitize({ replaceWith: '_' }));
 app.use(sanitizeInput);
+
+app.get('/api/sante', (req, res) => {
+  res.json({ statut: 'OK', heure: new Date().toISOString() });
+});
+
 app.use('/api', limiteurGlobal);
 
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
@@ -68,10 +73,6 @@ app.use('/api/creneaux', authMiddleware, creneauRoutes);
 app.use('/api/absences', authMiddleware, absenceRoutes);
 app.use('/api/rapports', authMiddleware, rapportRoutes);
 app.use('/api/calendar/sync', authMiddleware, creerRoutesGestion());
-
-app.get('/api/sante', (req, res) => {
-  res.json({ statut: 'OK', heure: new Date().toISOString() });
-});
 
 app.use((err, req, res, next) => {
   console.error('Erreur non gérée:', err);
